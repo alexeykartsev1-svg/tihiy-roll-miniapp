@@ -15,8 +15,10 @@ from urllib.parse import parse_qsl
 
 import httpx
 from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
@@ -58,19 +60,80 @@ app.add_middleware(
 
 
 class OrderItem(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    # Normalize common client formats before validation; prices are always read from MENU.
+    model_config = ConfigDict(extra="ignore")
     id: str = Field(min_length=1, max_length=40)
     qty: int = Field(ge=1, le=99)
 
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_item(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        row = dict(value)
+        if "id" not in row:
+            for alias in ("product_id", "productId", "key"):
+                if alias in row:
+                    row["id"] = row[alias]
+                    break
+        if "qty" not in row:
+            for alias in ("quantity", "count"):
+                if alias in row:
+                    row["qty"] = row[alias]
+                    break
+        item_id = row.get("id")
+        # IDs used in earlier versions of the Mini App.
+        item_id = {"p": "philadelphia", "l": "lava", "c": "warm_crab", "s": "warm_salmon"}.get(item_id, item_id)
+        return {"id": item_id, "qty": row.get("qty")}
+
 
 class OrderPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    # Accept common field spellings from previously published Mini App builds.
+    model_config = ConfigDict(extra="ignore")
     init_data: str = Field(min_length=1, max_length=10000)
     client_order_id: str = Field(min_length=8, max_length=80)
     name: str = Field(min_length=1, max_length=100)
     phone: str = Field(min_length=5, max_length=50)
     time: str = Field(min_length=2, max_length=100)
     items: list[OrderItem] = Field(min_length=1, max_length=20)
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_legacy_payload(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        data = dict(value)
+        # Some earlier builds wrapped the form fields inside an `order` object.
+        if isinstance(data.get("order"), dict):
+            wrapped = dict(data.pop("order"))
+            wrapped.update(data)
+            data = wrapped
+        aliases = {
+            "init_data": ("init_data", "initData", "telegram_init_data", "telegramInitData"),
+            "client_order_id": ("client_order_id", "clientOrderId", "order_id", "orderId", "idempotency_key"),
+            "name": ("name", "customer_name", "customerName"),
+            "phone": ("phone", "phone_number", "phoneNumber", "telephone"),
+            "time": ("time", "pickup_time", "pickupTime", "desired_time"),
+            "items": ("items", "cart", "order_items", "orderItems"),
+        }
+        normalized: dict[str, Any] = {}
+        for field, keys in aliases.items():
+            for key in keys:
+                if key in data and data[key] is not None:
+                    normalized[field] = data[key]
+                    break
+        # Some old carts were serialized as {product_id: quantity}; normalize to a list.
+        if isinstance(normalized.get("items"), dict):
+            normalized["items"] = [
+                {"id": item_id, "qty": quantity}
+                for item_id, quantity in normalized["items"].items()
+                if quantity is not None
+            ]
+        # Old site builds may omit an idempotency key. Generate one server-side;
+        # this does not weaken Telegram initData signature verification.
+        if not normalized.get("client_order_id"):
+            normalized["client_order_id"] = str(uuid.uuid4())
+        return normalized
 
     @field_validator("name", "phone", "time")
     @classmethod
@@ -184,6 +247,33 @@ def prune_memory(now: float) -> None:
             timestamps.popleft()
         if not timestamps:
             _recent_orders.pop(user_id, None)
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    # Log only field paths and validation messages, never log initData, phone, or customer details.
+    safe_errors = [
+        {"loc": [str(part) for part in error.get("loc", ())],
+         "msg": str(error.get("msg", "Некорректное значение")),
+         "type": str(error.get("type", "validation_error"))}
+        for error in exc.errors()
+    ]
+    body_keys: list[str] = []
+    try:
+        body = await request.json()
+        if isinstance(body, dict):
+            body_keys = sorted(str(key) for key in body.keys())
+    except Exception:
+        pass
+    logger.warning("Request validation failed path=%s body_keys=%s errors=%s", request.url.path, body_keys, safe_errors)
+    return JSONResponse(
+        status_code=422,
+        content={
+            "ok": False,
+            "detail": safe_errors,
+            "message": "Некоторые поля заказа не распознаны. Обновите магазин и попробуйте ещё раз.",
+        },
+    )
 
 
 @app.get("/health")

@@ -511,7 +511,25 @@ document.getElementById('form').addEventListener('submit', async event => {
     let result = {};
     try { result = await response.json(); } catch (_) { result = {}; }
     if (!response.ok || result.ok !== true) {
-      const message = (result && result.detail) ? String(result.detail) : 'Сервер не подтвердил отправку заказа.';
+      const detail = result && result.detail;
+      let message = (result && result.message) || 'Сервер не подтвердил отправку заказа.';
+      if (typeof detail === 'string' && detail.trim()) {
+        message = detail;
+      } else if (Array.isArray(detail) && detail.length) {
+        const labels = {
+          init_data: 'Не получены данные авторизации Telegram',
+          client_order_id: 'Не удалось создать номер заказа',
+          name: 'Проверь имя', phone: 'Проверь телефон', time: 'Проверь время получения',
+          items: 'Проверь состав заказа', id: 'Неизвестное блюдо', qty: 'Проверь количество блюда'
+        };
+        message = detail.map(error => {
+          const loc = Array.isArray(error.loc) ? error.loc.filter(part => part !== 'body' && part !== 'query').map(String) : [];
+          const field = loc.length ? loc[loc.length - 1] : '';
+          const label = labels[field] || (error.msg ? String(error.msg) : 'Некорректные данные заказа');
+          if (field && labels[field]) return label + (error.msg ? ` (${error.msg})` : '');
+          return label;
+        }).join('. ');
+      }
       throw new Error(message);
     }
 
