@@ -462,11 +462,26 @@ document.getElementById('form').addEventListener('submit', event => {
     tg.ready(); tg.expand();
     const payload = JSON.stringify(order);
     if (payload.length > 4096) { notice.textContent = 'Заказ слишком большой. Уменьши количество позиций.'; notice.classList.add('show'); return; }
-    submit.disabled = true; submit.textContent = 'Отправляем заказ…';
-    tg.sendData(payload); // Telegram delivers the web_app_data update and closes the Mini App.
+    submit.disabled = true;
+    submit.textContent = 'Отправляем заказ…';
+    notice.classList.remove('show');
+    // sendData works only when this Mini App was opened from a Telegram reply-keyboard WebApp button.
+    // Telegram normally closes the Mini App immediately after accepting this call.
+    tg.sendData(payload);
+    window.clearTimeout(window.__tihiySendTimeout);
+    window.__tihiySendTimeout = window.setTimeout(() => {
+      // sendData has no success callback. Never display a fake success state.
+      submit.disabled = false;
+      submit.textContent = 'Подтвердить заказ';
+      notice.textContent = 'Telegram не закрыл магазин после отправки. Проверь чат с ботом: если пришло подтверждение, заказ принят. Если подтверждения нет, открой магазин именно кнопкой «🍣 Открыть магазин» в чате с ботом. Не нажимай повторно, пока не проверишь чат, чтобы не создать дубликат.';
+      notice.classList.add('show');
+    }, 3500);
   } catch (error) {
-    submit.disabled = false; submit.textContent = 'Подтвердить заказ';
-    notice.textContent = 'Не удалось передать заказ. Закрой магазин и открой его заново через кнопку бота.'; notice.classList.add('show');
+    window.clearTimeout(window.__tihiySendTimeout);
+    submit.disabled = false;
+    submit.textContent = 'Подтвердить заказ';
+    notice.textContent = 'Telegram не принял отправку. Закрой магазин и открой его через кнопку «🍣 Открыть магазин» в чате с ботом.';
+    notice.classList.add('show');
     console.error('Mini App sendData error:', error);
   }
 });
