@@ -962,8 +962,16 @@ function renderMenu(filter = activeFilter) {
 }
 
 const SET_PRESETS={solo:[['philadelphia',1],['lava',1]],duo:[['philadelphia',1],['warm_crab',1],['lava',1]],party:[['philadelphia',2],['lava',1],['warm_crab',1],['warm_salmon',1]]};
-function renderSetPrices(){Object.entries({solo:'setSoloPrice',duo:'setDuoPrice',party:'setPartyPrice'}).forEach(([key,id])=>{const el=document.getElementById(id);if(!el)return;const rows=SET_PRESETS[key];const total=rows.reduce((sum,[pid,qty])=>{const p=products.find(x=>x.id===pid);return sum+(p?p.price*qty:0)},0);el.textContent=money(total)})}
-document.addEventListener('click',event=>{const button=event.target.closest('[data-set]');if(!button)return;const rows=SET_PRESETS[button.dataset.set]||[];let added=false;rows.forEach(([id,qty])=>{if(products.some(p=>p.id===id)){cart[id]=Math.min(99,(cart[id]||0)+qty);added=true}});if(added){saveCart();renderMenu(activeFilter);updateCartBar();button.textContent='Добавлено ✓';setTimeout(()=>{button.textContent='Добавить сет'},1400)}});
+function renderSetPrices(){
+  Object.entries({solo:'setSoloPrice',duo:'setDuoPrice',party:'setPartyPrice'}).forEach(([key,id])=>{
+    const el=document.getElementById(id);if(!el)return;
+    const rows=SET_PRESETS[key];const available=rows.every(([pid])=>products.some(p=>p.id===pid));
+    const card=el.closest('.set-card');if(card)card.hidden=!available;
+    const total=rows.reduce((sum,[pid,qty])=>{const p=products.find(x=>x.id===pid);return sum+(p?p.price*qty:0)},0);
+    el.textContent=available?money(total):'Временно недоступен';
+  });
+}
+document.addEventListener('click',event=>{const button=event.target.closest('[data-set]');if(!button)return;const rows=SET_PRESETS[button.dataset.set]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;rows.forEach(([id,qty])=>{cart[id]=Math.min(99,(cart[id]||0)+qty)});saveCart();renderMenu(activeFilter);updateCartBar();button.textContent='Добавлено ✓';setTimeout(()=>{button.textContent='Добавить сет'},1400)});
 function renderCustomSetBuilder(){
   const root=document.getElementById('customSetOptions');if(!root)return;root.replaceChildren();
   products.forEach(product=>{
