@@ -1055,7 +1055,7 @@ document.addEventListener('click',event=>{
  }
 });
 
-document.addEventListener('click',event=>{const button=event.target.closest('[data-set]');if(!button)return;const rows=SET_PRESETS[button.dataset.set]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;rows.forEach(([id,qty])=>{cart[id]=Math.min(99,(cart[id]||0)+qty)});saveCart();renderMenu(activeFilter);updateCartBar();button.textContent='Добавлено ✓';setTimeout(()=>{button.textContent='Добавить сет'},1400)});
+document.addEventListener('click',event=>{const button=event.target.closest('[data-set]');if(!button)return;const key=button.dataset.set;const rows=SET_PRESETS[key]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;rows.forEach(([id,qty])=>{cart[id]=Math.min(99,(cart[id]||0)+qty)});setQuantities[key]=(setQuantities[key]||0)+1;syncSetCount(key);saveCart();renderMenu(activeFilter);updateCartBar();renderCart();button.textContent='Добавлено ✓';setTimeout(()=>{button.textContent='Добавить сет'},1400)});
 function renderCustomSetBuilder(){
   const root=document.getElementById('customSetOptions');if(!root)return;root.replaceChildren();
   products.forEach(product=>{
