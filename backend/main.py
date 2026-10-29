@@ -428,7 +428,7 @@ def init_order_db():
         os.makedirs(folder, exist_ok=True)
     with order_db() as connection:
         connection.execute("""CREATE TABLE IF NOT EXISTS orders (
-            order_id TEXT PRIMARY KEY, created_at TEXT NOT NULL, customer_name TEXT NOT NULL,
+            order_id TEXT PRIMARY KEY, created_at TEXT NOT NULL, telegram_id INTEGER NOT NULL DEFAULT 0, customer_name TEXT NOT NULL,
             phone TEXT NOT NULL, pickup_time TEXT NOT NULL, notes TEXT NOT NULL,
             items_json TEXT NOT NULL, total INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'new'
         )""")
@@ -459,10 +459,20 @@ async def admin_update_order(order_id: str, payload: dict[str, Any], x_telegram_
     if status_value not in VALID_ORDER_STATUSES:
         raise HTTPException(status_code=400, detail="Неизвестный статус заказа.")
     with order_db() as connection:
-        cursor = connection.execute("UPDATE orders SET status=? WHERE order_id=?", (status_value, order_id))
-        if cursor.rowcount == 0:
+        row = connection.execute("SELECT telegram_id,customer_name FROM orders WHERE order_id=?", (order_id,)).fetchone()
+        if row is None:
             raise HTTPException(status_code=404, detail="Заказ не найден.")
-    return {"ok": True, "order_id": order_id, "status": status_value}
+        connection.execute("UPDATE orders SET status=? WHERE order_id=?", (status_value, order_id))
+        customer_telegram_id = int(row["telegram_id"] or 0)
+    # Telegram only permits proactive messages when the customer has started the bot.
+    notify_text = {"accepted":"Заказ принят! Скоро начнём готовить 🍣","preparing":"Ваш заказ уже готовится 👨‍🍳","ready":"Ваш заказ готов! Можно забирать 📦","completed":"Спасибо за заказ! Будем рады видеть вас снова ❤️","cancelled":"К сожалению, заказ отменён. Если это ошибка, свяжитесь с владельцем магазина."}.get(status_value)
+    if BOT_TOKEN and customer_telegram_id and notify_text:
+        try:
+            async with httpx.AsyncClient(timeout=8.0) as client:
+                await client.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", json={"chat_id":customer_telegram_id,"text":f"🍣 Тихий ролл · заказ #{order_id}\n\n{notify_text}"})
+        except httpx.HTTPError:
+            logger.warning("Customer status notification failed for order %s", order_id)
+    return {"ok": True, "order_id": order_id, "status": status_value, "customer_notified": bool(BOT_TOKEN and customer_telegram_id)}
 
 @app.get("/api/admin/analytics")
 async def admin_analytics(x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
@@ -577,8 +587,8 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
 
         with order_db() as connection:
             connection.execute(
-                "INSERT OR IGNORE INTO orders (order_id,created_at,customer_name,phone,pickup_time,notes,items_json,total,status) VALUES (?,?,?,?,?,?,?,?,?)",
-                (order_code, datetime.now().isoformat(timespec="seconds"), payload.name, payload.phone,
+                "INSERT OR IGNORE INTO orders (order_id,created_at,telegram_id,customer_name,phone,pickup_time,notes,items_json,total,status) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                (order_code, datetime.now().isoformat(timespec="seconds"), user_id, payload.name, payload.phone,
                  payload.time, payload.notes, json.dumps(items, ensure_ascii=False), total, "new")
             )
 
