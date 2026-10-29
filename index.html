@@ -1006,7 +1006,7 @@ function renderCart() {
     items.append(wrap);
   }
   const history=readOrderHistory();
-  if(history.length){const prev=history[0];const box=document.createElement('section');box.className='order-history';const h=document.createElement('h3');h.textContent='Заказывали раньше?';const detail=document.createElement('p');detail.className='field-hint';detail.textContent=prev.summary+' · '+money(prev.total);const repeat=document.createElement('button');repeat.type='button';repeat.className='repeat-order';repeat.textContent='Повторить прошлый заказ';repeat.addEventListener('click',()=>{cart={};prev.items.forEach(item=>{if(products.some(p=>p.id===item.id))cart[item.id]=Math.min(99,item.qty)});saveCart();renderMenu(activeFilter);updateCartBar();renderCart()});box.append(h,detail,repeat);items.append(box)}
+  if(history.length){const prev=history[0];const box=document.createElement('section');box.className='order-history';const h=document.createElement('h3');h.textContent='Заказывали раньше?';const detail=document.createElement('p');detail.className='field-hint';detail.textContent=prev.summary+' · '+money(prev.total);const repeat=document.createElement('button');repeat.type='button';repeat.className='repeat-order';repeat.textContent='Повторить прошлый заказ';repeat.addEventListener('click',()=>{Object.keys(cart).forEach(key=>delete cart[key]);prev.items.forEach(item=>{if(products.some(p=>p.id===item.id))cart[item.id]=Math.min(99,item.qty)});saveCart();renderMenu(activeFilter);updateCartBar();renderCart()});box.append(h,detail,repeat);items.append(box)}
   form.hidden = false;
 }
 function openCart() {
