@@ -592,8 +592,7 @@ DEFAULT_SITE_CONTENT = {
         {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":""},
         {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":""},
         {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":""},
-        {"id":"newyear","description":"Праздничное сочетание Филадельфии, Лавы и тёплых роллов.","image":""}
-    ],
+            ],
     "promo_title":"Закажи к удобному времени",
     "promo_text":"Выбирай блюда заранее — мы приготовим заказ к согласованному времени.",
     "promo_button":"Перейти к меню",
@@ -662,7 +661,7 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
         current["slides"] = clean
     if "sets" in payload:
         sets = payload["sets"]
-        allowed_set_ids = {"solo", "duo", "party", "newyear"}
+        allowed_set_ids = {"solo", "duo", "party"}
         if not isinstance(sets, list) or len(sets) > 4:
             raise HTTPException(status_code=400, detail="Можно настроить не более 4 готовых сетов.")
         clean_sets = []

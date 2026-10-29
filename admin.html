@@ -127,7 +127,6 @@ function renderSetContentEditor(){
   {id:'solo',title:'Сет «На одного»',description:'Филадельфия и Лава — для уютного ужина.',image:'./assets/set-solo.webp'},
   {id:'duo',title:'Сет «Вечер вдвоём»',description:'Филадельфия, Тёплый краб и Лава — поделиться вкусом.',image:'./assets/set-duo.webp'},
   {id:'party',title:'Сет «Компания»',description:'Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp'},
-  {id:'newyear',title:'Новогодний сет',description:'Праздничное сочетание Филадельфии, Лавы и тёплых роллов.',image:'./assets/set-party.webp'}
  ];
  const savedSets=Array.isArray(siteContent.sets)?siteContent.sets:[];
  root.replaceChildren();siteSetPhotos={};
@@ -162,7 +161,7 @@ $('saveContent').addEventListener('click',async()=>{
  try{
   const payload={hero_title:$('heroTitle').value.trim(),hero_subtitle:$('heroSubtitle').value.trim(),hero_button:$('heroButton').value.trim(),promo_title:$('promoTitle').value.trim(),promo_text:$('promoText').value.trim(),promo_button:$('promoButton').value.trim(),promo_link:$('promoLink').value.trim(),slides:[],sets:[]};
   document.querySelectorAll('#slideEditor [data-slide]').forEach(el=>{const i=Number(el.dataset.slide);payload.slides[i]=payload.slides[i]||{title:'',accent:'',desc:'',image:'',button:'',active:true};payload.slides[i][el.dataset.key]=el.dataset.key==='active'?el.checked:el.value.trim()});
-  payload.sets=['solo','duo','party','newyear'].map(id=>{
+  payload.sets=['solo','duo','party'].map(id=>{
    const description=document.querySelector('[data-set-field="'+id+'"]');
    const url=document.querySelector('[data-set-url="'+id+'"]');
    return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():'')};
