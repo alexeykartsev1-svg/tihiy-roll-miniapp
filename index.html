@@ -520,6 +520,33 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 .card-actions { justify-content: center !important; }
 .card-actions .premium-qty { flex: 1 1 100%; max-width: 100%; }
 
+
+/* Final mobile polish: one-line phone banner and breathing room for form hints */
+.phone-banner {
+  grid-template-columns: 42px auto minmax(0, 1fr) !important;
+  gap: 10px !important;
+  min-height: 76px;
+  padding: 12px 14px !important;
+}
+.phone-label { white-space: nowrap; line-height: 1.2; }
+.phone-label br { display: none; }
+.phone-number { white-space: nowrap; min-width: 0; font-size: clamp(14px, 3.6vw, 22px); letter-spacing: .01em; }
+.phone-arrow { display: none; }
+#form .field-hint {
+  margin: 9px 0 16px !important;
+  padding: 0 2px;
+  line-height: 1.5 !important;
+}
+#phoneHint { margin-top: 9px !important; margin-bottom: 18px !important; }
+#form input + .field-hint { margin-top: 9px !important; }
+#form [name="delivery_address"] + .field-hint { margin-top: 9px !important; margin-bottom: 18px !important; }
+@media (max-width: 390px) {
+  .phone-banner { grid-template-columns: 32px auto minmax(0,1fr) !important; gap: 7px !important; padding: 10px !important; }
+  .phone-icon { width: 32px; height: 32px; display:grid; place-items:center; font-size:20px; }
+  .phone-label { font-size: 11px; }
+  .phone-number { font-size: clamp(12px, 3.3vw, 15px); letter-spacing: 0; }
+}
+
 </style>
 </head>
 <body>
@@ -726,6 +753,30 @@ const products = [
   const hero=document.querySelector('.hero-slider');
   hero.addEventListener('mouseenter',()=>{if(timer)clearInterval(timer);});
   hero.addEventListener('mouseleave',restart);
+
+  // Touch swipe support; existing arrows and dots remain available.
+  let touchStartX = 0, touchStartY = 0, touchStartAt = 0;
+  hero.addEventListener('touchstart', (event) => {
+    if (!event.changedTouches || !event.changedTouches.length) return;
+    const touch = event.changedTouches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchStartAt = Date.now();
+    if (timer) clearInterval(timer);
+  }, {passive:true});
+  hero.addEventListener('touchend', (event) => {
+    if (!event.changedTouches || !event.changedTouches.length || !touchStartAt) return;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    const elapsed = Date.now() - touchStartAt;
+    touchStartAt = 0;
+    if (Math.abs(dx) >= 45 && Math.abs(dx) > Math.abs(dy) * 1.25 && elapsed < 1000) {
+      show(active + (dx < 0 ? 1 : -1));
+    }
+    restart();
+  }, {passive:true});
+  hero.addEventListener('touchcancel', () => { touchStartAt = 0; restart(); }, {passive:true});
   show(0); restart();
 })();
 
