@@ -406,6 +406,115 @@ textarea { min-height:86px; resize:vertical; line-height:1.45; }
   .premium-qty button { width:27px;height:27px;flex-basis:27px; }
 }
 
+
+/* Design refinement: calmer hierarchy, readable mobile text, consistent controls */
+:root {
+  --gold: #e2b765;
+  --gold-light: #f3d79e;
+  --gold-line: rgba(226,183,101,.34);
+  --radius: 18px;
+}
+.app { width:min(1320px, calc(100% - 40px)); }
+.topbar { min-height:76px; }
+.quick-nav { gap:8px; padding:14px 0 4px; }
+.quick-nav a,.quick-nav button { min-height:40px; padding:10px 14px; font-size:13px; }
+.hero.hero-slider { min-height:390px; }
+.hero-slider .hero-copy { max-width:440px; }
+.hero-slider h1 { font-size:clamp(40px,4.2vw,60px); line-height:.98; letter-spacing:-1.5px; }
+.hero-slider .hero-copy p { font-size:15px; line-height:1.55; max-width:340px; }
+.section { margin-top:28px; }
+.section-heading { margin-bottom:16px; }
+.section-heading h2 { font-size:clamp(22px,2.2vw,30px); }
+.section-note { font-size:12px; }
+.grid { gap:16px; }
+.card { border-color:rgba(211,164,74,.48); border-radius:18px; }
+.food { aspect-ratio:1.28 / 1; }
+.body { padding:13px 14px 14px; }
+.body h3 { font-size:clamp(15px,1.35vw,20px); line-height:1.18; min-height:2.35em; }
+.desc { font-family:inherit; font-size:13px; line-height:1.45; min-height:3.9em; color:#d2c7b6; }
+.price { font-family:inherit; font-size:clamp(18px,1.8vw,25px); }
+.weight-chip { font-family:inherit; font-size:12px; }
+.premium-qty { min-height:44px; height:44px; }
+.premium-qty button { width:40px; height:40px; flex-basis:40px; font-size:24px; }
+.card-cart-button { width:52px; height:44px; flex-basis:52px; font-size:22px; border-radius:12px; }
+.favorite { width:36px; height:36px; font-size:25px; }
+.phone-banner { border-radius:18px; }
+.guide-grid { gap:14px; }
+.guide-card { border-radius:16px; }
+.guide-copy { padding:13px; }
+.guide-copy h3 { font-size:15px; }
+.guide-copy p { font-size:13px; line-height:1.5; }
+.cartbar { box-shadow:0 10px 35px rgba(0,0,0,.35); }
+button, a { -webkit-tap-highlight-color:transparent; }
+button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
+@media (min-width:1101px) {
+  .grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
+@media (max-width:900px) {
+  .app { width:calc(100% - 28px); }
+  .grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+  .body { padding:11px; }
+  .body h3 { font-size:16px; }
+  .desc { font-size:12px; }
+}
+@media (max-width:700px) {
+  .app { width:calc(100% - 20px); padding-bottom:112px; }
+  .topbar { min-height:68px; gap:8px; }
+  .brand-mark { width:42px; height:42px; flex-basis:42px; font-size:21px; }
+  .brand-title { font-size:15px; letter-spacing:1.2px; }
+  .brand-sub { font-size:9px; letter-spacing:1.7px; }
+  .status { font-size:11px; padding:8px 10px; gap:6px; }
+  .quick-nav { display:flex; flex-wrap:nowrap; overflow-x:auto; padding:11px 0 5px; scrollbar-width:none; }
+  .quick-nav::-webkit-scrollbar { display:none; }
+  .quick-nav a,.quick-nav button { flex:0 0 auto; min-height:40px; font-size:12px; }
+  .hero.hero-slider { min-height:360px; margin-top:10px; }
+  .hero-slider .hero-copy { padding:28px 18px 66px; }
+  .hero-slider h1 { font-size:clamp(35px,9vw,48px); line-height:1; }
+  .hero-slider .hero-copy p { font-size:14px; max-width:290px; }
+  .section { margin-top:24px; }
+  .section-heading { align-items:flex-start; }
+  .section-heading h2 { font-size:23px; }
+  .section-note { font-size:11px; white-space:normal; text-align:right; }
+  .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .food { aspect-ratio:1.12 / 1; }
+  .product-badge { top:7px; left:7px; padding:5px 7px; font-size:10px; }
+  .favorite { top:6px; right:6px; width:32px; height:32px; font-size:23px; }
+  .body { padding:10px; }
+  .body h3 { font-size:14px; line-height:1.2; min-height:2.4em; }
+  .desc { font-size:12px; line-height:1.4; min-height:4.2em; margin-bottom:9px; }
+  .price-weight-row { align-items:flex-start; gap:6px; }
+  .price { font-size:18px; }
+  .weight-chip { font-size:11px; padding:5px 6px; }
+  .card-actions { gap:6px; margin-top:9px; }
+  .premium-qty { height:40px; min-height:40px; }
+  .premium-qty button { width:34px; height:34px; flex-basis:34px; font-size:21px; }
+  .premium-qty b { font-size:14px; }
+  .card-cart-button { width:42px; height:40px; flex-basis:42px; font-size:19px; }
+  .guide-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .guide-visual { height:90px; }
+  .guide-copy { padding:11px; }
+  .guide-copy h3 { font-size:14px; }
+  .guide-copy p { font-size:12px; }
+  .phone-banner { grid-template-columns:44px minmax(0,1fr) 28px; gap:9px; padding:12px; }
+  .phone-icon { width:42px; height:42px; font-size:20px; }
+  .phone-label { font-size:12px; }
+  .phone-number { grid-column:2; border-left:0; padding-left:0; font-size:clamp(20px,5.2vw,28px); }
+  .phone-arrow { grid-column:3; grid-row:1 / span 2; width:28px; height:28px; }
+  .site-footer { flex-wrap:wrap; }
+  .cartbar { gap:8px; padding:9px; min-height:62px; }
+  .cartbar button { min-height:42px; max-width:48%; }
+}
+@media (max-width:360px) {
+  .app { width:calc(100% - 16px); }
+  .brand-title { font-size:13px; }
+  .status { font-size:10px; padding:7px 8px; }
+  .body { padding:8px; }
+  .body h3 { font-size:13px; }
+  .desc { font-size:12px; }
+  .premium-qty button { width:30px; height:30px; flex-basis:30px; }
+  .card-cart-button { width:36px; flex-basis:36px; }
+}
+
 </style>
 </head>
 <body>
