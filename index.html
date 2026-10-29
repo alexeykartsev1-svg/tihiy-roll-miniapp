@@ -658,13 +658,8 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 
   <section class="section menu-section" id="menu-section" aria-labelledby="menu-title">
     <div class="section-heading"><h2 id="menu-title">Меню</h2><span class="section-note">Выбери любимое&nbsp; ↗</span></div>
-    <div class="filters" role="group" aria-label="Категории меню">
+    <div class="filters" id="categoryFilters" role="group" aria-label="Категории меню">
       <button class="filter active" type="button" data-filter="all" aria-pressed="true">Всё меню</button>
-      <button class="filter" type="button" data-filter="classic" aria-pressed="false">Классика</button>
-      <button class="filter" type="button" data-filter="warm" aria-pressed="false">Тёплые роллы</button>
-      <button class="filter" type="button" data-filter="sets" aria-pressed="false">Сеты</button>
-      <button class="filter" type="button" data-filter="dogs" aria-pressed="false">Азиатские хот-доги</button>
-      <button class="filter" type="button" data-filter="snacks" aria-pressed="false">Снеки</button>
     </div>
     <section class="grid" id="menu" aria-live="polite"></section>
   </section>
@@ -939,6 +934,21 @@ function renderFavorites() {
   renderProductCards(document.getElementById('favoritesGrid'), products.filter(product => favorites.has(product.id)));
   const count = document.getElementById('favoritesCount');
   if (count) count.textContent = String(favorites.size);
+}
+async function loadCategoryFilters(){
+  const root=document.getElementById('categoryFilters');if(!root)return;
+  try{
+    const response=await fetch(API_BASE_URL+'/api/categories',{cache:'no-store'});
+    if(!response.ok)return;
+    const data=await response.json();if(!Array.isArray(data))return;
+    const available=new Set(products.map(p=>p.cat));
+    const categories=data.filter(c=>c&&c.id&&c.id!=='all'&&available.has(c.id));
+    root.replaceChildren();
+    const all=document.createElement('button');all.type='button';all.className='filter';all.dataset.filter='all';all.textContent='Всё меню';all.setAttribute('aria-pressed','false');root.append(all);
+    categories.forEach(cat=>{const button=document.createElement('button');button.type='button';button.className='filter';button.dataset.filter=cat.id;button.textContent=cat.name;button.setAttribute('aria-pressed','false');root.append(button)});
+    if(!categories.some(c=>c.id===activeFilter)&&activeFilter!=='all')activeFilter='all';
+    root.querySelectorAll('.filter').forEach(button=>{const selected=button.dataset.filter===activeFilter;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});
+  }catch(error){console.warn('Не удалось загрузить категории меню:',error)}
 }
 function renderMenu(filter = activeFilter) {
   activeFilter = filter;
@@ -1428,6 +1438,7 @@ async function loadServerCatalog() {
     });
     // Keep local photos for products not yet seeded by server; normal admin-created products arrive from API.
     products.splice(0, products.length, ...merged);
+    await loadCategoryFilters();
     Object.keys(cart).forEach(id => { if (!products.some(p => p.id === id)) delete cart[id]; });
     [...favorites].forEach(id => { if (!products.some(p => p.id === id)) favorites.delete(id); });
     saveCart(); saveFavorites(); renderMenu(activeFilter); updateCartBar();
@@ -1446,6 +1457,7 @@ async function showAdminButtonIfAllowed() {
   } catch (error) { console.warn('Проверка доступа к панели управления не удалась.'); }
 }
 renderMenu();
+loadCategoryFilters();
 renderCustomSetBuilder();
 updateCartBar();
 loadServerCatalog();
