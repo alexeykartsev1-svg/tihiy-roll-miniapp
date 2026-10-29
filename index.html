@@ -515,6 +515,11 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
   .card-cart-button { width:36px; flex-basis:36px; }
 }
 
+
+/* Карточки меню: убираем дублирующую кнопку-корзину, оставляем компактный счётчик количества */
+.card-actions { justify-content: center !important; }
+.card-actions .premium-qty { flex: 1 1 100%; max-width: 100%; }
+
 </style>
 </head>
 <body>
@@ -812,7 +817,6 @@ function renderProductCards(target, visible) {
             <b>${quantity}</b>
             <button type="button" data-act="plus" data-id="${product.id}" aria-label="Увеличить количество ${product.name}">+</button>
           </div>
-          <button class="card-cart-button" type="button" data-act="plus" data-id="${product.id}" aria-label="Добавить ${product.name} в корзину" title="Добавить в корзину">🛒</button>
         </div>
       </div>`;
     target.append(card);
