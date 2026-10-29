@@ -638,6 +638,33 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
  #sets-section .set-qty{grid-template-columns:19px minmax(7px,1fr) 19px!important}
  #sets-section .set-card.set-card-photo .set-qty button{width:17px!important;height:17px!important;min-height:17px!important;font-size:12px!important}
 }
+
+/* Premium modal for set composition */
+.set-composition-dialog{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:18px;background:rgba(3,3,3,.78);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);animation:setCompositionFadeIn .18s ease-out}
+.set-composition-panel{position:relative;display:flex;flex-direction:column;box-sizing:border-box;width:min(100%,460px);max-height:min(740px,calc(100vh - 36px));max-height:min(740px,calc(100dvh - 36px));overflow:hidden;border:1px solid rgba(226,190,112,.9);border-radius:24px;background:linear-gradient(150deg,#20190f 0%,#11100d 48%,#090908 100%);color:#fff8e8;box-shadow:0 26px 90px rgba(0,0,0,.62),inset 0 0 0 1px rgba(255,224,160,.06);animation:setCompositionCardIn .2s ease-out}
+.set-composition-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:24px 22px 17px;border-bottom:1px solid rgba(226,190,112,.2);background:radial-gradient(ellipse at 0 0,rgba(221,174,89,.14),transparent 74%)}
+.set-composition-title-wrap{min-width:0}
+.set-composition-kicker{display:inline-block;margin-bottom:9px;color:#e9c777;font-size:10px;font-weight:800;letter-spacing:2px}
+.set-composition-header h2{margin:0;color:#fff6e2;font-size:clamp(21px,5vw,27px);font-weight:850;line-height:1.2;overflow-wrap:anywhere}
+.set-composition-subtitle{margin:7px 0 0;color:#bcb1a0;font-size:14px;line-height:1.4}
+.set-composition-x{flex:0 0 40px;display:flex;align-items:center;justify-content:center;width:40px;height:40px;min-height:40px;border:1px solid rgba(226,190,112,.56);border-radius:50%;background:rgba(0,0,0,.3);color:#f4d48e;font-size:25px;line-height:1;cursor:pointer}
+.set-composition-x:hover,.set-composition-x:focus-visible{background:rgba(226,190,112,.13);outline:2px solid rgba(226,190,112,.45);outline-offset:2px}
+.set-composition-summary{display:flex;flex-wrap:wrap;gap:8px;padding:15px 22px 0}
+.set-composition-metric{display:inline-flex;align-items:center;min-height:32px;padding:6px 11px;border:1px solid rgba(226,190,112,.7);border-radius:11px;color:#f5dfad;font-size:13px;font-weight:700;white-space:nowrap}
+.set-composition-body{min-height:0;overflow-y:auto;padding:12px 22px 16px;overscroll-behavior:contain}
+.set-composition-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.set-composition-item{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px;box-sizing:border-box;padding:12px 13px;border:1px solid rgba(226,190,112,.19);border-radius:13px;background:linear-gradient(100deg,rgba(255,255,255,.045),rgba(255,255,255,.015))}
+.set-composition-item-name{min-width:0;color:#f4eee2;font-size:15px;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
+.set-composition-item-amount{flex:0 0 auto;padding:5px 9px;border:1px solid rgba(226,190,112,.42);border-radius:999px;color:#eccb81;font-size:12px;font-weight:800;white-space:nowrap}
+.set-composition-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 22px 19px;border-top:1px solid rgba(226,190,112,.2);background:rgba(0,0,0,.14)}
+.set-composition-footer span{color:#a99d8b;font-size:11px;line-height:1.4}
+.set-composition-done{flex:0 0 auto;min-width:112px;min-height:42px;padding:10px 18px;border:1px solid #e2be70;border-radius:12px;background:linear-gradient(135deg,#f5d68f,#e5b85e);color:#21170b;font-size:14px;font-weight:850;cursor:pointer}
+.set-composition-done:hover,.set-composition-done:focus-visible{filter:brightness(1.04);outline:2px solid #f5d68f;outline-offset:3px}
+@keyframes setCompositionFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes setCompositionCardIn{from{transform:translateY(8px) scale(.985);opacity:.7}to{transform:translateY(0) scale(1);opacity:1}}
+@media(max-width:420px){.set-composition-dialog{padding:12px}.set-composition-panel{border-radius:20px;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px)}.set-composition-header{padding:20px 17px 14px}.set-composition-summary{padding:13px 17px 0}.set-composition-body{padding:11px 17px 13px}.set-composition-footer{padding:13px 17px 16px}.set-composition-item{padding:11px 10px}.set-composition-item-name{font-size:14px}.set-composition-item-amount{font-size:11px;padding:5px 7px}}
+@media(prefers-reduced-motion:reduce){.set-composition-dialog,.set-composition-panel{animation:none}}
+
 </style>
 </head>
 <body>
@@ -1068,7 +1095,78 @@ function populateSetImages(){
 }
 document.addEventListener('click',event=>{
  const composition=event.target.closest('[data-set-composition]');
- if(composition){const key=composition.dataset.setComposition;const rows=SET_PRESETS[key]||[];const card=composition.closest('[data-set-card]');const title=card&&card.querySelector('h3')?card.querySelector('h3').textContent:'Состав сета';const names=rows.map(([id,qty])=>{const p=products.find(x=>x.id===id);return p?(qty>1?qty+' × ':'')+p.name:''}).filter(Boolean);if(!names.length)return;document.querySelector('.set-composition-dialog')?.remove();const dialog=document.createElement('div');dialog.className='set-composition-dialog';dialog.innerHTML='<section class="set-composition-panel" role="dialog" aria-modal="true"><h3></h3><ul></ul><button type="button">Закрыть</button></section>';dialog.querySelector('h3').textContent=title;names.forEach(name=>{const li=document.createElement('li');li.textContent=name;dialog.querySelector('ul').append(li)});dialog.querySelector('button').addEventListener('click',()=>dialog.remove());dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.remove()});document.body.append(dialog);return}
+ if(composition){
+  event.preventDefault();
+  const key=composition.dataset.setComposition;
+  const rows=SET_PRESETS[key]||[];
+  const card=composition.closest('[data-set-card]');
+  const titleNode=card&&card.querySelector('h3');
+  const title=titleNode?titleNode.textContent.trim():'Состав сета';
+  const items=rows.map(([id,qty])=>{
+   const product=products.find(p=>p.id===id);
+   return product?{name:product.name,qty}:null;
+  }).filter(Boolean);
+  if(!items.length)return;
+  document.querySelector('.set-composition-dialog')?.remove();
+  const previousFocus=document.activeElement;
+  const previousOverflow=document.body.style.overflow;
+  const dialog=document.createElement('div');
+  dialog.className='set-composition-dialog';
+  dialog.setAttribute('aria-label','Состав готового сета');
+  dialog.innerHTML='<section class="set-composition-panel" role="dialog" aria-modal="true" aria-labelledby="setCompositionTitle">'+
+   '<div class="set-composition-header"><div class="set-composition-title-wrap"><span class="set-composition-kicker">ТИХИЙ РОЛЛ · ГОТОВЫЙ СЕТ</span><h2 id="setCompositionTitle"></h2><p class="set-composition-subtitle">Что входит в набор</p></div><button class="set-composition-x" type="button" aria-label="Закрыть окно">×</button></div>'+
+   '<div class="set-composition-summary"></div><div class="set-composition-body"><ul class="set-composition-list"></ul></div>'+
+   '<div class="set-composition-footer"><span>Свежеприготовленные роллы</span><button class="set-composition-done" type="button">Понятно</button></div></section>';
+  const panel=dialog.querySelector('.set-composition-panel');
+  dialog.querySelector('#setCompositionTitle').textContent=title;
+  const summary=dialog.querySelector('.set-composition-summary');
+  if(card){
+   card.querySelectorAll('.set-meta span').forEach(metric=>{
+    const chip=document.createElement('span');
+    chip.className='set-composition-metric';
+    chip.textContent=metric.textContent.replace(/^[^\d]*/,'').trim();
+    if(chip.textContent)summary.append(chip);
+   });
+  }
+  const list=dialog.querySelector('.set-composition-list');
+  items.forEach(item=>{
+   const li=document.createElement('li');
+   li.className='set-composition-item';
+   const name=document.createElement('span');
+   name.className='set-composition-item-name';
+   name.textContent=item.name;
+   const amount=document.createElement('span');
+   amount.className='set-composition-item-amount';
+   amount.textContent=item.qty===1?'1 порция':item.qty+' порции';
+   li.append(name,amount);
+   list.append(li);
+  });
+  let isClosed=false;
+  const closeDialog=()=>{
+   if(isClosed)return;
+   isClosed=true;
+   dialog.remove();
+   document.body.style.overflow=previousOverflow;
+   document.removeEventListener('keydown',handleDialogKeydown,true);
+   if(previousFocus&&typeof previousFocus.focus==='function')previousFocus.focus({preventScroll:true});
+  };
+  const handleDialogKeydown=e=>{
+   if(e.key==='Escape'){e.preventDefault();closeDialog();return}
+   if(e.key==='Tab'){
+    const buttons=dialog.querySelectorAll('button');
+    if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons[buttons.length-1].focus()}
+    else if(!e.shiftKey&&document.activeElement===buttons[buttons.length-1]){e.preventDefault();buttons[0].focus()}
+   }
+  };
+  dialog.querySelector('.set-composition-x').addEventListener('click',closeDialog);
+  dialog.querySelector('.set-composition-done').addEventListener('click',closeDialog);
+  dialog.addEventListener('click',e=>{if(e.target===dialog)closeDialog()});
+  document.addEventListener('keydown',handleDialogKeydown,true);
+  document.body.append(dialog);
+  document.body.style.overflow='hidden';
+  dialog.querySelector('.set-composition-x').focus({preventScroll:true});
+  return;
+ }
  const qtyButton=event.target.closest('[data-set-qty]');
  if(qtyButton){const key=qtyButton.dataset.setKey;const rows=SET_PRESETS[key]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;
   if(qtyButton.dataset.setQty==='plus'){rows.forEach(([id,qty])=>cart[id]=Math.min(99,(cart[id]||0)+qty));setQuantities[key]=(setQuantities[key]||0)+1}
