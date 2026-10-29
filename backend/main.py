@@ -588,6 +588,12 @@ DEFAULT_SITE_CONTENT = {
         {"title":"Азиатский хот-дог","accent":"хрустящий снаружи","desc":"Щедрая начинка и яркие соусы в каждом кусочке.","image":"","button":"Попробовать новинку","active":True},
         {"title":"Собери свой сет","accent":"на свой вкус","desc":"Выбирай любимые роллы и создай собственное сочетание.","image":"","button":"Собрать сет","active":True}
     ],
+    "sets": [
+        {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":""},
+        {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":""},
+        {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":""},
+        {"id":"newyear","description":"Праздничное сочетание Филадельфии, Лавы и тёплых роллов.","image":""}
+    ],
     "promo_title":"Закажи к удобному времени",
     "promo_text":"Выбирай блюда заранее — мы приготовим заказ к согласованному времени.",
     "promo_button":"Перейти к меню",
@@ -601,6 +607,7 @@ def read_site_content() -> dict[str, Any]:
             merged = dict(DEFAULT_SITE_CONTENT)
             merged.update(data)
             merged["slides"] = data.get("slides", DEFAULT_SITE_CONTENT["slides"])
+            merged["sets"] = data.get("sets", DEFAULT_SITE_CONTENT["sets"])
             return merged
     except (OSError, json.JSONDecodeError):
         pass
@@ -653,6 +660,31 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
             row["active"] = bool(slide.get("active", True))
             clean.append(row)
         current["slides"] = clean
+    if "sets" in payload:
+        sets = payload["sets"]
+        allowed_set_ids = {"solo", "duo", "party", "newyear"}
+        if not isinstance(sets, list) or len(sets) > 4:
+            raise HTTPException(status_code=400, detail="Можно настроить не более 4 готовых сетов.")
+        clean_sets = []
+        seen = set()
+        for index, item in enumerate(sets):
+            if not isinstance(item, dict):
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: неверный формат.")
+            set_id = item.get("id")
+            if set_id not in allowed_set_ids or set_id in seen:
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: неизвестный или повторяющийся ID.")
+            description = item.get("description", "")
+            image = item.get("image", "")
+            if not isinstance(description, str) or len(description) > 300:
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: описание должно быть до 300 символов.")
+            if not isinstance(image, str) or len(image) > 1_000_000:
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: фотография слишком большая.")
+            if image and not image.startswith("https://"):
+                if not re.match(r"^data:image/(jpeg|png|webp);base64,", image):
+                    raise HTTPException(status_code=400, detail=f"Сет {index+1}: используй HTTPS-ссылку или загрузи JPG, PNG, WebP.")
+            clean_sets.append({"id": set_id, "description": description.strip(), "image": image.strip()})
+            seen.add(set_id)
+        current["sets"] = clean_sets
     write_site_content(current)
     return {"ok": True, "content": current}
 
