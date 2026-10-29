@@ -432,6 +432,9 @@ def init_order_db():
             phone TEXT NOT NULL, pickup_time TEXT NOT NULL, notes TEXT NOT NULL,
             items_json TEXT NOT NULL, total INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'new'
         )""")
+        columns = {row["name"] for row in connection.execute("PRAGMA table_info(orders)").fetchall()}
+        if "telegram_id" not in columns:
+            connection.execute("ALTER TABLE orders ADD COLUMN telegram_id INTEGER NOT NULL DEFAULT 0")
         connection.execute("CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at)")
 
 init_order_db()
