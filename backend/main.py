@@ -281,12 +281,12 @@ async def request_validation_error_handler(request: Request, exc: RequestValidat
 ADMIN_TELEGRAM_ID = os.getenv("ADMIN_TELEGRAM_ID", "").strip()
 PRODUCTS_FILE = os.getenv("PRODUCTS_FILE", os.path.join(os.path.dirname(__file__), "products.json"))
 DEFAULT_PRODUCTS = [
-    {"id":"philadelphia","name":"Филадельфия","price":450,"weight":"280 г","cat":"classic","badge":"ХИТ","desc":"","photo":"","active":True,"sort_order":0},
-    {"id":"lava","name":"Лава","price":350,"weight":"280 г","cat":"classic","badge":"","desc":"","photo":"","active":True,"sort_order":1},
-    {"id":"warm_crab","name":"Тёплый краб","price":350,"weight":"280 г","cat":"warm","badge":"","desc":"","photo":"","active":True,"sort_order":2},
-    {"id":"warm_salmon","name":"Тёплый лосось","price":450,"weight":"280 г","cat":"warm","badge":"","desc":"","photo":"","active":True,"sort_order":3},
-    {"id":"california","name":"Калифорния","price":390,"weight":"280 г","cat":"classic","badge":"","desc":"","photo":"","active":True,"sort_order":4},
-    {"id":"unagi","name":"Унаги","price":460,"weight":"280 г","cat":"classic","badge":"","desc":"","photo":"","active":True,"sort_order":5},
+    {"id":"philadelphia","name":"Филадельфия","price":450,"weight":"280 г","cat":"classic","badge":"ХИТ","desc":"Нежный лосось, сливочный сыр, свежий огурец и рис.","photo":"","active":True,"sort_order":0},
+    {"id":"lava","name":"Лава","price":350,"weight":"280 г","cat":"classic","badge":"","desc":"Нежный соус лава, сливочный сыр и свежие ингредиенты.","photo":"","active":True,"sort_order":1},
+    {"id":"warm_crab","name":"Тёплый краб","price":350,"weight":"280 г","cat":"warm","badge":"","desc":"Тёплый ролл с крабом и аппетитной золотистой корочкой.","photo":"","active":True,"sort_order":2},
+    {"id":"warm_salmon","name":"Тёплый лосось","price":450,"weight":"280 г","cat":"warm","badge":"","desc":"Тёплый ролл с лососем, приготовленный до золотистой корочки.","photo":"","active":True,"sort_order":3},
+    {"id":"california","name":"Калифорния","price":390,"weight":"280 г","cat":"classic","badge":"","desc":"Классический ролл с нежной начинкой и рисом.","photo":"","active":True,"sort_order":4},
+    {"id":"unagi","name":"Унаги","price":460,"weight":"280 г","cat":"classic","badge":"","desc":"Ролл с угрём и насыщенным соусом унаги.","photo":"","active":True,"sort_order":5},
 ]
 
 def read_products() -> list[dict[str, Any]]:
