@@ -46,7 +46,7 @@ async function loadOrders(){
     const data=await api('/api/admin/orders?limit=100');
     const summary=data.summary||{};
     const analytics=await api('/api/admin/analytics');
-    $('analyticsSummary').textContent='Заказов: '+(analytics.orders_count||0)+' · Выручка без отмен: '+new Intl.NumberFormat('ru-RU').format(analytics.revenue||0)+' ₽ · В работе: '+(analytics.active_orders||0);
+    $('analyticsSummary').textContent='Заказов: '+(analytics.orders_count||0)+' · Выручка без отмен: '+new Intl.NumberFormat('ru-RU').format(analytics.revenue||0)+' ₽ · Валовая прибыль (по заполненной себестоимости): '+new Intl.NumberFormat('ru-RU').format(analytics.gross_profit||0)+' ₽ · В работе: '+(analytics.active_orders||0);
     const list=$('ordersList');list.replaceChildren();
     if(!data.orders||!data.orders.length){list.textContent='Пока нет сохранённых заказов.';return}
     data.orders.forEach(order=>{
