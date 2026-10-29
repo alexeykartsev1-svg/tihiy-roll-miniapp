@@ -551,9 +551,10 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 /* Definitive phone banner layout: icon, label and full number share one row */
 .phone-banner {
   display: grid !important;
-  grid-template-columns: 34px max-content minmax(0, 1fr) !important;
+  grid-template-columns: 34px max-content max-content !important;
+  justify-content: start !important;
   align-items: center !important;
-  gap: 10px !important;
+  gap: 8px !important;
   min-height: 76px !important;
   padding: 12px 14px !important;
 }
@@ -576,11 +577,11 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
   font-size: clamp(13px, 3.8vw, 20px) !important;
   letter-spacing: 0 !important;
   line-height: 1.1 !important;
-  text-align: right !important;
+  text-align: left !important;
 }
 .phone-arrow { display: none !important; }
 @media (max-width: 360px) {
-  .phone-banner { grid-template-columns: 28px max-content minmax(0,1fr) !important; gap: 6px !important; padding: 9px !important; }
+  .phone-banner { grid-template-columns: 28px max-content max-content !important; gap: 5px !important; padding: 9px !important; }
   .phone-icon { width: 28px !important; height: 28px !important; font-size: 16px !important; }
   .phone-label { font-size: 10px !important; }
   .phone-number { font-size: 12px !important; }
@@ -626,7 +627,7 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 
   <a class="phone-banner" href="tel:+79230005857" aria-label="Заказать по телефону 8 923 000 58 57">
     <span class="phone-icon" aria-hidden="true">☎</span>
-    <span class="phone-label">Заказать по<br>телефону</span>
+    <span class="phone-label">Заказать по телефону</span>
     <strong class="phone-number">8 923 000 58 57</strong>
     <span class="phone-arrow" aria-hidden="true">↗</span>
   </a>
