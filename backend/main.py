@@ -576,6 +576,86 @@ async def get_availability(date: str) -> dict[str, Any]:
             full_times.append(match.group(1))
     return {"date": date, "unavailable_times": sorted(set(full_times)), "max_orders_per_slot": MAX_ORDERS_PER_SLOT}
 
+
+# Editable homepage content managed by the store owner.
+SITE_CONTENT_FILE = os.getenv("SITE_CONTENT_FILE", os.path.join(os.path.dirname(__file__), "site_content.json"))
+DEFAULT_SITE_CONTENT = {
+    "hero_title": "Тихо готовим, громко вкусно",
+    "hero_subtitle": "Свежие роллы и азиатские блюда — приготовим к выбранному времени.",
+    "hero_button": "Выбрать блюда",
+    "slides": [
+        {"title":"Тихо готовим,","accent":"громко вкусно","desc":"Свежие роллы и азиатские блюда — приготовим к выбранному времени.","image":"","button":"Выбрать блюда","active":True},
+        {"title":"Азиатский хот-дог","accent":"хрустящий снаружи","desc":"Щедрая начинка и яркие соусы в каждом кусочке.","image":"","button":"Попробовать новинку","active":True},
+        {"title":"Собери свой сет","accent":"на свой вкус","desc":"Выбирай любимые роллы и создай собственное сочетание.","image":"","button":"Собрать сет","active":True}
+    ],
+    "promo_title":"Закажи к удобному времени",
+    "promo_text":"Выбирай блюда заранее — мы приготовим заказ к согласованному времени.",
+    "promo_button":"Перейти к меню",
+    "promo_link":"#menu"
+}
+def read_site_content() -> dict[str, Any]:
+    try:
+        with open(SITE_CONTENT_FILE, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        if isinstance(data, dict):
+            merged = dict(DEFAULT_SITE_CONTENT)
+            merged.update(data)
+            merged["slides"] = data.get("slides", DEFAULT_SITE_CONTENT["slides"])
+            return merged
+    except (OSError, json.JSONDecodeError):
+        pass
+    return json.loads(json.dumps(DEFAULT_SITE_CONTENT, ensure_ascii=False))
+def write_site_content(data: dict[str, Any]) -> None:
+    folder = os.path.dirname(SITE_CONTENT_FILE)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    temporary = SITE_CONTENT_FILE + ".tmp"
+    with open(temporary, "w", encoding="utf-8") as handle:
+        json.dump(data, handle, ensure_ascii=False, indent=2)
+    os.replace(temporary, SITE_CONTENT_FILE)
+
+@app.get("/api/site-content")
+async def get_site_content() -> dict[str, Any]:
+    return read_site_content()
+
+@app.get("/api/admin/site-content")
+async def admin_get_site_content(x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    return read_site_content()
+
+@app.put("/api/admin/site-content")
+async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    current = read_site_content()
+    limits = {"hero_title":160, "hero_subtitle":300, "hero_button":50, "promo_title":120, "promo_text":500, "promo_button":50, "promo_link":300}
+    for key, limit in limits.items():
+        if key in payload:
+            value = payload[key]
+            if not isinstance(value, str) or len(value.strip()) > limit:
+                raise HTTPException(status_code=400, detail=f"Поле {key}: слишком длинный текст или неверный формат.")
+            current[key] = value.strip()
+    if "slides" in payload:
+        slides = payload["slides"]
+        if not isinstance(slides, list) or len(slides) > 5:
+            raise HTTPException(status_code=400, detail="Можно настроить не более 5 слайдов.")
+        clean = []
+        for i, slide in enumerate(slides):
+            if not isinstance(slide, dict):
+                raise HTTPException(status_code=400, detail=f"Слайд {i+1}: неверный формат.")
+            row = {}
+            for key, limit in (("title",120),("accent",120),("desc",300),("image",1500),("button",50)):
+                value = slide.get(key, "")
+                if not isinstance(value, str) or len(value) > limit:
+                    raise HTTPException(status_code=400, detail=f"Слайд {i+1}: проверь поле {key}.")
+                if key == "image" and value and not value.startswith(("https://", "data:image/")):
+                    raise HTTPException(status_code=400, detail="Для изображения укажи HTTPS-ссылку или загруженное изображение.")
+                row[key] = value.strip()
+            row["active"] = bool(slide.get("active", True))
+            clean.append(row)
+        current["slides"] = clean
+    write_site_content(current)
+    return {"ok": True, "content": current}
+
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {
