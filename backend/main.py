@@ -325,6 +325,31 @@ def current_menu() -> dict[str, dict[str, Any]]:
                 result[str(p["id"])] = {"name": str(p["name"]), "price": price, "cost": max(0, int(p.get("cost", 0) or 0))}
     return result
 
+CATEGORIES_FILE = os.getenv("CATEGORIES_FILE", os.path.join(os.path.dirname(__file__), "categories.json"))
+DEFAULT_CATEGORIES = [
+    {"id":"classic","name":"Классические","sort_order":0},
+    {"id":"warm","name":"Тёплые и мясные","sort_order":1},
+    {"id":"dogs","name":"Азиатские хот-доги","sort_order":2},
+    {"id":"snacks","name":"Закуски","sort_order":3},
+    {"id":"sets","name":"Сеты","sort_order":4},
+    {"id":"all","name":"Другое","sort_order":5},
+]
+def read_categories() -> list[dict[str, Any]]:
+    try:
+        with open(CATEGORIES_FILE, "r", encoding="utf-8") as handle:
+            data=json.load(handle)
+        if isinstance(data,list) and all(isinstance(x,dict) and x.get("id") and x.get("name") for x in data):
+            return data
+    except (OSError,json.JSONDecodeError):
+        pass
+    return [dict(x) for x in DEFAULT_CATEGORIES]
+def write_categories(categories: list[dict[str, Any]]) -> None:
+    folder=os.path.dirname(CATEGORIES_FILE)
+    if folder: os.makedirs(folder,exist_ok=True)
+    temporary=CATEGORIES_FILE+".tmp"
+    with open(temporary,"w",encoding="utf-8") as handle: json.dump(categories,handle,ensure_ascii=False,indent=2)
+    os.replace(temporary,CATEGORIES_FILE)
+
 def require_admin_init_data(raw: str) -> dict[str, Any]:
     if not BOT_TOKEN:
         raise HTTPException(status_code=503, detail="На сервере не настроен BOT_TOKEN.")
@@ -356,6 +381,39 @@ def admin_from_header(x_telegram_init_data: str | None) -> None:
     if not x_telegram_init_data:
         raise HTTPException(status_code=401, detail="Нет данных авторизации Telegram. Откройте панель из Telegram.")
     require_admin_init_data(x_telegram_init_data)
+
+@app.get("/api/categories")
+async def get_categories() -> list[dict[str, Any]]:
+    return sorted(read_categories(), key=lambda c: int(c.get("sort_order",0)))
+
+@app.get("/api/admin/categories")
+async def admin_get_categories(x_telegram_init_data: str | None = Header(default=None)) -> list[dict[str, Any]]:
+    admin_from_header(x_telegram_init_data)
+    return sorted(read_categories(), key=lambda c: int(c.get("sort_order",0)))
+
+@app.post("/api/admin/categories")
+async def admin_create_category(payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    category_id=str(payload.get("id","")).strip()
+    name=str(payload.get("name","")).strip()
+    if not re.fullmatch(r"[A-Za-z0-9_-]{2,30}",category_id) or not name or len(name)>60:
+        raise HTTPException(status_code=400,detail="Укажите ID категории латиницей и название до 60 символов.")
+    categories=read_categories()
+    if any(c["id"]==category_id or c["name"].casefold()==name.casefold() for c in categories):
+        raise HTTPException(status_code=409,detail="Категория с таким ID или названием уже существует.")
+    item={"id":category_id,"name":name,"sort_order":max([int(c.get("sort_order",0)) for c in categories],default=-1)+1}
+    categories.append(item);write_categories(categories)
+    return {"ok":True,"category":item}
+
+@app.delete("/api/admin/categories/{category_id}")
+async def admin_delete_category(category_id: str, x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    if any(str(p.get("cat","all"))==category_id for p in read_products()):
+        raise HTTPException(status_code=409,detail="Сначала перенесите товары из этой категории в другую.")
+    categories=read_categories();updated=[c for c in categories if c["id"]!=category_id]
+    if len(updated)==len(categories): raise HTTPException(status_code=404,detail="Категория не найдена.")
+    write_categories(updated)
+    return {"ok":True}
 
 @app.get("/api/menu")
 async def get_menu() -> list[dict[str, Any]]:
