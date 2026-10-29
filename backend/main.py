@@ -53,8 +53,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=False,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "X-Telegram-Init-Data"],
     max_age=600,
 )
 
@@ -207,8 +207,9 @@ def calculate_order(items: list[OrderItem]) -> tuple[list[dict[str, Any]], int]:
     seen: set[str] = set()
     clean_items: list[dict[str, Any]] = []
     total = 0
+    live_menu = current_menu()
     for row in items:
-        if row.id not in MENU:
+        if row.id not in live_menu:
             raise ValueError(f"Неизвестная позиция меню: {row.id}")
         if row.id in seen:
             raise ValueError("В заказе повторяется одна и та же позиция")
@@ -275,6 +276,134 @@ async def request_validation_error_handler(request: Request, exc: RequestValidat
         },
     )
 
+
+
+ADMIN_TELEGRAM_ID = os.getenv("ADMIN_TELEGRAM_ID", "").strip()
+PRODUCTS_FILE = os.getenv("PRODUCTS_FILE", os.path.join(os.path.dirname(__file__), "products.json"))
+DEFAULT_PRODUCTS = [
+    {"id":"philadelphia","name":"Филадельфия","price":450,"weight":"280 г","cat":"classic","badge":"ХИТ","desc":"","photo":"","active":True,"sort_order":0},
+    {"id":"lava","name":"Лава","price":350,"weight":"280 г","cat":"classic","badge":"","desc":"","photo":"","active":True,"sort_order":1},
+    {"id":"warm_crab","name":"Тёплый краб","price":350,"weight":"280 г","cat":"warm","badge":"","desc":"","photo":"","active":True,"sort_order":2},
+    {"id":"warm_salmon","name":"Тёплый лосось","price":450,"weight":"280 г","cat":"warm","badge":"","desc":"","photo":"","active":True,"sort_order":3},
+    {"id":"california","name":"Калифорния","price":390,"weight":"280 г","cat":"classic","badge":"","desc":"","photo":"","active":True,"sort_order":4},
+    {"id":"unagi","name":"Унаги","price":460,"weight":"280 г","cat":"classic","badge":"","desc":"","photo":"","active":True,"sort_order":5},
+]
+
+def read_products() -> list[dict[str, Any]]:
+    try:
+        with open(PRODUCTS_FILE, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        if isinstance(data, list) and all(isinstance(item, dict) for item in data):
+            return data
+    except (OSError, json.JSONDecodeError):
+        pass
+    return [dict(item) for item in DEFAULT_PRODUCTS]
+
+def write_products(products: list[dict[str, Any]]) -> None:
+    folder = os.path.dirname(PRODUCTS_FILE)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    temporary = PRODUCTS_FILE + ".tmp"
+    with open(temporary, "w", encoding="utf-8") as handle:
+        json.dump(products, handle, ensure_ascii=False, indent=2)
+    os.replace(temporary, PRODUCTS_FILE)
+
+def current_menu() -> dict[str, dict[str, Any]]:
+    result = {}
+    for p in read_products():
+        if p.get("active", True) and p.get("id") and p.get("name"):
+            try:
+                price = int(p.get("price", 0))
+            except (TypeError, ValueError):
+                continue
+            if price > 0:
+                result[str(p["id"])] = {"name": str(p["name"]), "price": price}
+    return result
+
+def require_admin_init_data(raw: str) -> dict[str, Any]:
+    if not BOT_TOKEN:
+        raise HTTPException(status_code=503, detail="На сервере не настроен BOT_TOKEN.")
+    if not ADMIN_TELEGRAM_ID.isdigit():
+        raise HTTPException(status_code=503, detail="На сервере не задан ADMIN_TELEGRAM_ID.")
+    try:
+        auth = verify_telegram_init_data(raw, BOT_TOKEN)
+    except (ValueError, Exception) as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    if str(auth["user"].get("id")) != ADMIN_TELEGRAM_ID:
+        raise HTTPException(status_code=403, detail="Доступ разрешён только владельцу магазина.")
+    return auth
+
+class ProductPayload(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(min_length=2, max_length=48, pattern=r"^[A-Za-z0-9_-]+$")
+    name: str = Field(min_length=1, max_length=100)
+    price: int = Field(ge=1, le=100000)
+    weight: str = Field(default="280 г", max_length=30)
+    cat: str = Field(default="all", max_length=30)
+    badge: str = Field(default="", max_length=30)
+    desc: str = Field(default="", max_length=1000)
+    photo: str = Field(default="", max_length=1200000)
+    active: bool = True
+    sort_order: int = Field(default=0, ge=0, le=10000)
+
+def admin_from_header(x_telegram_init_data: str | None) -> None:
+    if not x_telegram_init_data:
+        raise HTTPException(status_code=401, detail="Нет данных авторизации Telegram. Откройте панель из Telegram.")
+    require_admin_init_data(x_telegram_init_data)
+
+@app.get("/api/menu")
+async def get_menu() -> list[dict[str, Any]]:
+    return sorted([p for p in read_products() if p.get("active", True)], key=lambda p: (int(p.get("sort_order", 0)), str(p.get("name", ""))))
+
+@app.post("/api/admin/check")
+async def admin_check(payload: dict[str, Any]) -> dict[str, Any]:
+    raw = payload.get("init_data", "")
+    try:
+        auth = require_admin_init_data(raw if isinstance(raw, str) else "")
+        return {"ok": True, "is_admin": True, "user_id": auth["user"]["id"]}
+    except HTTPException as exc:
+        if exc.status_code in (401, 403):
+            return {"ok": True, "is_admin": False, "detail": exc.detail}
+        raise
+
+@app.get("/api/admin/products")
+async def admin_get_products(x_telegram_init_data: str | None = Header(default=None)) -> list[dict[str, Any]]:
+    admin_from_header(x_telegram_init_data)
+    return sorted(read_products(), key=lambda p: (int(p.get("sort_order", 0)), str(p.get("name", ""))))
+
+@app.post("/api/admin/products")
+async def admin_create_product(payload: ProductPayload, x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    products = read_products()
+    if any(p.get("id") == payload.id for p in products):
+        raise HTTPException(status_code=409, detail="Товар с таким ID уже существует.")
+    item = payload.model_dump()
+    products.append(item)
+    write_products(products)
+    return {"ok": True, "product": item}
+
+@app.put("/api/admin/products/{product_id}")
+async def admin_update_product(product_id: str, payload: ProductPayload, x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    if payload.id != product_id:
+        raise HTTPException(status_code=400, detail="ID существующего товара менять нельзя.")
+    products = read_products()
+    for index, item in enumerate(products):
+        if item.get("id") == product_id:
+            products[index] = payload.model_dump()
+            write_products(products)
+            return {"ok": True, "product": products[index]}
+    raise HTTPException(status_code=404, detail="Товар не найден.")
+
+@app.delete("/api/admin/products/{product_id}")
+async def admin_delete_product(product_id: str, x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    products = read_products()
+    updated = [p for p in products if p.get("id") != product_id]
+    if len(updated) == len(products):
+        raise HTTPException(status_code=404, detail="Товар не найден.")
+    write_products(updated)
+    return {"ok": True}
 
 @app.get("/health")
 async def health() -> dict[str, Any]:
