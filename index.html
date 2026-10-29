@@ -274,6 +274,10 @@ textarea { min-height:86px; resize:vertical; line-height:1.45; }
 .cart-summary > span:last-child { display:block; min-width:0; line-height:1.25; }\n.cart-summary #count { max-width:100%; line-height:1.25; white-space:normal; }\n.cart-summary #totalLabel { line-height:1.3; }
 #count, #totalLabel { overflow-wrap:anywhere; }
 .cartbar button { max-width:48%; white-space:normal; line-height:1.25; text-align:center; }
+.pickup-address-card { margin:12px 0 18px; padding:14px; border:1px solid rgba(229,185,111,.28); border-radius:14px; background:rgba(229,185,111,.055); }
+.pickup-address-card p { margin:7px 0 12px; line-height:1.55; color:var(--text); font-size:14px; }
+.pickup-map-link { display:inline-flex; align-items:center; gap:6px; margin:0 0 12px; color:var(--gold-light); font-size:13px; font-weight:800; text-decoration:none; }
+.pickup-map { display:block; width:100%; height:220px; border:0; border-radius:10px; background:#17130d; }
 .fulfillment-options { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
 .fulfillment-option { position:relative; min-width:0; cursor:pointer; }
 .fulfillment-option input { position:absolute; opacity:0; width:1px; height:1px; }
@@ -715,6 +719,12 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
         <label class="fulfillment-option"><input type="radio" name="fulfillment" value="Самовывоз" checked><span>Самовывоз</span></label>
         <label class="fulfillment-option"><input type="radio" name="fulfillment" value="Доставка"><span>Доставка</span></label>
       </div>
+      <div id="pickupAddressWrap" class="pickup-address-card">
+        <span class="field-label">Адрес самовывоза</span>
+        <p><strong>Тихий ролл</strong><br>Социалистическая, 26<br>район «Остров», Чарышское</p>
+        <a class="pickup-map-link" href="https://yandex.ru/maps/?text=%D0%A2%D0%B8%D1%85%D0%B8%D0%B9%20%D1%80%D0%BE%D0%BB%D0%BB%2C%20%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%2C%2026%2C%20%D0%A7%D0%B0%D1%80%D1%8B%D1%88%D1%81%D0%BA%D0%BE%D0%B5" target="_blank" rel="noopener noreferrer">📍 Открыть адрес на карте</a>
+        <iframe title="Карта адреса самовывоза — Тихий ролл" class="pickup-map" src="https://yandex.ru/map-widget/v1/?text=%D0%A2%D0%B8%D1%85%D0%B8%D0%B9%20%D1%80%D0%BE%D0%BB%D0%BB%2C%20%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%2C%2026%2C%20%D0%A7%D0%B0%D1%80%D1%8B%D1%88%D1%81%D0%BA%D0%BE%D0%B5" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
       <div id="deliveryAddressWrap" hidden>
         <label class="field-label" for="deliveryAddress">Адрес доставки</label>
         <input id="deliveryAddress" name="delivery_address" maxlength="250" placeholder="Улица, дом, квартира">
@@ -1092,7 +1102,11 @@ document.addEventListener('click', event => {
   if (action === 'show-all') { renderMenu('all'); return; }
   if (action === 'go-menu') { closeCart(); document.getElementById('menu-section').scrollIntoView({behavior:'smooth'}); }
 });
-document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => renderMenu(button.dataset.filter)));
+document.getElementById('categoryFilters').addEventListener('click', event => {
+  const button = event.target.closest('button[data-filter]');
+  if (!button || !event.currentTarget.contains(button)) return;
+  renderMenu(button.dataset.filter);
+});
 document.getElementById('shopCta').addEventListener('click', () => document.getElementById('menu-section').scrollIntoView({behavior:'smooth'}));
 document.getElementById('open').addEventListener('click', openCart);
 document.getElementById('favoritesCartLink').addEventListener('click', openCart);
@@ -1156,11 +1170,13 @@ pickupDate.addEventListener('change', () => {
 });
 
 const deliveryAddressWrap = document.getElementById('deliveryAddressWrap');
+const pickupAddressWrap = document.getElementById('pickupAddressWrap');
 const deliveryAddress = document.getElementById('deliveryAddress');
 document.querySelectorAll('input[name="fulfillment"]').forEach(input => {
   input.addEventListener('change', () => {
     const delivery = document.querySelector('input[name="fulfillment"]:checked')?.value === 'Доставка';
     deliveryAddressWrap.hidden = !delivery;
+    if (pickupAddressWrap) pickupAddressWrap.hidden = delivery;
     deliveryAddress.required = delivery;
     if (!delivery) deliveryAddress.setCustomValidity('');
   });
@@ -1249,6 +1265,7 @@ document.getElementById('form').addEventListener('submit', async event => {
     notes: [
       String(fields.get('notes') || '').trim(),
       'Способ получения: ' + String(fields.get('fulfillment') || 'Самовывоз'),
+      (String(fields.get('fulfillment') || 'Самовывоз') === 'Самовывоз' ? 'Адрес самовывоза: Тихий ролл, Социалистическая, 26, район «Остров», Чарышское' : ''),
       (String(fields.get('fulfillment') || '') === 'Доставка' ? 'Адрес доставки: ' + String(fields.get('delivery_address') || '').trim() : '')
     ].filter(Boolean).join('\\n'),
     items: products.filter(product => (cart[product.id] || 0) > 0)
