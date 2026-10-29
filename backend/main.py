@@ -497,6 +497,26 @@ async def admin_analytics(x_telegram_init_data: str | None = Header(default=None
                 [{"name": name, "qty": qty} for name, qty in popular.items()],
                 key=lambda item: item["qty"], reverse=True)[:10]}
 
+MAX_ORDERS_PER_SLOT = max(1, int(os.getenv("MAX_ORDERS_PER_SLOT", "5")))
+
+@app.get("/api/availability")
+async def get_availability(date: str) -> dict[str, Any]:
+    try:
+        datetime.strptime(date, "%Y-%m-%d")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="Дата должна быть в формате ГГГГ-ММ-ДД.") from exc
+    with order_db() as connection:
+        rows = connection.execute(
+            "SELECT pickup_time, COUNT(*) AS amount FROM orders WHERE pickup_time LIKE ? AND status != 'cancelled' GROUP BY pickup_time",
+            (f"%{date}%",)
+        ).fetchall()
+    full_times = []
+    for row in rows:
+        match = __import__("re").search(r"в (\d{2}:\d{2})$", row["pickup_time"])
+        if match and int(row["amount"]) >= MAX_ORDERS_PER_SLOT:
+            full_times.append(match.group(1))
+    return {"date": date, "unavailable_times": sorted(set(full_times)), "max_orders_per_slot": MAX_ORDERS_PER_SLOT}
+
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {
