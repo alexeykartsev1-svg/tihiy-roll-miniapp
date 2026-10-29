@@ -224,8 +224,10 @@ def calculate_order(items: list[OrderItem]) -> tuple[list[dict[str, Any]], int]:
             "id": row.id,
             "name": product["name"],
             "price": product["price"],
+            "cost": product.get("cost", 0),
             "qty": row.qty,
             "subtotal": subtotal,
+            "gross_profit": (product["price"] - product.get("cost", 0)) * row.qty,
         })
     if total <= 0 or total > 250000:
         raise ValueError("Некорректная сумма заказа")
@@ -320,7 +322,7 @@ def current_menu() -> dict[str, dict[str, Any]]:
             except (TypeError, ValueError):
                 continue
             if price > 0:
-                result[str(p["id"])] = {"name": str(p["name"]), "price": price}
+                result[str(p["id"])] = {"name": str(p["name"]), "price": price, "cost": max(0, int(p.get("cost", 0) or 0))}
     return result
 
 def require_admin_init_data(raw: str) -> dict[str, Any]:
@@ -468,6 +470,7 @@ async def admin_analytics(x_telegram_init_data: str | None = Header(default=None
     with order_db() as connection:
         rows = connection.execute("SELECT items_json,total,status,created_at FROM orders ORDER BY created_at DESC").fetchall()
     revenue = sum(row["total"] for row in rows if row["status"] != "cancelled")
+    gross_profit = sum(sum(int(item.get("gross_profit", 0)) for item in json.loads(row["items_json"])) for row in rows if row["status"] != "cancelled")
     active_orders = sum(row["status"] not in ("completed", "cancelled") for row in rows)
     popular: dict[str, int] = {}
     for row in rows:
@@ -476,7 +479,7 @@ async def admin_analytics(x_telegram_init_data: str | None = Header(default=None
         for item in json.loads(row["items_json"]):
             name = str(item.get("name", item.get("id", "Блюдо")))
             popular[name] = popular.get(name, 0) + int(item.get("qty", 0))
-    return {"orders_count": len(rows), "revenue": revenue,
+    return {"orders_count": len(rows), "revenue": revenue, "gross_profit": gross_profit,
             "active_orders": active_orders, "popular_items": sorted(
                 [{"name": name, "qty": qty} for name, qty in popular.items()],
                 key=lambda item: item["qty"], reverse=True)[:10]}
