@@ -1141,14 +1141,21 @@ phoneInput.addEventListener('blur', () => {
   phoneInput.setCustomValidity(normalized ? '' : 'Введите российский мобильный номер в формате +7 9XX XXX-XX-XX.');
   if (normalized) phoneInput.value = '+7 ' + normalized.slice(2,5) + ' ' + normalized.slice(5,8) + '-' + normalized.slice(8,10) + '-' + normalized.slice(10,12);
 });
-function updatePickupTimes() {
+async function updatePickupTimes() {
   const selectedDate = pickupDay.value === 'tomorrow' ? (() => { const d = new Date(); d.setDate(d.getDate()+1); return localDateString(d); })() : pickupDay.value === 'custom' ? pickupDate.value : localDateString(new Date());
   const todayString = localDateString(new Date());
   const select = document.getElementById('pickupTime');
+  let unavailable = [];
+  if (selectedDate && API_BASE_URL) {
+    try { const response = await fetch(API_BASE_URL + '/api/availability?date=' + encodeURIComponent(selectedDate), {cache:'no-store'}); if (response.ok) { const data=await response.json(); unavailable=Array.isArray(data.unavailable_times)?data.unavailable_times:[]; } } catch (_) {}
+  }
   [...select.options].forEach(option => {
     if (!option.value) return;
-    const isPast = selectedDate === todayString && option.value <= `${String(new Date().getHours()).padStart(2,'0')}:${String(new Date().getMinutes()).padStart(2,'0')}`;
-    option.disabled = isPast;
+    const now = new Date(); const currentTime = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    const isPast = selectedDate === todayString && option.value <= currentTime;
+    const isFull = unavailable.includes(option.value);
+    option.disabled = isPast || isFull;
+    option.textContent = option.value + (isFull ? ' — мест нет' : '');
   });
   if (select.selectedOptions[0]?.disabled) select.value = '';
 }
