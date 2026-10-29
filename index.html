@@ -589,7 +589,7 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 
 /* Sales helpers: curated sets, cart add-ons, repeat previous order */
 .sets-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.set-card{border:1px solid var(--gold-line);border-radius:16px;padding:15px;background:linear-gradient(150deg,#20190f,#11100d)}.set-card h3{margin:0 0 6px;font-size:16px}.set-card p{margin:0 0 12px;color:var(--muted);font-size:12px;line-height:1.45;min-height:34px}.set-card .set-price{color:var(--gold-light);font-weight:900;font-size:19px;margin-bottom:10px}.set-card button,.cart-suggestion button,.repeat-order{border:1px solid rgba(255,224,164,.65);border-radius:10px;padding:10px 12px;background:var(--gold);color:#21170b;font-size:12px;font-weight:850}.cart-suggestions{margin-top:15px;padding-top:14px;border-top:1px solid var(--gold-faint)}.cart-suggestions h3,.order-history h3{margin:0 0 8px;font-size:14px}.cart-suggestion{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(229,185,111,.12)}.cart-suggestion span{min-width:0;font-size:12px}.cart-suggestion small{display:block;color:var(--muted);margin-top:3px}.order-history{margin-top:14px;padding-top:12px;border-top:1px solid var(--gold-faint)}@media(max-width:600px){.sets-grid{grid-template-columns:1fr}.set-card p{min-height:0}.cart-suggestion button{flex:0 0 auto}}
-</style>
+.custom-set-builder{margin-top:24px;padding:clamp(16px,3vw,26px);border:1px solid rgba(226,190,112,.5);border-radius:22px;background:linear-gradient(145deg,rgba(218,176,95,.08),rgba(10,10,9,.75))}.custom-set-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}.custom-set-heading h3{margin:0 0 6px;font-size:clamp(21px,3vw,28px)}.custom-set-heading p{margin:0;color:var(--muted,#b9b2a5);line-height:1.5}.custom-set-badge{flex-shrink:0;border:1px solid rgba(226,190,112,.5);border-radius:999px;padding:7px 10px;font-size:10px;letter-spacing:.12em;color:#e8c77e}.custom-set-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.custom-set-option{display:flex;align-items:center;gap:11px;min-width:0;padding:10px;border:1px solid rgba(226,190,112,.18);border-radius:15px;background:rgba(0,0,0,.22)}.custom-set-option img{width:58px;height:58px;object-fit:cover;border-radius:11px;flex-shrink:0}.custom-set-details{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}.custom-set-details strong{font-size:14px;line-height:1.25}.custom-set-details small{font-size:12px;color:var(--muted,#b9b2a5)}.custom-set-qty{max-width:112px;min-width:92px;padding:9px 7px;border:1px solid rgba(226,190,112,.35);border-radius:10px;background:#15130f;color:#f7f1e6;font:inherit;font-size:12px}.custom-set-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:18px;padding-top:17px;border-top:1px solid rgba(226,190,112,.2)}.custom-set-footer>div{display:flex;flex-direction:column;gap:4px}.custom-set-footer span,.custom-set-footer small{color:var(--muted,#b9b2a5);font-size:12px}.custom-set-footer strong{font-size:26px;color:#e8c77e}.custom-set-footer button{border:0;border-radius:12px;padding:14px 18px;background:#e8c77e;color:#17120a;font-weight:800;cursor:pointer}.custom-set-footer button:disabled{opacity:.45;cursor:not-allowed}@media(max-width:520px){.custom-set-options{grid-template-columns:1fr}.custom-set-option img{width:54px;height:54px}.custom-set-details strong{font-size:13px}.custom-set-qty{min-width:90px;max-width:100px}.custom-set-footer{align-items:stretch;flex-direction:column}.custom-set-footer button{width:100%}.custom-set-badge{font-size:9px;padding:6px 8px}}</style>
 </head>
 <body>
 <main class="app">
@@ -677,6 +677,12 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
       <article class="set-card"><h3>🎉 Сет «Компания»</h3><p>Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.</p><div class="set-price" id="setPartyPrice">—</div><button type="button" data-set="party">Добавить сет</button></article>
     </div>
     <p class="field-hint">Стоимость рассчитывается по актуальным ценам меню. Это подборки блюд, а не скидочные наборы.</p>
+    <div class="custom-set-builder" id="customSetBuilder">
+      <div class="custom-set-heading"><div><h3>Собери свой сет</h3><p>Выбирай любимые роллы и количество каждой позиции.</p></div><span class="custom-set-badge">ТВОЙ ВЫБОР</span></div>
+      <div class="custom-set-options" id="customSetOptions" aria-live="polite"></div>
+      <div class="custom-set-footer"><div><span>Твой сет</span><strong id="customSetTotal">0 ₽</strong><small id="customSetCount">Выбери блюда из меню</small></div><button type="button" id="addCustomSet" disabled>Добавить сет в корзину →</button></div>
+      <p class="field-hint">Цена рассчитывается автоматически по актуальным ценам меню.</p>
+    </div>
   </section>
 
   <section class="section favorites-section" id="favorites-section" aria-labelledby="favorites-title">
@@ -948,6 +954,36 @@ function renderMenu(filter = activeFilter) {
 const SET_PRESETS={solo:[['philadelphia',1],['lava',1]],duo:[['philadelphia',1],['warm_crab',1],['lava',1]],party:[['philadelphia',2],['lava',1],['warm_crab',1],['warm_salmon',1]]};
 function renderSetPrices(){Object.entries({solo:'setSoloPrice',duo:'setDuoPrice',party:'setPartyPrice'}).forEach(([key,id])=>{const el=document.getElementById(id);if(!el)return;const rows=SET_PRESETS[key];const total=rows.reduce((sum,[pid,qty])=>{const p=products.find(x=>x.id===pid);return sum+(p?p.price*qty:0)},0);el.textContent=money(total)})}
 document.addEventListener('click',event=>{const button=event.target.closest('[data-set]');if(!button)return;const rows=SET_PRESETS[button.dataset.set]||[];let added=false;rows.forEach(([id,qty])=>{if(products.some(p=>p.id===id)){cart[id]=Math.min(99,(cart[id]||0)+qty);added=true}});if(added){saveCart();renderMenu(activeFilter);updateCartBar();button.textContent='Добавлено ✓';setTimeout(()=>{button.textContent='Добавить сет'},1400)}});
+function renderCustomSetBuilder(){
+  const root=document.getElementById('customSetOptions');if(!root)return;root.replaceChildren();
+  products.forEach(product=>{
+    const row=document.createElement('label');row.className='custom-set-option';
+    const image=document.createElement('img');image.src=product.photo;image.alt='';image.loading='lazy';
+    const details=document.createElement('span');details.className='custom-set-details';
+    const name=document.createElement('strong');name.textContent=product.name;
+    const price=document.createElement('small');price.textContent=money(product.price)+' / порция';
+    details.append(name,price);
+    const qty=document.createElement('select');qty.className='custom-set-qty';qty.setAttribute('aria-label','Количество: '+product.name);
+    [['0','Не добавлять'],['1','1 шт.'],['2','2 шт.'],['3','3 шт.'],['4','4 шт.'],['5','5 шт.']].forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;qty.append(option)});
+    qty.dataset.productId=product.id;qty.addEventListener('change',updateCustomSetTotal);
+    row.append(image,details,qty);root.append(row);
+  });
+  updateCustomSetTotal();
+}
+function updateCustomSetTotal(){
+  const root=document.getElementById('customSetOptions');if(!root)return;let total=0,count=0;
+  root.querySelectorAll('.custom-set-qty').forEach(select=>{const qty=Number(select.value)||0;const product=products.find(p=>p.id===select.dataset.productId);if(product&&qty){total+=product.price*qty;count+=qty}});
+  document.getElementById('customSetTotal').textContent=money(total);
+  document.getElementById('customSetCount').textContent=count?count+' порц. в твоём сете':'Выбери блюда из меню';
+  document.getElementById('addCustomSet').disabled=count===0;
+}
+document.getElementById('addCustomSet')?.addEventListener('click',()=>{
+  const root=document.getElementById('customSetOptions');if(!root)return;let added=0;
+  root.querySelectorAll('.custom-set-qty').forEach(select=>{const qty=Number(select.value)||0;const product=products.find(p=>p.id===select.dataset.productId);if(product&&qty){cart[product.id]=Math.min(99,(cart[product.id]||0)+qty);added+=qty}});
+  if(!added)return;saveCart();renderMenu(activeFilter);updateCartBar();renderCart();
+  const button=document.getElementById('addCustomSet');button.textContent='Добавлено в корзину ✓';setTimeout(()=>{button.textContent='Добавить сет в корзину →'},1600);
+  root.querySelectorAll('.custom-set-qty').forEach(select=>select.value='0');updateCustomSetTotal();
+});
 function getTotals() {
   let count = 0, total = 0;
   products.forEach(product => { const qty = cart[product.id] || 0; count += qty; total += qty * product.price; });
@@ -1410,6 +1446,7 @@ async function showAdminButtonIfAllowed() {
   } catch (error) { console.warn('Проверка доступа к панели управления не удалась.'); }
 }
 renderMenu();
+renderCustomSetBuilder();
 updateCartBar();
 loadServerCatalog();
 showAdminButtonIfAllowed();
