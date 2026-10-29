@@ -95,6 +95,7 @@ class OrderPayload(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     phone: str = Field(min_length=5, max_length=50)
     time: str = Field(min_length=2, max_length=100)
+    notes: str = Field(default="", max_length=1000)
     items: list[OrderItem] = Field(min_length=1, max_length=20)
 
     @model_validator(mode="before")
@@ -114,6 +115,7 @@ class OrderPayload(BaseModel):
             "name": ("name", "customer_name", "customerName"),
             "phone": ("phone", "phone_number", "phoneNumber", "telephone"),
             "time": ("time", "pickup_time", "pickupTime", "desired_time"),
+            "notes": ("notes", "comment", "order_notes"),
             "items": ("items", "cart", "order_items", "orderItems"),
         }
         normalized: dict[str, Any] = {}
@@ -437,6 +439,7 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
         "name": payload.name,
         "phone": payload.phone,
         "time": payload.time,
+        "notes": payload.notes,
         "items": [{"id": item["id"], "qty": item["qty"]} for item in items],
     }
     fingerprint = hashlib.sha256(json.dumps(canonical, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
@@ -470,6 +473,7 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
             f"Время получения: {payload.time}\n"
             f"Telegram клиента: {telegram_label} (ID {user_id}, {telegram_name})\n\n"
             + "\n".join(lines)
+            + (f"\n\nДополнение / способ получения:\n{payload.notes}" if payload.notes.strip() else "")
             + f"\n\nИТОГО: {format_money(total)}\n\n"
             "Время выдачи необходимо подтвердить отдельно."
         )
