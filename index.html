@@ -1267,6 +1267,13 @@ document.getElementById('form').addEventListener('submit', async event => {
     }
 
     succeeded = true;
+    saveOrderHistory({
+      orderId: result.order_id,
+      summary: order.items.map(item => { const p=products.find(product=>product.id===item.id); return (p?p.name:item.id)+' × '+item.qty; }).join(', '),
+      items: order.items.map(item=>({id:item.id,qty:item.qty})),
+      total: Number(result.total || getTotals().total),
+      date: new Date().toISOString()
+    });
     document.getElementById('items').hidden = true;
     form.hidden = true;
     success.hidden = false;
