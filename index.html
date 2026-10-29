@@ -1035,6 +1035,7 @@ function renderSetPrices(){
     const total=rows.reduce((sum,[pid,qty])=>{const p=products.find(x=>x.id===pid);return sum+(p?p.price*qty:0)},0);
     el.textContent=available?money(total):'Временно недоступен';
   });
+  populateSetImages();
 }
 
 const setQuantities={solo:0,duo:0,party:0,newyear:0};
