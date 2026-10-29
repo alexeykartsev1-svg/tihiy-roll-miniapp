@@ -587,6 +587,30 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
   .phone-number { font-size: 12px !important; }
 }
 
+
+/* Premium set cards — keep the existing dark/gold TihiyRoll visual language */
+.sets-grid{display:grid;grid-template-columns:1fr;gap:16px}
+.set-card.set-card-photo{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(42%,.95fr);gap:0;min-height:235px;overflow:hidden;padding:0;border:1px solid rgba(226,190,112,.68);border-radius:20px;background:#100f0c;box-shadow:inset 0 0 0 1px rgba(255,220,150,.035)}
+.set-card-copy{position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:20px 0 16px 20px}
+.set-card.set-card-photo h3{margin:0 0 10px;font-size:clamp(17px,2vw,22px);line-height:1.25;color:#fff8e8}
+.set-card.set-card-photo p{min-height:0;margin:0 0 14px;color:#c9c3b8;font-size:15px;line-height:1.45}
+.set-meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.set-meta span{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid rgba(226,190,112,.7);border-radius:11px;color:#f7e8c6;font-size:13px;white-space:nowrap}
+.set-card.set-card-photo .set-price{margin:0 0 13px;color:#f2d28b;font-size:clamp(23px,3vw,30px);line-height:1.1;font-weight:900}
+.set-actions{display:grid;grid-template-columns:minmax(92px,.85fr) minmax(120px,1.2fr);gap:8px;width:100%;margin-top:auto;padding-right:10px;align-items:stretch}
+.set-card.set-card-photo .set-actions button{min-height:42px;padding:8px 10px;border-radius:12px;font-size:13px;line-height:1.15;white-space:nowrap}
+.set-card.set-card-photo .set-composition{border:1px solid #e2be70;background:transparent;color:#f2d28b}
+.set-card.set-card-photo .set-add{border:1px solid #e2be70;background:linear-gradient(135deg,#f5d68f,#e5b85e);color:#21170b}
+.set-qty{grid-column:1/-1;display:grid;grid-template-columns:38px 1fr 38px;align-items:center;justify-items:center;min-height:38px;border:1px solid rgba(226,190,112,.78);border-radius:999px;padding:3px;background:rgba(0,0,0,.45)}
+.set-card.set-card-photo .set-qty button{width:32px;height:32px;min-height:32px;padding:0;border:1px solid #cba45c;border-radius:50%;background:transparent;color:#f4d48e;font-size:22px}
+.set-qty output{color:#fff;font-weight:800;font-size:15px}
+.set-card-visual{position:relative;min-width:0;min-height:100%;overflow:hidden}
+.set-card-visual:before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,#100f0c 0%,rgba(16,15,12,.72) 10%,rgba(16,15,12,.08) 60%,rgba(16,15,12,.05) 100%)}
+.set-card-visual img{display:block;width:100%;height:100%;position:absolute;inset:0;object-fit:cover;object-position:center}
+.set-card-photo[data-set-card="party"] .set-card-visual img,.set-card-photo[data-set-card="newyear"] .set-card-visual img{object-position:65% center}
+@media(max-width:600px){.sets-grid{gap:12px}.set-card.set-card-photo{grid-template-columns:minmax(0,1fr) 43%;min-height:225px;border-radius:17px}.set-card-copy{padding:15px 0 13px 13px}.set-card.set-card-photo h3{font-size:16px;margin-bottom:8px}.set-card.set-card-photo p{font-size:13px;line-height:1.4;margin-bottom:11px}.set-meta{gap:5px;margin-bottom:10px}.set-meta span{padding:5px 7px;font-size:11px;border-radius:9px}.set-card.set-card-photo .set-price{font-size:24px;margin-bottom:11px}.set-actions{grid-template-columns:1fr;gap:6px;padding-right:7px}.set-card.set-card-photo .set-actions button{min-height:36px;font-size:12px;padding:7px 8px}.set-qty{grid-column:1;grid-template-columns:34px 1fr 34px;min-height:35px}.set-card.set-card-photo .set-qty button{width:29px;height:29px;min-height:29px}.set-card-visual:before{background:linear-gradient(90deg,#100f0c 0%,rgba(16,15,12,.48) 12%,rgba(16,15,12,.02) 100%)}}
+@media(max-width:380px){.set-card.set-card-photo{grid-template-columns:minmax(0,1fr) 38%;min-height:230px}.set-card-copy{padding-left:10px}.set-card.set-card-photo h3{font-size:14px}.set-card.set-card-photo p{font-size:12px}.set-meta span{font-size:10px;padding:4px 5px}.set-card.set-card-photo .set-price{font-size:22px}}
+
 /* Sales helpers: curated sets, cart add-ons, repeat previous order */
 .sets-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.set-card{border:1px solid var(--gold-line);border-radius:16px;padding:15px;background:linear-gradient(150deg,#20190f,#11100d)}.set-card h3{margin:0 0 8px;font-size:17px;line-height:1.3}.set-card p{margin:0 0 14px;color:var(--muted);font-size:15px;line-height:1.55;min-height:58px}.set-card .set-price{color:var(--gold-light);font-weight:900;font-size:19px;margin-bottom:10px}.sets-note{margin:22px 0 0!important;font-size:14px!important;line-height:1.55!important}.custom-set-note{margin:20px 0 0!important;font-size:14px!important;line-height:1.55!important}.set-card button,.cart-suggestion button,.repeat-order{border:1px solid rgba(255,224,164,.65);border-radius:10px;padding:10px 12px;background:var(--gold);color:#21170b;font-size:12px;font-weight:850}.cart-suggestions{margin-top:15px;padding-top:14px;border-top:1px solid var(--gold-faint)}.cart-suggestions h3,.order-history h3{margin:0 0 8px;font-size:14px}.cart-suggestion{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(229,185,111,.12)}.cart-suggestion span{min-width:0;font-size:12px}.cart-suggestion small{display:block;color:var(--muted);margin-top:3px}.order-history{margin-top:14px;padding-top:12px;border-top:1px solid var(--gold-faint)}@media(max-width:600px){.sets-grid{grid-template-columns:1fr}.set-card p{min-height:0}.cart-suggestion button{flex:0 0 auto}}
 .custom-set-builder{margin-top:24px;padding:clamp(16px,3vw,26px);border:1px solid rgba(226,190,112,.5);border-radius:22px;background:linear-gradient(145deg,rgba(218,176,95,.08),rgba(10,10,9,.75))}.custom-set-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}.custom-set-heading h3{margin:0 0 6px;font-size:clamp(21px,3vw,28px)}.custom-set-heading p{margin:0;color:var(--muted,#b9b2a5);line-height:1.5}.custom-set-badge{flex-shrink:0;border:1px solid rgba(226,190,112,.5);border-radius:999px;padding:7px 10px;font-size:10px;letter-spacing:.12em;color:#e8c77e}.custom-set-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.custom-set-option{display:flex;align-items:center;gap:11px;min-width:0;padding:10px;border:1px solid rgba(226,190,112,.18);border-radius:15px;background:rgba(0,0,0,.22)}.custom-set-option img{width:58px;height:58px;object-fit:cover;border-radius:11px;flex-shrink:0}.custom-set-details{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}.custom-set-details strong{font-size:14px;line-height:1.25}.custom-set-details small{font-size:12px;color:var(--muted,#b9b2a5)}.custom-set-qty{max-width:112px;min-width:92px;padding:9px 7px;border:1px solid rgba(226,190,112,.35);border-radius:10px;background:#15130f;color:#f7f1e6;font:inherit;font-size:12px}.custom-set-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:18px;padding-top:17px;border-top:1px solid rgba(226,190,112,.2)}.custom-set-footer>div{display:flex;flex-direction:column;gap:4px}.custom-set-footer span,.custom-set-footer small{color:var(--muted,#b9b2a5);font-size:12px}.custom-set-footer strong{font-size:26px;color:#e8c77e}.custom-set-footer button{border:0;border-radius:12px;padding:14px 18px;background:#e8c77e;color:#17120a;font-weight:800;cursor:pointer}.custom-set-footer button:disabled{opacity:.45;cursor:not-allowed}@media(max-width:520px){.custom-set-options{grid-template-columns:1fr}.custom-set-option img{width:54px;height:54px}.custom-set-details strong{font-size:13px}.custom-set-qty{min-width:90px;max-width:100px}.custom-set-footer{align-items:stretch;flex-direction:column}.custom-set-footer button{width:100%}.custom-set-badge{font-size:9px;padding:6px 8px}}</style>
@@ -668,10 +692,46 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
   <section class="section" id="sets-section" aria-labelledby="sets-title">
     <div class="section-heading"><h2 id="sets-title">Готовые сеты</h2><span class="section-note">Любимые сочетания</span></div>
     <div class="sets-grid">
-      <article class="set-card"><h3>🍣 Сет «На одного»</h3><p>Филадельфия и Лава — для уютного ужина.</p><div class="set-price" id="setSoloPrice">—</div><button type="button" data-set="solo">Добавить сет</button></article>
-      <article class="set-card"><h3>🥢 Сет «Вечер вдвоём»</h3><p>Филадельфия, Тёплый краб и Лава — поделиться вкусом.</p><div class="set-price" id="setDuoPrice">—</div><button type="button" data-set="duo">Добавить сет</button></article>
-      <article class="set-card"><h3>🎉 Сет «Компания»</h3><p>Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.</p><div class="set-price" id="setPartyPrice">—</div><button type="button" data-set="party">Добавить сет</button></article>
-      <article class="set-card"><h3>🎄 Новогодний сет</h3><p>Праздничное сочетание Филадельфии, Лавы и тёплых роллов.</p><div class="set-price" id="setNewYearPrice">—</div><button type="button" data-set="newyear">Добавить сет</button></article>
+      <article class="set-card set-card-photo" data-set-card="solo">
+        <div class="set-card-copy">
+          <h3>🍣 Сет «На одного»</h3><p>Филадельфия и Лава — для уютного ужина.</p>
+          <div class="set-meta"><span aria-label="32 штук">▣ &nbsp;32 шт.</span><span aria-label="800 граммов">⚖ &nbsp;800 г</span></div>
+          <div class="set-price" id="setSoloPrice">—</div>
+          <div class="set-actions"><button class="set-composition" type="button" data-set-composition="solo">☷ &nbsp; Состав</button><button class="set-add" type="button" data-set="solo">Добавить сет</button>
+            <div class="set-qty" aria-label="Количество сетов"><button type="button" data-set-qty="minus" data-set-key="solo" aria-label="Уменьшить количество">−</button><output data-set-count="solo">0</output><button type="button" data-set-qty="plus" data-set-key="solo" aria-label="Увеличить количество">+</button></div>
+          </div>
+        </div><div class="set-card-visual" aria-hidden="true"><img data-set-image="solo" alt="" loading="lazy"></div>
+      </article>
+      <article class="set-card set-card-photo" data-set-card="duo">
+        <div class="set-card-copy">
+          <h3>🥢 Сет «Вечер вдвоём»</h3><p>Филадельфия, Тёплый краб и Лава — поделиться вкусом.</p>
+          <div class="set-meta"><span aria-label="48 штук">▣ &nbsp;48 шт.</span><span aria-label="1200 граммов">⚖ &nbsp;1 200 г</span></div>
+          <div class="set-price" id="setDuoPrice">—</div>
+          <div class="set-actions"><button class="set-composition" type="button" data-set-composition="duo">☷ &nbsp; Состав</button><button class="set-add" type="button" data-set="duo">Добавить сет</button>
+            <div class="set-qty" aria-label="Количество сетов"><button type="button" data-set-qty="minus" data-set-key="duo" aria-label="Уменьшить количество">−</button><output data-set-count="duo">0</output><button type="button" data-set-qty="plus" data-set-key="duo" aria-label="Увеличить количество">+</button></div>
+          </div>
+        </div><div class="set-card-visual" aria-hidden="true"><img data-set-image="duo" alt="" loading="lazy"></div>
+      </article>
+      <article class="set-card set-card-photo" data-set-card="party">
+        <div class="set-card-copy">
+          <h3>🎉 Сет «Компания»</h3><p>Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.</p>
+          <div class="set-meta"><span aria-label="64 штук">▣ &nbsp;64 шт.</span><span aria-label="1600 граммов">⚖ &nbsp;1 600 г</span></div>
+          <div class="set-price" id="setPartyPrice">—</div>
+          <div class="set-actions"><button class="set-composition" type="button" data-set-composition="party">☷ &nbsp; Состав</button><button class="set-add" type="button" data-set="party">Добавить сет</button>
+            <div class="set-qty" aria-label="Количество сетов"><button type="button" data-set-qty="minus" data-set-key="party" aria-label="Уменьшить количество">−</button><output data-set-count="party">0</output><button type="button" data-set-qty="plus" data-set-key="party" aria-label="Увеличить количество">+</button></div>
+          </div>
+        </div><div class="set-card-visual" aria-hidden="true"><img data-set-image="party" alt="" loading="lazy"></div>
+      </article>
+      <article class="set-card set-card-photo" data-set-card="newyear">
+        <div class="set-card-copy">
+          <h3>🎄 Новогодний сет</h3><p>Праздничное сочетание Филадельфии, Лавы и тёплых роллов.</p>
+          <div class="set-meta"><span aria-label="64 штук">▣ &nbsp;64 шт.</span><span aria-label="1600 граммов">⚖ &nbsp;1 600 г</span></div>
+          <div class="set-price" id="setNewYearPrice">—</div>
+          <div class="set-actions"><button class="set-composition" type="button" data-set-composition="newyear">☷ &nbsp; Состав</button><button class="set-add" type="button" data-set="newyear">Добавить сет</button>
+            <div class="set-qty" aria-label="Количество сетов"><button type="button" data-set-qty="minus" data-set-key="newyear" aria-label="Уменьшить количество">−</button><output data-set-count="newyear">0</output><button type="button" data-set-qty="plus" data-set-key="newyear" aria-label="Увеличить количество">+</button></div>
+          </div>
+        </div><div class="set-card-visual" aria-hidden="true"><img data-set-image="newyear" alt="" loading="lazy"></div>
+      </article>
     </div>
     <p class="field-hint sets-note">Стоимость рассчитывается по актуальным ценам меню. Это подборки блюд, а не скидочные наборы.</p>
     <div class="custom-set-builder" id="customSetBuilder">
@@ -976,6 +1036,24 @@ function renderSetPrices(){
     el.textContent=available?money(total):'Временно недоступен';
   });
 }
+
+const setQuantities={solo:0,duo:0,party:0,newyear:0};
+function syncSetCount(key){const out=document.querySelector('[data-set-count="'+key+'"]');if(out)out.textContent=String(setQuantities[key]||0)}
+function populateSetImages(){
+ const sourceIds={solo:'philadelphia',duo:'warm_crab',party:'warm_salmon',newyear:'lava'};
+ Object.entries(sourceIds).forEach(([key,id])=>{const p=products.find(x=>x.id===id)||products.find(x=>x.photo);const img=document.querySelector('[data-set-image="'+key+'"]');if(p&&img){img.src=p.photo;img.onerror=()=>{img.style.display='none'}}});
+}
+document.addEventListener('click',event=>{
+ const composition=event.target.closest('[data-set-composition]');
+ if(composition){const key=composition.dataset.setComposition;const rows=SET_PRESETS[key]||[];const names=rows.map(([id,qty])=>{const p=products.find(x=>x.id===id);return p?(qty>1?qty+' × ':'')+p.name:''}).filter(Boolean);if(names.length)window.alert('Состав сета:\n'+names.join('\n'));return}
+ const qtyButton=event.target.closest('[data-set-qty]');
+ if(qtyButton){const key=qtyButton.dataset.setKey;const rows=SET_PRESETS[key]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;
+  if(qtyButton.dataset.setQty==='plus'){rows.forEach(([id,qty])=>cart[id]=Math.min(99,(cart[id]||0)+qty));setQuantities[key]=(setQuantities[key]||0)+1}
+  else {if((setQuantities[key]||0)<=0)return;rows.forEach(([id,qty])=>cart[id]=Math.max(0,(cart[id]||0)-qty));setQuantities[key]--; }
+  saveCart();renderMenu(activeFilter);updateCartBar();renderCart();syncSetCount(key);return
+ }
+});
+
 document.addEventListener('click',event=>{const button=event.target.closest('[data-set]');if(!button)return;const rows=SET_PRESETS[button.dataset.set]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;rows.forEach(([id,qty])=>{cart[id]=Math.min(99,(cart[id]||0)+qty)});saveCart();renderMenu(activeFilter);updateCartBar();button.textContent='Добавлено ✓';setTimeout(()=>{button.textContent='Добавить сет'},1400)});
 function renderCustomSetBuilder(){
   const root=document.getElementById('customSetOptions');if(!root)return;root.replaceChildren();
