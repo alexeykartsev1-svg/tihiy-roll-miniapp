@@ -214,7 +214,7 @@ def calculate_order(items: list[OrderItem]) -> tuple[list[dict[str, Any]], int]:
         if row.id in seen:
             raise ValueError("В заказе повторяется одна и та же позиция")
         seen.add(row.id)
-        product = MENU[row.id]
+        product = live_menu[row.id]
         subtotal = product["price"] * row.qty
         total += subtotal
         clean_items.append({
