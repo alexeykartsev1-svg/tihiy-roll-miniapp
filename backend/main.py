@@ -6,6 +6,7 @@ import hmac
 import json
 import logging
 import os
+import sqlite3
 import time
 import uuid
 from collections import defaultdict, deque
@@ -53,7 +54,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=False,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "X-Telegram-Init-Data"],
     max_age=600,
 )
@@ -408,6 +409,78 @@ async def admin_delete_product(product_id: str, x_telegram_init_data: str | None
     write_products(updated)
     return {"ok": True}
 
+
+# Order history is stored in SQLite. Set ORDERS_DB_PATH to a persistent disk path
+# on hosting providers if order history must survive service redeploys.
+ORDERS_DB_PATH = os.getenv("ORDERS_DB_PATH", "/tmp/tihiy_roll_orders.sqlite3")
+VALID_ORDER_STATUSES = {"new", "accepted", "preparing", "ready", "completed", "cancelled"}
+
+def order_db():
+    connection = sqlite3.connect(ORDERS_DB_PATH, timeout=10)
+    connection.row_factory = sqlite3.Row
+    return connection
+
+def init_order_db():
+    folder = os.path.dirname(ORDERS_DB_PATH)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    with order_db() as connection:
+        connection.execute("""CREATE TABLE IF NOT EXISTS orders (
+            order_id TEXT PRIMARY KEY, created_at TEXT NOT NULL, customer_name TEXT NOT NULL,
+            phone TEXT NOT NULL, pickup_time TEXT NOT NULL, notes TEXT NOT NULL,
+            items_json TEXT NOT NULL, total INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'new'
+        )""")
+        connection.execute("CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at)")
+
+init_order_db()
+
+@app.get("/api/admin/orders")
+async def admin_get_orders(x_telegram_init_data: str | None = Header(default=None), limit: int = 100) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    limit = max(1, min(limit, 200))
+    with order_db() as connection:
+        rows = connection.execute("SELECT * FROM orders ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
+    orders = []
+    for row in rows:
+        item = dict(row)
+        item["items"] = json.loads(item.pop("items_json"))
+        orders.append(item)
+    totals = {"orders": len(orders), "revenue": sum(o["total"] for o in orders),
+              "new": sum(o["status"] == "new" for o in orders),
+              "completed": sum(o["status"] == "completed" for o in orders)}
+    return {"orders": orders, "summary": totals}
+
+@app.patch("/api/admin/orders/{order_id}")
+async def admin_update_order(order_id: str, payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    status_value = payload.get("status")
+    if status_value not in VALID_ORDER_STATUSES:
+        raise HTTPException(status_code=400, detail="Неизвестный статус заказа.")
+    with order_db() as connection:
+        cursor = connection.execute("UPDATE orders SET status=? WHERE order_id=?", (status_value, order_id))
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Заказ не найден.")
+    return {"ok": True, "order_id": order_id, "status": status_value}
+
+@app.get("/api/admin/analytics")
+async def admin_analytics(x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    with order_db() as connection:
+        rows = connection.execute("SELECT items_json,total,status,created_at FROM orders ORDER BY created_at DESC").fetchall()
+    revenue = sum(row["total"] for row in rows if row["status"] != "cancelled")
+    active_orders = sum(row["status"] not in ("completed", "cancelled") for row in rows)
+    popular: dict[str, int] = {}
+    for row in rows:
+        if row["status"] == "cancelled":
+            continue
+        for item in json.loads(row["items_json"]):
+            name = str(item.get("name", item.get("id", "Блюдо")))
+            popular[name] = popular.get(name, 0) + int(item.get("qty", 0))
+    return {"orders_count": len(rows), "revenue": revenue,
+            "active_orders": active_orders, "popular_items": sorted(
+                [{"name": name, "qty": qty} for name, qty in popular.items()],
+                key=lambda item: item["qty"], reverse=True)[:10]}
+
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {
@@ -498,6 +571,13 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
             else:
                 detail = "Telegram временно не принял заказ. Попробуйте ещё раз чуть позже."
             raise HTTPException(status_code=502, detail=detail)
+
+        with order_db() as connection:
+            connection.execute(
+                "INSERT OR IGNORE INTO orders (order_id,created_at,customer_name,phone,pickup_time,notes,items_json,total,status) VALUES (?,?,?,?,?,?,?,?,?)",
+                (order_code, datetime.now().isoformat(timespec="seconds"), payload.name, payload.phone,
+                 payload.time, payload.notes, json.dumps(items, ensure_ascii=False), total, "new")
+            )
 
         result = {
             "ok": True,
