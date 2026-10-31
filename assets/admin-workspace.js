@@ -47,7 +47,10 @@
     wrap.insertBefore(shell,head);shell.append(sidebar,main);main.append(head);
     if(status)main.append(status);
     if(login)main.append(login);
-    main.append(app);if(foot)main.append(foot);
+    main.append(app);
+    const legacyData=document.createElement('div');legacyData.className='hidden';legacyData.id='legacyAdminData';
+    legacyData.append(orderPanel);main.append(legacyData);
+    if(foot)main.append(foot);
 
     const home=page('home','Главная','Обзор магазина и быстрый доступ к ежедневным задачам');
     home.innerHTML+='<div class="admin-home-hero"><div><h2>Тихий ролл · магазин под контролем</h2><p>Заказы, меню, фотографии и показатели продаж — в одном рабочем пространстве.</p></div><div class="admin-home-actions"><button class="btn primary" type="button" data-go="orders">Открыть новые заказы</button><button class="btn" type="button" data-go="products">Добавить товар</button></div></div><div class="admin-kpis" id="homeKpis"></div><div class="admin-home-grid"><section class="panel"><div class="toolbar"><div><h2 style="margin:0">Быстрые действия</h2><p class="muted">Основные ежедневные операции</p></div></div><div class="admin-home-shortcuts"><button class="admin-home-shortcut" type="button" data-go="orders"><i>▤</i><span><b>Заказы</b><small>Принять и обновить статус</small></span></button><button class="admin-home-shortcut" type="button" data-go="products"><i>🍣</i><span><b>Товары</b><small>Фото, состав и стоимость</small></span></button><button class="admin-home-shortcut" type="button" data-go="sets"><i>🎁</i><span><b>Готовые сеты</b><small>Состав и галерея</small></span></button><button class="admin-home-shortcut" type="button" data-go="banners"><i>▧</i><span><b>Главная и баннеры</b><small>Слайды и рекламный блок</small></span></button></div></section><section class="panel"><h2>Последние заказы</h2><div id="homeRecentOrders"></div></section></div>';
