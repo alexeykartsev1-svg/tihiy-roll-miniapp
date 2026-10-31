@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import json
 import time
+from pydantic import ValidationError
 from urllib.parse import urlencode
 
 from main import MENU, OrderItem, ProductPayload, calculate_order, verify_telegram_init_data
@@ -58,9 +59,10 @@ def main() -> None:
             price=350,
             gallery=["file:///tmp/photo.jpg"],
         )
-        raise AssertionError("Unsafe gallery source should fail")
-    except Exception:
+    except ValidationError:
         pass
+    else:
+        raise AssertionError("Unsafe gallery source should fail")
 
     items, total = calculate_order([OrderItem(id="philadelphia", qty=1), OrderItem(id="warm_salmon", qty=2)])
     assert total == MENU["philadelphia"]["price"] + 2 * MENU["warm_salmon"]["price"]
