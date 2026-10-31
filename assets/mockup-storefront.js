@@ -420,6 +420,7 @@ function formatRussianPhone(value){
  if(digits.startsWith('8')||digits.startsWith('7'))digits=digits.slice(1);
  digits=digits.slice(0,10);
  let result='+7';
+ if(!digits.length)return '+7 ';
  if(digits.length)result+=' '+digits.slice(0,3);
  if(digits.length>3)result+=' '+digits.slice(3,6);
  if(digits.length>6)result+='-'+digits.slice(6,8);
@@ -571,11 +572,11 @@ $('#catalogSearch').addEventListener('input',e=>{state.search=e.target.value.tri
 $('#pickupDate').addEventListener('change',refreshTimes);
 const checkoutName=$('#checkoutName'),checkoutPhone=$('#checkoutPhone'),deliveryAddress=$('#deliveryAddress');
 checkoutPhone.value=formatRussianPhone(checkoutPhone.value||'+7 ');
-checkoutPhone.addEventListener('focus',()=>{if(!checkoutPhone.value||checkoutPhone.value.trim()==='')checkoutPhone.value='+7 ';});
+checkoutPhone.addEventListener('focus',()=>{if(!checkoutPhone.value||checkoutPhone.value.trim()==='')checkoutPhone.value='+7 ';if(checkoutPhone.value.trim()==='+7'){try{checkoutPhone.setSelectionRange(checkoutPhone.value.length,checkoutPhone.value.length);}catch(_){}}});
 checkoutPhone.addEventListener('beforeinput',event=>{
  if(!event.inputType?.startsWith('delete'))return;
  const start=checkoutPhone.selectionStart??0,end=checkoutPhone.selectionEnd??0;
- if(start<2&&end<=2)event.preventDefault();
+ if(start<=2&&end<=2)event.preventDefault();
 });
 checkoutPhone.addEventListener('input',()=>{normalizePhoneField();if(checkoutPhone.classList.contains('is-invalid'))validateCheckoutPhone(true);});
 checkoutPhone.addEventListener('blur',()=>validateCheckoutPhone(true));
