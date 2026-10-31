@@ -332,4 +332,80 @@
   window.addEventListener('tihiy:catalog-rendered',()=>{applyCatalogTools()});
   loadShopSettings();
   activateNav();
+}
+  function initCustomerOrderHistory(){
+    const modal=$('#ordersModal'),list=$('#myOrdersList'),header=$('.topbar');
+    if(!modal||!list)return;
+    const tg=window.Telegram&&window.Telegram.WebApp;
+    const open=document.createElement('button');open.type='button';open.id='myOrdersOpen';open.className='my-orders-open';open.textContent='Мои заказы';
+    open.addEventListener('click',()=>{modal.classList.add('show');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';loadMyOrders()});
+    if(header)header.append(open);
+    const close=()=>{
+      modal.classList.remove('show');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';
+    };
+    $('#closeOrders')?.addEventListener('click',close);
+    modal.addEventListener('click',event=>{if(event.target===modal)close()});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&modal.classList.contains('show'))close()});
+    $('#refreshMyOrders')?.addEventListener('click',loadMyOrders);
+    async function loadMyOrders(){
+      list.replaceChildren();
+      const hint=$('#myOrdersHint');
+      if(!tg||!tg.initData){
+        if(hint)hint.textContent='Открой магазин через Telegram, чтобы увидеть заказы, оформленные с этого аккаунта.';
+        const empty=document.createElement('div');empty.className='orders-empty';empty.textContent='Для просмотра заказов нужна авторизация Telegram.';list.append(empty);return;
+      }
+      if(hint)hint.textContent='Получаем актуальные статусы из магазина…';
+      const loading=document.createElement('div');loading.className='orders-empty';loading.textContent='Загружаем заказы…';list.append(loading);
+      try{
+        const response=await fetch(API+'/api/my-orders?limit=20',{headers:{'X-Telegram-Init-Data':tg.initData},cache:'no-store'});
+        const data=await response.json().catch(()=>({}));
+        if(!response.ok)throw new Error(data.detail||'Не удалось загрузить историю заказов.');
+        list.replaceChildren();
+        const rows=Array.isArray(data.orders)?data.orders:[];
+        if(hint)hint.textContent=rows.length?'Последние '+rows.length+' заказов. Статусы обновляются после изменения заказа владельцем.':'Заказов пока нет.';
+        if(!rows.length){const empty=document.createElement('div');empty.className='orders-empty';empty.textContent='Здесь появятся твои заказы после оформления.';list.append(empty);return}
+        rows.forEach(order=>{
+          const card=document.createElement('article');card.className='customer-order-card';
+          const top=document.createElement('div');top.className='customer-order-top';
+          const number=document.createElement('strong');number.textContent='#'+order.order_id;
+          const status=document.createElement('span');status.className='customer-order-status status-'+(order.status||'new');
+          const labels={new:'Принят к обработке',accepted:'Заказ принят',preparing:'Готовится',ready:'Готов к выдаче',completed:'Выдан',cancelled:'Отменён'};
+          status.textContent=labels[order.status]||'Статус уточняется';top.append(number,status);
+          const date=document.createElement('p');date.className='customer-order-date';
+          const created=new Date(order.created_at||'');date.textContent=(Number.isNaN(created.getTime())?'':created.toLocaleString('ru-RU',{day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'})+' · ') +(order.pickup_time||'Время не указано');
+          const progress=document.createElement('div');progress.className='customer-order-progress';
+          const stages=[['accepted','Принят'],['preparing','Готовим'],['ready','Готов'],['completed','Выдан']];
+          const index=stages.findIndex(stage=>stage[0]===order.status);
+          stages.forEach(([key,label],i)=>{
+            const stage=document.createElement('span');stage.className=(i<index?'done ':'')+(i===index?'current':'');
+            const dot=document.createElement('i');dot.textContent=i<index?'✓':String(i+1);
+            const text=document.createElement('small');text.textContent=label;stage.append(dot,text);progress.append(stage);
+          });
+          if(order.status==='cancelled')progress.classList.add('cancelled');
+          const items=document.createElement('div');items.className='customer-order-items';
+          (order.items||[]).forEach(item=>{
+            const product=store.products.find(p=>p.id===item.id);
+            const line=document.createElement('div');line.className='customer-order-item';
+            const img=document.createElement('img');img.src=safeImage(product?.photo||'');img.alt='';
+            const name=document.createElement('span');name.textContent=(item.name||product?.name||item.id)+' × '+item.qty;
+            const total=document.createElement('b');total.textContent=money(item.subtotal||((item.price||product?.price||0)*(item.qty||0)));
+            line.append(img,name,total);items.append(line);
+          });
+          const footer=document.createElement('div');footer.className='customer-order-footer';
+          const label=document.createElement('span');label.textContent='Итого';
+          const sum=document.createElement('strong');sum.textContent=money(order.total);footer.append(label,sum);
+          card.append(top,date,progress,items,footer);
+          list.append(card);
+        });
+      }catch(error){
+        list.replaceChildren();const empty=document.createElement('div');empty.className='orders-empty';empty.textContent=error.message;list.append(empty);
+        if(hint)hint.textContent='Попробуй обновить список.';
+      }
+    }
+    window.__TIHIY_LOAD_MY_ORDERS=loadMyOrders;
+    document.addEventListener('tihiy:order-placed',()=>{
+      if(modal.classList.contains('show'))loadMyOrders();
+    });
+  }
+  initCustomerOrderHistory();
 })();
