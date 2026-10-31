@@ -455,3 +455,136 @@
 .admin-panel-entry-copy small{color:#a9b8be;font-size:10px}
 .admin-panel-entry-arrow{margin-left:auto;color:#ff8d82;font-size:20px;font-weight:800}
 .admin-panel-entry:active{transform:scale(.985);filter:brightness(1.12)}
+
+
+/* Brand identity, home operating hours and all-screen mobile navigation */
+.brand-logo{
+ display:grid;place-items:center;width:48px;height:48px;flex:0 0 48px;
+ border:1px solid rgba(242,76,64,.48);border-radius:16px;
+ background:linear-gradient(145deg,rgba(22,34,40,.96),rgba(5,12,17,.98));
+ box-shadow:0 5px 18px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.06);
+ text-decoration:none;overflow:hidden
+}
+.brand-logo svg{display:block;width:45px;height:45px}
+.brand-logo:active{transform:scale(.96)}
+.brand-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;height:48px!important}
+.catalogue-header{padding-top:13px!important}
+.catalogue-header .brand-row .brand-logo{justify-self:start}
+.catalogue-header .catalogue-title{margin-top:12px}
+.catalogue-header .menu-trigger{width:40px;height:40px;font-size:21px}
+.workflow-topbar{
+ display:flex!important;justify-content:space-between!important;align-items:center!important;
+ height:58px!important;min-height:58px!important;grid-template-columns:none!important;
+ gap:10px!important;padding:8px 2px 6px!important
+}
+.workflow-topbar .brand-logo{justify-self:start}
+.workflow-topbar .round-icon{margin-left:auto}
+.workflow-topbar .wordmark,.workflow-topbar .header-actions{display:none!important}
+.workflow-topbar .menu-trigger{margin-left:auto}
+.catalogue-header .wordmark,.catalogue-header .header-actions{display:none!important}
+.device-status{display:none!important}
+.detail-topbar{top:12px!important;left:14px!important;right:14px!important}
+.detail-brand-logo{position:absolute;left:53px;top:0;width:43px;height:43px;border-radius:14px}
+.detail-brand-logo svg{width:40px;height:40px}
+.detail-top-actions .round-icon{width:42px;height:42px}
+.detail-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.detail-title-row h2{min-width:0;margin:0}
+.detail-favorite-inline{
+ display:grid;place-items:center;width:42px;height:42px;flex:0 0 42px;
+ border:1px solid rgba(255,255,255,.17);border-radius:13px;
+ background:rgba(255,255,255,.045);color:#ff7067;font-size:27px;line-height:1
+}
+.detail-favorite-inline:active{transform:scale(.94);background:rgba(255,62,56,.13)}
+.detail-image-stage{touch-action:pan-y}
+.detail-image-stage>img{-webkit-user-drag:none;user-select:none}
+.home-hero h2{max-width:340px;font-size:clamp(31px,8vw,43px);line-height:1.05;letter-spacing:-.8px}
+.home-service-panel{display:grid;gap:9px;margin:0 0 21px}
+.home-hours-card{
+ padding:14px 15px;border:1px solid rgba(157,185,198,.22);border-radius:16px;
+ background:linear-gradient(145deg,rgba(17,29,36,.97),rgba(5,12,17,.98));
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.035)
+}
+.home-hours-state{display:flex;align-items:center;gap:10px;min-height:24px;color:#edf4f5;font-size:15px;font-weight:850}
+.home-hours-state b{font-size:15px;letter-spacing:-.1px}
+.hours-dot{position:relative;display:block;width:11px;height:11px;flex:0 0 11px;border-radius:50%}
+.hours-dot:after{content:"";position:absolute;inset:-5px;border:1px solid currentColor;border-radius:50%;opacity:.6;animation:hoursPulse 1.55s ease-out infinite}
+.hours-dot.is-open{background:#29df79;color:#29df79;box-shadow:0 0 11px rgba(41,223,121,.55)}
+.hours-dot.is-closed{background:#f04440;color:#f04440;box-shadow:0 0 11px rgba(240,68,64,.42)}
+.home-hours-state b.is-open{color:#55e58b}
+.home-hours-state b.is-closed{color:#ff716c}
+@keyframes hoursPulse{0%{transform:scale(.72);opacity:.75}100%{transform:scale(1.8);opacity:0}}
+.home-hours-lines{display:grid;gap:5px;margin-top:10px}
+.home-hours-lines>div{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#c4d0d5;font-size:12px}
+.home-hours-lines strong{color:#f0f4f5;font-size:12px;font-weight:850;white-space:nowrap}
+.home-hours-note{display:block;margin-top:8px;color:#82939b;font-size:9px;letter-spacing:.2px}
+.home-phone-button{
+ display:flex;align-items:center;gap:12px;min-height:62px;padding:10px 15px;
+ border:1px solid rgba(255,126,113,.47);border-radius:15px;
+ background:linear-gradient(110deg,#f3483f,#d9232c);color:white;text-decoration:none;
+ box-shadow:0 8px 22px rgba(218,35,44,.22),inset 0 1px 0 rgba(255,255,255,.14);
+ transition:filter .15s,transform .15s
+}
+.home-phone-button:active{transform:scale(.985);filter:brightness(1.1)}
+.home-phone-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border:1px solid rgba(255,255,255,.27);border-radius:12px;background:rgba(255,255,255,.1);font-size:23px}
+.home-phone-copy{display:grid;gap:3px;min-width:0}
+.home-phone-copy b{font-size:14px;font-weight:900;line-height:1.15}
+.home-phone-copy small{font-size:13px;font-weight:700;letter-spacing:.4px;white-space:nowrap}
+.home-phone-arrow{margin-left:auto;font-size:20px;font-weight:850}
+.home-shortcuts button{border-color:rgba(159,181,194,.25);transition:transform .14s,border-color .14s,background .14s,box-shadow .14s}
+.home-shortcuts button.active{
+ border-color:rgba(255,135,122,.94);
+ background:linear-gradient(145deg,rgba(248,67,57,.98),rgba(197,29,40,.96));
+ color:#fff;box-shadow:0 0 0 2px rgba(255,68,57,.13),0 8px 19px rgba(237,50,45,.25)
+}
+.home-shortcuts button.active>span{background:rgba(255,255,255,.14)}
+.home-shortcuts button.active small{color:rgba(255,255,255,.82)}
+.home-shortcuts button:active{transform:scale(.97)}
+/* Keep the five-tab bar visible over product and set details on mobile */
+@media(max-width:1120px){
+ .catalogue-header{padding:12px 13px 10px!important}
+ .catalogue-header .brand-row{height:48px!important}
+ .catalogue-header .catalogue-title{margin-top:12px}
+ .bottom-nav{
+  position:fixed!important;z-index:95!important;left:50%!important;right:auto!important;bottom:0!important;
+  transform:translateX(-50%)!important;width:100%!important;max-width:548px!important;
+  height:calc(76px + env(safe-area-inset-bottom))!important;min-height:76px!important;max-height:none!important;
+  flex:0 0 auto!important;padding:5px 5px calc(5px + env(safe-area-inset-bottom))!important;
+  border-radius:19px 19px 0 0!important;border-bottom:0!important;
+  background:rgba(5,12,18,.97)!important;box-shadow:0 -10px 26px rgba(0,0,0,.43)!important;
+  backdrop-filter:blur(18px)
+ }
+ .bottom-nav button{height:65px!important}
+ .catalogue-scroll{padding-bottom:calc(95px + env(safe-area-inset-bottom))!important}
+ .workflow-scroll{padding-bottom:calc(105px + env(safe-area-inset-bottom))!important}
+ .detail-device.mobile-active{
+  z-index:60!important;padding-bottom:calc(76px + env(safe-area-inset-bottom))!important;
+  height:100dvh!important;box-sizing:border-box
+ }
+ .detail-device.mobile-active .detail-scroll{padding-bottom:24px!important}
+ .detail-device.mobile-active .detail-topbar{top:12px!important}
+ .detail-device.mobile-active .detail-image-stage{touch-action:pan-y}
+ .brand-logo{width:44px;height:44px;flex-basis:44px;border-radius:14px}
+ .brand-logo svg{width:41px;height:41px}
+ .workflow-topbar{height:55px!important;min-height:55px!important;padding-top:5px!important}
+ .home-service-panel{gap:8px}
+}
+@media(max-width:600px){
+ .catalogue-header{flex-basis:160px!important;padding:10px 12px 8px!important}
+ .catalogue-header .catalogue-title{margin-top:10px!important}
+ .catalogue-title h1{font-size:31px}
+ .home-hero{margin-top:11px}
+ .home-hero h2{font-size:34px}
+ .home-service-panel{margin-bottom:18px}
+ .home-hours-card{padding:12px 13px}
+ .home-hours-state b{font-size:14px}
+ .home-hours-lines>div{font-size:11px}
+ .home-hours-lines strong{font-size:11px}
+ .home-phone-button{min-height:59px;padding:9px 12px}
+ .home-phone-copy b{font-size:13px}
+ .home-phone-copy small{font-size:12px}
+ .home-shortcuts button{min-height:74px}
+ .bottom-nav button{height:62px!important;font-size:10px}
+ .nav-icon{height:29px;font-size:25px;line-height:28px}
+ .detail-title-row h2{font-size:27px}
+ .detail-favorite-inline{width:38px;height:38px;flex-basis:38px;font-size:25px}
+}
