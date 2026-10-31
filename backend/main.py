@@ -610,7 +610,8 @@ DEFAULT_SITE_CONTENT = {
     "promo_title":"Закажи к удобному времени",
     "promo_text":"Выбирай блюда заранее — мы приготовим заказ к согласованному времени.",
     "promo_button":"Перейти к меню",
-    "promo_link":"#menu"
+    "promo_link":"#menu",
+    "promo_image":""
 }
 def read_site_content() -> dict[str, Any]:
     try:
@@ -647,12 +648,14 @@ async def admin_get_site_content(x_telegram_init_data: str | None = Header(defau
 async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
     admin_from_header(x_telegram_init_data)
     current = read_site_content()
-    limits = {"hero_title":160, "hero_subtitle":300, "hero_button":50, "promo_title":120, "promo_text":500, "promo_button":50, "promo_link":300}
+    limits = {"hero_title":160, "hero_subtitle":300, "hero_button":50, "promo_title":120, "promo_text":500, "promo_button":50, "promo_link":300, "promo_image":1_000_000}
     for key, limit in limits.items():
         if key in payload:
             value = payload[key]
             if not isinstance(value, str) or len(value.strip()) > limit:
                 raise HTTPException(status_code=400, detail=f"Поле {key}: слишком длинный текст или неверный формат.")
+            if key == "promo_image" and value and not (value.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", value)):
+                raise HTTPException(status_code=400, detail="Для рекламного фото загрузи JPG, PNG, WebP или укажи HTTPS-ссылку.")
             current[key] = value.strip()
     if "slides" in payload:
         slides = payload["slides"]
