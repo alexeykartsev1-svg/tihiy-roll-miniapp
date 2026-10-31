@@ -1058,6 +1058,10 @@ function renderProductCards(target, visible) {
   visible.forEach(product => {
     const quantity = cart[product.id] || 0;
     const isFavorite = favorites.has(product.id);
+    const stockLimited = product.stock != null;
+    const stock = stockLimited ? Math.max(0, Number(product.stock)||0) : null;
+    const soldOut = stockLimited && stock===0;
+    const stockReached = stockLimited && quantity>=stock;
     const badge = product.badge || ({philadelphia:'ХИТ', lava:'НОВИНКА', unagi:'ХИТ', warm_crab:'ХИТ', warm_salmon:'НОВИНКА'})[product.id] || '';
     const card = document.createElement('article');
     card.className = 'card';
@@ -1074,12 +1078,13 @@ function renderProductCards(target, visible) {
           <span class="price">${money(product.price)}</span>
           <span class="weight-chip" aria-label="Вес ${product.weight || '280 г'}"><span aria-hidden="true">⚖</span> ${product.weight || '280 г'}</span>
           <span class="weight-chip" aria-label="Количество ${product.pieces || 8} штук">▣ ${product.pieces || 8} шт.</span>
+          ${stockLimited ? `<span class="stock-chip ${soldOut?"sold-out":""}">${soldOut?"Нет в наличии":"Осталось: "+stock}</span>` : ""}
         </div>
         <div class="card-actions">
           <div class="qty premium-qty">
-            <button type="button" data-act="minus" data-id="${product.id}" aria-label="Уменьшить количество ${product.name}">−</button>
+            <button type="button" data-act="minus" data-id="${product.id}" aria-label="Уменьшить количество ${product.name}" ${quantity<=0?"disabled":""}>−</button>
             <b>${quantity}</b>
-            <button type="button" data-act="plus" data-id="${product.id}" aria-label="Увеличить количество ${product.name}">+</button>
+            <button type="button" data-act="plus" data-id="${product.id}" aria-label="Увеличить количество ${product.name}" ${soldOut||stockReached?"disabled":""}>+</button>
           </div>
           <button class="details-link" type="button" data-details="${product.id}">☷ &nbsp; Состав</button>
         </div>
@@ -1372,7 +1377,9 @@ function updateCartBar() {
 }
 function changeQuantity(id, delta) {
   const current = cart[id] || 0;
-  const next = Math.max(0, Math.min(99, current + delta));
+  const product = products.find(item => item.id === id);
+  const stock = product && product.stock != null ? Math.max(0, Number(product.stock)||0) : 99;
+  const next = Math.max(0, Math.min(99, stock, current + delta));
   if (next) cart[id] = next; else delete cart[id];
   saveCart();
   renderMenu(activeFilter);
@@ -1784,6 +1791,9 @@ function openProductDetails(id) {
   document.getElementById('detailPrice').textContent = money(product.price);
   document.getElementById('detailDesc').textContent = product.desc || '';
   document.getElementById('detailExtra').textContent = product.details || ('Состав: '+(product.desc||'уточняется')+'. Вес: '+(product.weight||'уточняется')+'. Количество: '+(product.pieces||8)+' шт.');
+  const detailStock=product.stock==null?null:Math.max(0,Number(product.stock)||0);
+  const detailAddButton=document.getElementById('detailAdd');
+  if(detailAddButton){detailAddButton.disabled=detailStock!==null&&(detailStock===0||(cart[product.id]||0)>=detailStock);detailAddButton.textContent=detailStock===0?'Нет в наличии':detailStock!==null?'Добавить · осталось '+detailStock:'Добавить в корзину';}
   const dots = document.getElementById('galleryDots'); dots.replaceChildren();
   const showDetailPhoto=(index)=>{detailPhotoIndex=(index+safePhotos.length)%safePhotos.length;photo.src=safePhotos[detailPhotoIndex];photo.alt=product.name+' — фото '+(detailPhotoIndex+1);document.getElementById('galleryCount').textContent='Фото '+(detailPhotoIndex+1)+' из '+safePhotos.length;dots.querySelectorAll('button').forEach((dot,i)=>dot.classList.toggle('active',i===detailPhotoIndex));};
   safePhotos.forEach((src,i) => { const b=document.createElement('button'); b.type='button'; b.className=i===0?'active':''; b.setAttribute('aria-label','Фото '+(i+1)); b.addEventListener('click',()=>showDetailPhoto(i)); dots.append(b); });
@@ -1814,7 +1824,11 @@ async function loadServerCatalog() {
     products.splice(0, products.length, ...merged);
     renderCustomSetBuilder();
     await loadCategoryFilters();
-    Object.keys(cart).forEach(id => { if (!products.some(p => p.id === id)) delete cart[id]; });
+    Object.keys(cart).forEach(id => {
+      const product=products.find(p=>p.id===id);
+      if(!product){delete cart[id];return}
+      if(product.stock!=null){const limit=Math.max(0,Number(product.stock)||0);if(limit===0)delete cart[id];else if(cart[id]>limit)cart[id]=limit;}
+    });
     [...favorites].forEach(id => { if (!products.some(p => p.id === id)) favorites.delete(id); });
     saveCart(); saveFavorites(); renderMenu(activeFilter); updateCartBar();
   } catch (error) { console.warn('Не удалось загрузить актуальное меню с сервера:', error); }
