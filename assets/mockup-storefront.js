@@ -553,7 +553,7 @@ function updateStoreHours(){
 }
 function syncHomeShortcutState(){
  document.querySelectorAll('[data-home-filter]').forEach(button=>{
-  const selected=button.dataset.homeFilter===state.filter;
+  const selected=button.dataset.homeFilter===state.filter||(state.filter==='all'&&button.dataset.homeFilter==='sets');
   button.classList.toggle('active',selected);
   button.setAttribute('aria-pressed',selected?'true':'false');
  });
