@@ -1181,8 +1181,13 @@ function syncSetCount(key){
  const plus=document.querySelector('[data-set-qty="plus"][data-set-key="'+key+'"]');
  const stock=editableSetsContent[key]?.stock;
  const limited=stock!==null&&stock!==undefined;
- if(plus){plus.disabled=limited&&count>=Number(stock);plus.title=plus.disabled?'Больше наборов нет в наличии':''}
- if(add){const unavailable=editableSetsContent[key]?.active===false||(limited&&count>=Number(stock));add.disabled=!!unavailable;add.title=add.disabled?'Набор временно недоступен':''}
+ const rows=SET_PRESETS[key]||[];
+ const componentsAvailable=rows.length>0&&rows.every(([id,qty])=>{
+  const product=products.find(item=>item.id===id);
+  return !!product&&(product.stock==null||(Number(cart[id]||0)+qty<=Number(product.stock)));
+ });
+ if(plus){plus.disabled=(limited&&count>=Number(stock))||!componentsAvailable;plus.title=plus.disabled?'Недостаточно остатков для ещё одного сета':''}
+ if(add){const unavailable=editableSetsContent[key]?.active===false||(limited&&count>=Number(stock))||(!count&&!componentsAvailable);add.disabled=!!unavailable;add.title=add.disabled?'Набор временно недоступен':''}
  try{localStorage.setItem(SET_CART_STORAGE_KEY,JSON.stringify(setQuantities))}catch(_){}
 }
 function reconcileSetCounts(){
@@ -1243,6 +1248,7 @@ function applyEditableSets(rows){
  });
  renderSetPrices();
  populateSetImages();
+ reconcileSetCounts();
 }
 function populateSetImages(){
  Object.entries(DEFAULT_SET_CONTENT).forEach(([key,defaults])=>{
@@ -1347,7 +1353,13 @@ document.addEventListener('click',event=>{
  }
  const qtyButton=event.target.closest('[data-set-qty]');
  if(qtyButton){const key=qtyButton.dataset.setKey;const rows=SET_PRESETS[key]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;
-  if(qtyButton.dataset.setQty==='plus'){const stock=editableSetsContent[key]?.stock;if(stock!==null&&stock!==undefined&&(setQuantities[key]||0)>=Number(stock))return;rows.forEach(([id,qty])=>cart[id]=Math.min(99,(cart[id]||0)+qty));setQuantities[key]=(setQuantities[key]||0)+1}
+  if(qtyButton.dataset.setQty==='plus'){
+  const stock=editableSetsContent[key]?.stock;
+  if((stock!==null&&stock!==undefined&&(setQuantities[key]||0)>=Number(stock))||editableSetsContent[key]?.active===false)return;
+  const components=rows.every(([id,qty])=>{const product=products.find(item=>item.id===id);return product&&(product.stock==null||Number(cart[id]||0)+qty<=Number(product.stock))});
+  if(!components)return;
+  rows.forEach(([id,qty])=>cart[id]=Math.min(99,(cart[id]||0)+qty));setQuantities[key]=(setQuantities[key]||0)+1;
+ }
   else {if((setQuantities[key]||0)<=0)return;rows.forEach(([id,qty])=>{const next=Math.max(0,(cart[id]||0)-qty);if(next)cart[id]=next;else delete cart[id]});setQuantities[key]--; }
   saveCart();renderMenu(activeFilter);updateCartBar();renderCart();syncSetCount(key);return
  }
@@ -1359,7 +1371,11 @@ document.addEventListener('click',event=>{
  if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;
  const current=Number(setQuantities[key]||0),direction=current>0?-1:1;
  const stock=editableSetsContent[key]?.stock;
- if(direction>0&&(editableSetsContent[key]?.active===false||(stock!==null&&stock!==undefined&&current>=Number(stock))))return;
+ if(direction>0){
+   if(editableSetsContent[key]?.active===false||(stock!==null&&stock!==undefined&&current>=Number(stock)))return;
+   const components=rows.every(([id,qty])=>{const product=products.find(item=>item.id===id);return product&&(product.stock==null||Number(cart[id]||0)+qty<=Number(product.stock))});
+   if(!components)return;
+ }
  rows.forEach(([id,qty])=>{const next=Math.max(0,Math.min(99,(cart[id]||0)+(qty*direction)));if(next)cart[id]=next;else delete cart[id]});
  setQuantities[key]=Math.max(0,current+direction);syncSetCount(key);
  saveCart();renderMenu(activeFilter);updateCartBar();renderCart();
