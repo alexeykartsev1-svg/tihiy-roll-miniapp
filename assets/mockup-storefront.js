@@ -270,7 +270,7 @@ function updateDeliveryMap(){
 function updateCheckoutFulfillment(mode){
  const delivery=mode==='Доставка',value=delivery?'Доставка':'Самовывоз';
  const hidden=$('#fulfillment');if(hidden)hidden.value=value;
- $('[data-fulfillment]').forEach(button=>{
+ document.querySelectorAll('[data-fulfillment]').forEach(button=>{
   const active=button.dataset.fulfillment===value;
   button.classList.toggle('active',active);
   button.setAttribute('aria-pressed',active?'true':'false');
