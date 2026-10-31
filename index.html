@@ -691,6 +691,7 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 
 </style>
   <link rel="stylesheet" href="./assets/premium-storefront.css">
+<link rel="stylesheet" href="./assets/full-storefront.css">
 </head>
 <body>
 <main class="app">
@@ -1120,6 +1121,7 @@ function renderMenu(filter = activeFilter) {
   });
   renderProductCards(menu, products.filter(product => filter === 'all' || product.cat === filter));
   renderFavorites();
+  window.dispatchEvent(new CustomEvent('tihiy:catalog-rendered'));
 }
 
 const SET_PRESETS={solo:[['philadelphia',1],['lava',1]],duo:[['philadelphia',1],['warm_crab',1],['lava',1]],party:[['philadelphia',2],['lava',1],['warm_crab',1],['warm_salmon',1]],newyear:[['philadelphia',1],['california',1],['lava',1],['warm_crab',1],['warm_salmon',1]]};
@@ -1414,7 +1416,14 @@ const today = new Date();
 today.setHours(0,0,0,0);
 pickupDate.min = localDateString(today);
 pickupDate.value = localDateString(today);
-const isClosedDate = date => date.getDay() === 0 || date.getDay() === 3; // Sunday or Wednesday
+const isClosedDate = date => {
+  const settings = window.__TIHIY_STORE_SETTINGS;
+  if (settings && Array.isArray(settings.weekly_hours) && settings.weekly_hours.length === 7) {
+    const row = settings.weekly_hours[date.getDay() === 0 ? 6 : date.getDay() - 1];
+    return !!(row && row.closed);
+  }
+  return date.getDay() === 0 || date.getDay() === 3;
+};
 function dateForPickupChoice(choice) {
   const date = new Date(today);
   if (choice === 'tomorrow') date.setDate(date.getDate() + 1);
@@ -1561,8 +1570,11 @@ document.getElementById('form').addEventListener('submit', async event => {
   const selectedPickupDate = dateForPickupChoice(String(fields.get('pickup_day') || ''));
   const selectedFulfillment = String(fields.get('fulfillment') || 'Самовывоз');
   const addressValue = String(fields.get('delivery_address') || '').trim();
-  if (!order.name || !normalizeRussianMobile(fields.get('phone')) || !order.time || !String(fields.get('pickup_time') || '') || !selectedPickupDate || isClosedDate(selectedPickupDate) || (fields.get('pickup_day') === 'custom' && (!fields.get('pickup_date') || fields.get('pickup_date') < localDateString(new Date()))) || (selectedFulfillment === 'Доставка' && !addressValue) || !order.items.length) {
-    notice.textContent = 'Проверь имя, телефон, дату (среда и воскресенье — выходные), время, способ получения и состав заказа. Для доставки укажи адрес.';
+  const storeSettings = window.__TIHIY_STORE_SETTINGS || {};
+  const cartTotal = getTotals().total;
+  const minOrder = selectedFulfillment === 'Доставка' ? Number(storeSettings.minimum_order || 0) : 0;
+  if (!order.name || !normalizeRussianMobile(fields.get('phone')) || !order.time || !String(fields.get('pickup_time') || '') || !selectedPickupDate || isClosedDate(selectedPickupDate) || (fields.get('pickup_day') === 'custom' && (!fields.get('pickup_date') || fields.get('pickup_date') < localDateString(new Date()))) || (selectedFulfillment === 'Доставка' && (!addressValue || storeSettings.delivery_enabled === false)) || (selectedFulfillment === 'Самовывоз' && storeSettings.pickup_enabled === false) || !order.items.length || cartTotal < minOrder) {
+    notice.textContent = cartTotal < minOrder ? 'Минимальная сумма для доставки — ' + money(minOrder) + '.' : 'Проверь имя, телефон, дату, время, способ получения и состав заказа. Для доставки укажи адрес.';
     notice.classList.add('show');
     return;
   }
@@ -1787,5 +1799,26 @@ renderCustomSetBuilder();
 updateCartBar();
 loadServerCatalog();
 showAdminButtonIfAllowed();
+// Public read-only bridge for the enhanced presentation layer. Existing business logic remains authoritative.
+window.__TIHIY_STORE = {
+  get products(){ return products; },
+  get cart(){ return cart; },
+  get favorites(){ return favorites; },
+  get activeFilter(){ return activeFilter; },
+  money,
+  renderMenu,
+  renderCart,
+  updateCartBar,
+  changeQuantity,
+  openCart,
+  closeCart,
+  openProductDetails,
+  closeProductDetails,
+  refreshPickupChoices,
+  updatePickupTimes,
+  getTotals
+};
+
 </script>
+<script src="./assets/storefront-experience.js"></script>
 </body></html>
