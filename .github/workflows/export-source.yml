@@ -1,0 +1,33 @@
+name: Export full source bundle
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  package-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create source ZIP
+        run: |
+          zip -r tihiy-roll-full-source.zip . \
+            -x ".git/*" \
+            -x "tihiy-roll-full-source.zip"
+
+      - name: Upload source bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: tihiy-roll-full-source
+          path: tihiy-roll-full-source.zip
+          if-no-files-found: error
+          retention-days: 7
