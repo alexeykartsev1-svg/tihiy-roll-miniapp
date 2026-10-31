@@ -554,20 +554,46 @@ async def admin_analytics(x_telegram_init_data: str | None = Header(default=None
     admin_from_header(x_telegram_init_data)
     with order_db() as connection:
         rows = connection.execute("SELECT items_json,total,status,created_at FROM orders ORDER BY created_at DESC").fetchall()
-    revenue = sum(row["total"] for row in rows if row["status"] != "cancelled")
-    gross_profit = sum(sum(int(item.get("gross_profit", 0)) for item in json.loads(row["items_json"])) for row in rows if row["status"] != "cancelled")
+    valid_rows = [row for row in rows if row["status"] != "cancelled"]
+    revenue = sum(int(row["total"] or 0) for row in valid_rows)
+    gross_profit = sum(
+        sum(int(item.get("gross_profit", 0)) for item in json.loads(row["items_json"]))
+        for row in valid_rows
+    )
     active_orders = sum(row["status"] not in ("completed", "cancelled") for row in rows)
+    status_counts = {status: sum(row["status"] == status for row in rows) for status in VALID_ORDER_STATUSES}
     popular: dict[str, int] = {}
-    for row in rows:
-        if row["status"] == "cancelled":
-            continue
+    for row in valid_rows:
         for item in json.loads(row["items_json"]):
             name = str(item.get("name", item.get("id", "Блюдо")))
             popular[name] = popular.get(name, 0) + int(item.get("qty", 0))
-    return {"orders_count": len(rows), "revenue": revenue, "gross_profit": gross_profit,
-            "active_orders": active_orders, "popular_items": sorted(
-                [{"name": name, "qty": qty} for name, qty in popular.items()],
-                key=lambda item: item["qty"], reverse=True)[:10]}
+    daily: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        try:
+            day = datetime.fromisoformat(str(row["created_at"])).date().isoformat()
+        except (TypeError, ValueError):
+            continue
+        entry = daily.setdefault(day, {"date": day, "orders": 0, "revenue": 0})
+        entry["orders"] += 1
+        if row["status"] != "cancelled":
+            entry["revenue"] += int(row["total"] or 0)
+    daily_rows = sorted(daily.values(), key=lambda item: item["date"])[-30:]
+    valid_count = len(valid_rows)
+    return {
+        "orders_count": len(rows),
+        "valid_orders_count": valid_count,
+        "revenue": revenue,
+        "average_check": round(revenue / valid_count) if valid_count else 0,
+        "gross_profit": gross_profit,
+        "active_orders": active_orders,
+        "status_counts": status_counts,
+        "daily": daily_rows,
+        "popular_items": sorted(
+            [{"name": name, "qty": qty} for name, qty in popular.items()],
+            key=lambda item: item["qty"],
+            reverse=True,
+        )[:10],
+    }
 
 MAX_ORDERS_PER_SLOT = max(1, int(os.getenv("MAX_ORDERS_PER_SLOT", "5")))
 
