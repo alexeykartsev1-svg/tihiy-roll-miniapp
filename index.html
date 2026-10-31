@@ -21,7 +21,7 @@
           <button class="round-icon menu-trigger" type="button" aria-label="Открыть меню">☰</button>
           <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
           <div class="header-actions">
-            <button class="header-icon" type="button" data-open-favorites aria-label="Избранное">♡<b id="favCount">0</b></button>
+            <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b id="favCount">0</b></button>
             <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="cartCount">0</b></button>
           </div>
         </div>
@@ -53,7 +53,7 @@
             <span class="home-top-spacer"></span>
             <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
             <div class="header-actions">
-              <button class="header-icon" type="button" data-open-favorites aria-label="Избранное">♡<b id="homeFavCount">0</b></button>
+              <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b id="homeFavCount">0</b></button>
               <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="homeCartCount">0</b></button>
             </div>
           </div>
@@ -84,13 +84,32 @@
         </div>
       </section>
 
+      <section class="workflow-screen favorites-screen" id="favoritesScreen" aria-label="Избранное">
+        <div class="workflow-scroll favorites-scroll">
+          <div class="workflow-topbar">
+            <button class="round-icon menu-trigger" type="button" aria-label="Открыть меню">☰</button>
+            <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
+            <div class="header-actions">
+              <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b id="favoritesScreenFavCount">0</b></button>
+              <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="favoritesScreenCartCount">0</b></button>
+            </div>
+          </div>
+          <header class="favorites-page-heading">
+            <h2>Избранное</h2>
+            <p>Ваши любимые блюда</p>
+          </header>
+          <div class="catalogue-grid favorites-grid" id="favoritesGrid"></div>
+          <div class="empty-state favorites-empty" id="favoritesEmpty" hidden>Пока нет избранных блюд. Нажмите на сердечко в карточке, чтобы сохранить понравившееся.</div>
+        </div>
+      </section>
+
       <section class="workflow-screen" id="builderScreen" aria-label="Конструктор сета">
         <div class="workflow-scroll">
           <div class="workflow-topbar">
             <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
             <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
             <div class="header-actions">
-              <button class="header-icon" type="button" data-open-favorites aria-label="Избранное">♡<b id="builderFavCount">0</b></button>
+              <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b id="builderFavCount">0</b></button>
               <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="builderCartCount">0</b></button>
             </div>
           </div>
@@ -130,7 +149,7 @@
             <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
             <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
             <div class="header-actions">
-              <button class="header-icon" type="button" data-open-favorites aria-label="Избранное">♡<b id="basketFavCount">0</b></button>
+              <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b id="basketFavCount">0</b></button>
               <button class="header-icon cart-head" type="button" aria-label="Корзина">🛒<b id="basketCartCount">0</b></button>
             </div>
           </div>
@@ -168,7 +187,7 @@
             <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
             <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
             <div class="header-actions">
-              <button class="header-icon" type="button" data-open-favorites aria-label="Избранное">♡<b>♡</b></button>
+              <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b>♡</b></button>
             </div>
           </div>
           <div class="workflow-steps">
@@ -204,7 +223,7 @@
         <button type="button" data-nav="home"><span class="nav-icon">⌂</span>Главная</button>
         <button class="active" type="button" data-nav="catalogue"><span class="nav-icon grid-icon">▦</span>Каталог</button>
         <button type="button" data-nav="builder"><span class="nav-icon">♧</span>Конструктор</button>
-        <button type="button" data-open-favorites><span class="nav-icon">♡</span>Избранное</button>
+        <button type="button" data-nav="favorites"><span class="nav-icon">♡</span>Избранное</button>
         <button type="button" data-nav="cart"><span class="nav-icon">🛒<i id="navCartCount">0</i></span>Корзина</button>
       </nav>
     </section>
