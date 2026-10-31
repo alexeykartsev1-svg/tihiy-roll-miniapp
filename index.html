@@ -668,7 +668,7 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 .pickup-map-link{display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;color:var(--gold-light);font-size:13px;font-weight:800;text-decoration:none}
 .pickup-map{display:block;width:100%;height:220px;border:0;border-radius:10px;background:#17130d}
 .product-gallery-stage,.set-detail-gallery{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
-.product-gallery-stage .detail-photo,.set-detail-gallery img{display:block;width:100%;max-height:380px;aspect-ratio:4/3;object-fit:cover;border-radius:14px;border:1px solid #4a3822;background:#17130f}
+.product-gallery-stage .detail-photo,.set-detail-gallery img{display:block;width:100%;max-height:380px;aspect-ratio:4/3;object-fit:cover;border-radius:14px;border:1px solid #4a3822;background:#17130f;touch-action:pan-y}
 .gallery-arrow,.set-gallery-arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:38px;height:38px;border:1px solid rgba(229,185,111,.65);border-radius:50%;background:rgba(12,10,8,.78);color:#f2d49c;font-size:25px;line-height:1;cursor:pointer}
 .gallery-arrow.prev,.set-gallery-arrow.prev{left:10px}.gallery-arrow.next,.set-gallery-arrow.next{right:10px}
 .gallery-count,.set-gallery-count{margin-top:7px;text-align:center;color:#c7b596;font-size:12px}
@@ -1129,6 +1129,7 @@ function renderSetPrices(){
     el.textContent=available?money(total):'Временно недоступен';
   });
   populateSetImages();
+  if(typeof setQuantities!=='undefined')Object.keys(setQuantities).forEach(syncSetCount);
 }
 
 const setQuantities={solo:0,duo:0,party:0,newyear:0};
@@ -1142,7 +1143,7 @@ const DEFAULT_SET_CONTENT={
  solo:{description:'Филадельфия и Лава — для уютного ужина.',image:'./assets/set-solo.webp',title:'На одного'},
  duo:{description:'Филадельфия, Тёплый краб и Лава — поделиться вкусом.',image:'./assets/set-duo.webp',title:'Вечер вдвоём'},
  party:{description:'Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp',title:'Компания'},
- newyear:{description:'Праздничное сочетание любимых роллов для новогоднего стола. Состав временный.',image:placeholderImage('Новогодний сет','🎄'),title:'Новогодний сет'}
+ newyear:{description:'Праздничное сочетание любимых роллов для новогоднего стола. Состав временный.',image:'./assets/set-party.webp',title:'Новогодний сет'}
 };
 let editableSetsContent={};
 function applyEditableSets(rows){
