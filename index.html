@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://tihiy-roll-order-api.onrender.com">
   <link rel="stylesheet" href="./assets/mockup-storefront.css?v=mobile-polish-20261031">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="./assets/mockup-storefront.js?v=cartbuilder1" defer></script>
+  <script src="./assets/mockup-storefront.js?v=mobile-polish-20261031" defer></script>
 </head>
 <body>
   <main class="reference-board" id="referenceBoard">
@@ -266,7 +266,39 @@
   </main>
 
   <!-- Functional overlays -->
-  <div class="modal-layer" id="cartModal" aria-hidden="true"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="cartTitle"><header class="sheet-head"><div><small>ВАШ ВЫБОР</small><h2 id="cartTitle">Корзина</h2></div><button type="button" class="sheet-close" data-close="cartModal">×</button></header><div class="cart-lines" id="cartLines"><div class="empty-state">Корзина пока пуста.</div></div><form id="checkoutForm" class="checkout-form"><h3>Детали заказа</h3><label>Ваше имя<input name="name" maxlength="100" required placeholder="Как к вам обращаться"></label><label>Телефон<input name="phone" type="tel" maxlength="50" required placeholder="+7 900 000-00-00"></label><div class="form-row"><label>Дата<input name="pickup_date" id="pickupDate" type="date" required></label><label>Время<select name="pickup_time" id="pickupTime" required><option value="">Выбрать</option></select></label></div><label>Получение<select name="fulfillment" id="fulfillment"><option value="Самовывоз">Самовывоз</option><option value="Доставка">Доставка</option></select></label><label id="deliveryAddressField" hidden>Адрес доставки<input name="delivery_address" maxlength="300"></label><label>Комментарий<textarea name="notes" rows="2" maxlength="700"></textarea></label><p id="checkoutNote">Время выдачи подтвердим отдельно.</p><div id="checkoutError" role="alert"></div><div class="cart-total"><span>Итого</span><strong id="cartTotal">0 ₽</strong></div><button class="add-cart-button submit-order" type="submit" id="submitOrder">Отправить заказ ↗</button></form></section></div>
+  <div class="modal-layer" id="cartModal" aria-hidden="true"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="cartTitle"><header class="sheet-head"><div><small>ВАШ ВЫБОР</small><h2 id="cartTitle">Корзина</h2></div><button type="button" class="sheet-close" data-close="cartModal">×</button></header><div class="cart-lines" id="cartLines"><div class="empty-state">Корзина пока пуста.</div></div><form id="checkoutForm" class="checkout-form">
+          <h3>Детали заказа</h3>
+          <label class="checkout-field">Ваше имя<input name="name" maxlength="100" required autocomplete="name" placeholder="Как к вам обращаться"></label>
+          <label class="checkout-field">Телефон<input name="phone" type="tel" maxlength="50" required autocomplete="tel" placeholder="+7 900 000-00-00"></label>
+          <div class="form-row">
+            <label class="checkout-field">Дата<input name="pickup_date" id="pickupDate" type="date" required></label>
+            <label class="checkout-field">Время<select name="pickup_time" id="pickupTime" required><option value="">Выбрать время</option></select></label>
+          </div>
+          <section class="fulfillment-block">
+            <div class="field-label">Способ получения</div>
+            <div class="fulfillment-options" role="group" aria-label="Способ получения">
+              <button type="button" class="fulfillment-option active" data-fulfillment="Самовывоз" aria-pressed="true">Самовывоз</button>
+              <button type="button" class="fulfillment-option" data-fulfillment="Доставка" aria-pressed="false">Доставка</button>
+            </div>
+            <input type="hidden" name="fulfillment" id="fulfillment" value="Самовывоз">
+            <div class="checkout-location-card" id="pickupLocationField">
+              <div class="checkout-location-copy"><span>АДРЕС САМОВЫВОЗА</span><b id="pickupAddressText">Загружаем адрес…</b></div>
+              <iframe id="pickupMap" title="Карта места самовывоза" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://yandex.ru/map-widget/v1/?text=%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%2C%2026%2C%20%D0%A7%D0%B0%D1%80%D1%8B%D1%88%D1%81%D0%BA%D0%BE%D0%B5"></iframe>
+              <a id="pickupMapLink" href="https://yandex.ru/maps/?text=%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%2C%2026%2C%20%D0%A7%D0%B0%D1%80%D1%8B%D1%88%D1%81%D0%BA%D0%BE%D0%B5" target="_blank" rel="noopener">Открыть в Яндекс Картах ↗</a>
+            </div>
+            <label class="checkout-field" id="deliveryAddressField" hidden>Адрес доставки<input id="deliveryAddress" name="delivery_address" maxlength="300" autocomplete="street-address" placeholder="Улица, дом, квартира"></label>
+            <div class="checkout-location-card" id="deliveryLocationField" hidden>
+              <div class="checkout-location-copy"><span>АДРЕС ДОСТАВКИ</span><b>Проверьте точку на карте</b></div>
+              <iframe id="deliveryMap" title="Карта адреса доставки" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="about:blank"></iframe>
+              <a id="deliveryMapLink" href="https://yandex.ru/maps/" target="_blank" rel="noopener">Открыть карту ↗</a>
+            </div>
+          </section>
+          <label class="checkout-field">Комментарий<textarea name="notes" rows="3" maxlength="700" placeholder="Пожелания к заказу"></textarea></label>
+          <p id="checkoutNote">Время выдачи подтвердим отдельно.</p>
+          <div id="checkoutError" role="alert"></div>
+          <div class="cart-total"><span>Итого к оплате</span><strong id="cartTotal">0 ₽</strong></div>
+          <button class="add-cart-button submit-order" type="submit" id="submitOrder">Отправить заказ ↗</button>
+        </form></section></div>
   <div class="modal-layer" id="favoritesModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>СОХРАНЁННЫЕ БЛЮДА</small><h2>Избранное</h2></div><button type="button" class="sheet-close" data-close="favoritesModal">×</button></header><div id="favoritesList"></div></section></div>
   <div class="modal-layer" id="filtersModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>НАСТРОЙКИ МЕНЮ</small><h2>Фильтры</h2></div><button type="button" class="sheet-close" data-close="filtersModal">×</button></header><div class="filter-options" id="filterOptions"></div><button class="add-cart-button" id="applyFilters">Показать блюда</button></section></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
