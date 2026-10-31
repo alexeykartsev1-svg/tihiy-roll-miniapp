@@ -591,6 +591,121 @@ async def get_availability(date: str) -> dict[str, Any]:
 
 
 # Editable homepage content managed by the store owner.
+STORE_SETTINGS_FILE = os.getenv("STORE_SETTINGS_FILE", os.path.join(os.path.dirname(__file__), "store_settings.json"))
+DEFAULT_STORE_SETTINGS = {
+    "shop_name": "Тихий ролл",
+    "phone": "+7 923 000-58-57",
+    "description": "Свежие роллы и азиатские блюда, приготовленные к выбранному времени.",
+    "pickup_address": "Социалистическая, 26, район «Остров», Чарышское",
+    "pickup_map_url": "https://yandex.ru/maps/?text=%D0%A2%D0%B8%D1%85%D0%B8%D0%B9%20%D1%80%D0%BE%D0%BB%D0%BB%2C%20%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%2C%2026%2C%20%D0%A7%D0%B0%D1%80%D1%8B%D1%88%D1%81%D0%BA%D0%BE%D0%B5",
+    "pickup_enabled": True,
+    "delivery_enabled": True,
+    "minimum_order": 0,
+    "delivery_note": "Стоимость и возможность доставки подтвердим отдельно после получения заказа.",
+    "delivery_zones": [],
+    "weekly_hours": [
+        {"day": "Понедельник", "open": "12:00", "close": "21:00", "closed": False},
+        {"day": "Вторник", "open": "12:00", "close": "21:00", "closed": False},
+        {"day": "Среда", "open": "", "close": "", "closed": True},
+        {"day": "Четверг", "open": "12:00", "close": "21:00", "closed": False},
+        {"day": "Пятница", "open": "12:00", "close": "21:00", "closed": False},
+        {"day": "Суббота", "open": "12:00", "close": "21:00", "closed": False},
+        {"day": "Воскресенье", "open": "", "close": "", "closed": True},
+    ],
+}
+
+def _valid_clock(value: Any) -> bool:
+    return isinstance(value, str) and bool(re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", value))
+
+def validate_store_settings(payload: dict[str, Any], current: dict[str, Any] | None = None) -> dict[str, Any]:
+    if not isinstance(payload, dict):
+        raise ValueError("Настройки должны быть объектом.")
+    result = dict(current or DEFAULT_STORE_SETTINGS)
+    text_limits = {
+        "shop_name": 80, "phone": 50, "description": 300,
+        "pickup_address": 300, "delivery_note": 300,
+    }
+    for key, limit in text_limits.items():
+        if key in payload:
+            value = payload[key]
+            if not isinstance(value, str) or len(value.strip()) > limit:
+                raise ValueError(f"Поле {key}: проверь длину текста.")
+            result[key] = value.strip()
+    if "pickup_map_url" in payload:
+        value = payload["pickup_map_url"]
+        if not isinstance(value, str) or len(value) > 1000 or (value and not value.startswith("https://")):
+            raise ValueError("Ссылка на карту должна начинаться с HTTPS.")
+        result["pickup_map_url"] = value.strip()
+    for key in ("pickup_enabled", "delivery_enabled"):
+        if key in payload:
+            if not isinstance(payload[key], bool):
+                raise ValueError(f"Поле {key} должно быть переключателем.")
+            result[key] = payload[key]
+    if "minimum_order" in payload:
+        value = payload["minimum_order"]
+        if not isinstance(value, int) or isinstance(value, bool) or not 0 <= value <= 100000:
+            raise ValueError("Минимальная сумма заказа должна быть от 0 до 100 000 ₽.")
+        result["minimum_order"] = value
+    if "weekly_hours" in payload:
+        hours = payload["weekly_hours"]
+        if not isinstance(hours, list) or len(hours) != 7:
+            raise ValueError("График должен содержать ровно семь дней.")
+        clean_hours = []
+        for index, row in enumerate(hours):
+            if not isinstance(row, dict):
+                raise ValueError(f"График: неверная запись для дня {index + 1}.")
+            day = str(row.get("day", DEFAULT_STORE_SETTINGS["weekly_hours"][index]["day"]))[:30]
+            closed = row.get("closed", False)
+            opened, closed_at = row.get("open", ""), row.get("close", "")
+            if not isinstance(closed, bool):
+                raise ValueError("Признак выходного дня должен быть true/false.")
+            if not closed and (not _valid_clock(opened) or not _valid_clock(closed_at) or opened >= closed_at):
+                raise ValueError(f"Укажи корректное время открытия и закрытия для дня «{day}».")
+            clean_hours.append({"day": day, "open": "" if closed else opened, "close": "" if closed else closed_at, "closed": closed})
+        result["weekly_hours"] = clean_hours
+    if "delivery_zones" in payload:
+        zones = payload["delivery_zones"]
+        if not isinstance(zones, list) or len(zones) > 10:
+            raise ValueError("Можно добавить не более десяти зон доставки.")
+        clean_zones = []
+        for index, zone in enumerate(zones):
+            if not isinstance(zone, dict):
+                raise ValueError(f"Зона доставки {index + 1}: неверный формат.")
+            name = zone.get("name", "")
+            fee = zone.get("fee", 0)
+            active = zone.get("active", True)
+            radius = zone.get("radius_km", 0)
+            if not isinstance(name, str) or not name.strip() or len(name.strip()) > 80:
+                raise ValueError(f"Зона доставки {index + 1}: укажи название до 80 символов.")
+            if not isinstance(fee, int) or isinstance(fee, bool) or not 0 <= fee <= 20000:
+                raise ValueError(f"Зона доставки {index + 1}: стоимость должна быть от 0 до 20 000 ₽.")
+            if not isinstance(active, bool):
+                raise ValueError(f"Зона доставки {index + 1}: неверный статус.")
+            if not isinstance(radius, (int, float)) or isinstance(radius, bool) or not 0 <= float(radius) <= 100:
+                raise ValueError(f"Зона доставки {index + 1}: радиус должен быть от 0 до 100 км.")
+            clean_zones.append({"name": name.strip(), "fee": fee, "active": active, "radius_km": float(radius)})
+        result["delivery_zones"] = clean_zones
+    return result
+
+def read_store_settings() -> dict[str, Any]:
+    try:
+        with open(STORE_SETTINGS_FILE, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        if isinstance(data, dict):
+            return validate_store_settings(data, DEFAULT_STORE_SETTINGS)
+    except (OSError, json.JSONDecodeError, ValueError):
+        pass
+    return json.loads(json.dumps(DEFAULT_STORE_SETTINGS, ensure_ascii=False))
+
+def write_store_settings(settings: dict[str, Any]) -> None:
+    folder = os.path.dirname(STORE_SETTINGS_FILE)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    temporary = STORE_SETTINGS_FILE + ".tmp"
+    with open(temporary, "w", encoding="utf-8") as handle:
+        json.dump(settings, handle, ensure_ascii=False, indent=2)
+    os.replace(temporary, STORE_SETTINGS_FILE)
+
 SITE_CONTENT_FILE = os.getenv("SITE_CONTENT_FILE", os.path.join(os.path.dirname(__file__), "site_content.json"))
 DEFAULT_SITE_CONTENT = {
     "hero_title": "Тихо готовим, громко вкусно",
@@ -634,6 +749,33 @@ def write_site_content(data: dict[str, Any]) -> None:
     with open(temporary, "w", encoding="utf-8") as handle:
         json.dump(data, handle, ensure_ascii=False, indent=2)
     os.replace(temporary, SITE_CONTENT_FILE)
+
+@app.get("/api/store-settings")
+async def get_store_settings() -> dict[str, Any]:
+    return read_store_settings()
+
+@app.get("/api/admin/store-settings")
+async def admin_get_store_settings(x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    return {
+        "settings": read_store_settings(),
+        "integrations": {
+            "telegram_orders": bool(BOT_TOKEN and ADMIN_CHAT_ID),
+            "telegram_customer_updates": bool(BOT_TOKEN),
+            "online_payments": False,
+            "whatsapp": False,
+        },
+    }
+
+@app.put("/api/admin/store-settings")
+async def admin_update_store_settings(payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    try:
+        updated = validate_store_settings(payload, read_store_settings())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    write_store_settings(updated)
+    return {"ok": True, "settings": updated}
 
 @app.get("/api/site-content")
 async def get_site_content() -> dict[str, Any]:
