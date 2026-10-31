@@ -200,7 +200,7 @@ function detail(p,openOnMobile=true){
  $('#detailName').textContent=p.name;$('#detailDescription').textContent=p.desc||'Свежеприготовленное блюдо.';
  $('#detailPieces').textContent=(p.pieces||8)+' шт.';$('#detailWeight').textContent=p.weight||'280 г';
  $('#detailPrice').textContent=money(p.price);$('#detailQty').textContent='1';
- $('#detailExtra').textContent=p.set?'':(p.details||p.desc||'');
+ const detailExtra=$('#detailExtra');if(detailExtra){detailExtra.textContent='';detailExtra.hidden=true;}
  $('#detailFavorite').textContent=state.favorites.has(p.id)?'♥':'♡';
  $('#detailCompositionTitle').textContent=p.set?'Состав сета':'Состав';
  $('#photoStrip').innerHTML=state.photos.map((src,i)=>'<button class="thumb '+(i===0?'active':'')+'" type="button" data-photo-index="'+i+'"><img src="'+src+'" alt="Фото '+(i+1)+'"></button>').join('')+'<button class="thumb thumb-next" type="button" data-gallery-next>›</button>';
@@ -379,10 +379,13 @@ function showConfirmation(data){state.lastOrder=data;renderConfirmation();activa
 
 function checkoutMapUrl(query){return 'https://yandex.ru/map-widget/v1/?text='+encodeURIComponent(query||'Чарышское, Алтайский край');}
 function updateDeliveryMap(){
- const input=$('#deliveryAddress'),query=String(input?.value||'').trim()||'Чарышское, Алтайский край';
- const frame=$('#deliveryMap'),link=$('#deliveryMapLink');
- if(frame)frame.src=checkoutMapUrl(query);
- if(link)link.href='https://yandex.ru/maps/?text='+encodeURIComponent(query);
+ const input=$('#deliveryAddress'),query=String(input?.value||'').trim();
+ const frame=$('#checkoutMap'),link=$('#checkoutMapLink'),label=$('#checkoutMapLabel'),address=$('#checkoutMapAddress');
+ const search=query||'Чарышское, Алтайский край';
+ if(label)label.textContent='АДРЕС ДОСТАВКИ';
+ if(address)address.textContent=query||'Укажи адрес доставки — покажем точку на карте';
+ if(frame)frame.src=checkoutMapUrl(search);
+ if(link)link.href='https://yandex.ru/maps/?text='+encodeURIComponent(search);
 }
 function updateCheckoutFulfillment(mode){
  const delivery=mode==='Доставка',value=delivery?'Доставка':'Самовывоз';
@@ -395,16 +398,17 @@ function updateCheckoutFulfillment(mode){
  const addressField=$('#deliveryAddressField'),addressInput=$('#deliveryAddress');
  if(addressField)addressField.hidden=!delivery;
  if(addressInput)addressInput.required=delivery;
- const pickup=$('#pickupLocationField'),deliveryLocation=$('#deliveryLocationField');
- if(pickup)pickup.hidden=delivery;
- if(deliveryLocation)deliveryLocation.hidden=!delivery;
- const pickupAddress=state.settings.pickup_address||'Социалистическая, 26, Чарышское';
- const pickupMap=$('#pickupMap'),pickupText=$('#pickupAddressText'),pickupLink=$('#pickupMapLink');
- if(pickupText)pickupText.textContent=pickupAddress;
- if(pickupMap)pickupMap.src=checkoutMapUrl(pickupAddress);
- if(pickupLink)pickupLink.href=state.settings.pickup_map_url||('https://yandex.ru/maps/?text='+encodeURIComponent(pickupAddress));
+ const frame=$('#checkoutMap'),label=$('#checkoutMapLabel'),address=$('#checkoutMapAddress'),link=$('#checkoutMapLink');
+ if(delivery){
+  updateDeliveryMap();
+ }else{
+  const pickupAddress=state.settings.pickup_address||'Социалистическая, 26, Чарышское';
+  if(label)label.textContent='АДРЕС САМОВЫВОЗА';
+  if(address)address.textContent=pickupAddress;
+  if(frame)frame.src=checkoutMapUrl(pickupAddress);
+  if(link)link.href=state.settings.pickup_map_url||('https://yandex.ru/maps/?text='+encodeURIComponent(pickupAddress));
+ }
  $('#checkoutNote').textContent=delivery?(state.settings.delivery_note||'Стоимость и возможность доставки подтвердим после получения заказа.'):'Время самовывоза подтвердим отдельно.';
- if(delivery)updateDeliveryMap();
 }
 async function sendOrder(e){e.preventDefault();const form=$('#checkoutForm'),data=new FormData(form),error=$('#checkoutError');error.textContent='';if(!cartCount()){error.textContent='Корзина пуста.';return;}const telegram=tg();if(!telegram?.initData){error.textContent='Открой магазин через Telegram, чтобы отправить заказ.';return;}const name=String(data.get('name')||'').trim(),phone=String(data.get('phone')||'').trim(),date=String(data.get('pickup_date')||''),time=String(data.get('pickup_time')||''),fulfillment=String(data.get('fulfillment')||'Самовывоз'),address=String(data.get('delivery_address')||'').trim();if(!name||phone.replace(/\D/g,'').length<10||!date||!time){error.textContent='Проверь имя, телефон, дату и время.';return;}if(fulfillment==='Доставка'&&(!state.settings.delivery_enabled||!address)){error.textContent='Укажи адрес доставки.';return;}if(fulfillment==='Самовывоз'&&state.settings.pickup_enabled===false){error.textContent='Самовывоз сейчас недоступен.';return;}if(fulfillment==='Доставка'&&productTotal()<Number(state.settings.minimum_order||0)){error.textContent='Минимальная сумма доставки — '+money(state.settings.minimum_order)+'.';return;}const notes=[String(data.get('notes')||'').trim(),'Способ получения: '+fulfillment,fulfillment==='Доставка'?'Адрес доставки: '+address:''].filter(Boolean).join('\n');const payload={init_data:telegram.initData,client_order_id:form.dataset.orderId||crypto.randomUUID(),name:name,phone:phone,time:pickupLabel(date,time),notes:notes,items:state.products.filter(p=>qty(p.id)>0).map(p=>({id:p.id,qty:qty(p.id)})),sets:Object.entries(state.setCounts).filter(([,n])=>n>0).map(([id,n])=>({id:id,qty:Number(n)}))};form.dataset.orderId=payload.client_order_id;const button=$('#submitOrder');button.disabled=true;button.textContent='Отправляем…';try{telegram.ready();telegram.expand();const r=await fetch(API+'/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),cache:'no-store'}),result=await r.json().catch(()=>({}));if(!r.ok||result.ok!==true)throw Error(typeof result.detail==='string'?result.detail:'Сервер не подтвердил заказ.');const submitted={order_id:result.order_id,total:Number(result.total)||productTotal(),time:payload.time,items:payload.items,sets:payload.sets};state.cart={};state.setCounts={};save();renderAll();closeModal('cartModal');form.reset();delete form.dataset.orderId;showConfirmation(submitted);}catch(err){error.textContent=err.message||'Не удалось отправить заказ.';}finally{button.disabled=!cartCount();button.textContent='Отправить заказ ↗';}}
 async function checkAdminEntry(initData){
@@ -486,7 +490,17 @@ $('#sortSelect').addEventListener('change',e=>{state.sort=e.target.value;renderC
 $('#catalogSearch').addEventListener('input',e=>{state.search=e.target.value.trim().toLowerCase();renderCatalog();});
 $('#pickupDate').addEventListener('change',refreshTimes);
 $('#checkoutForm').addEventListener('submit',sendOrder);
+$('#deliveryAddress').addEventListener('input',updateDeliveryMap);
 $('#deliveryAddress').addEventListener('change',updateDeliveryMap);
+$('#homePhoneOrder')?.addEventListener('click',event=>{
+ const link=event.currentTarget,href=link.href;
+ if(!href||!href.startsWith('tel:')){event.preventDefault();toast('Номер телефона пока не настроен.');return;}
+ const webApp=tg();
+ if(webApp&&typeof webApp.openLink==='function'){
+  event.preventDefault();
+  try{webApp.openLink(href);}catch(error){window.location.href=href;}
+ }
+});
 
 $$('.modal-layer').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){['cartModal','favoritesModal','filtersModal','builderInfoModal'].forEach(closeModal);$('#detailDevice').classList.remove('mobile-active');}});
