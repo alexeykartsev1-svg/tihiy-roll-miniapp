@@ -690,6 +690,7 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 
 
 </style>
+  <link rel="stylesheet" href="./assets/premium-storefront.css">
 </head>
 <body>
 <main class="app">
@@ -701,9 +702,11 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
     <div class="status" id="workStatus" aria-live="polite"><span class="status-dot" aria-hidden="true"></span><span id="workStatusText">Принимаем заказы</span></div>
   </header>
   <nav class="quick-nav" aria-label="Навигация по магазину">
-    <a href="#menu-section">🍣 Меню</a>
-    <a href="#favorites-section">♥ Избранное <span id="favoritesCount" class="nav-count">0</span></a>
-    <button type="button" id="favoritesCartLink">🛒 Корзина</button>
+    <a href="#top" class="nav-home">Главная</a>
+    <a href="#menu-section">Каталог</a>
+    <a href="#customSetBuilder" class="nav-builder">Конструктор</a>
+    <a href="#favorites-section">Избранное <span id="favoritesCount" class="nav-count">0</span></a>
+    <button type="button" id="favoritesCartLink">Корзина</button>
     <a href="admin.html" id="adminPanelLink" hidden>⚙️ Управление</a>
   </nav>
 
