@@ -137,7 +137,7 @@ function renderBuilder(){
   list=products.map(builderProductCard);
  }
  $('#builderGrid').innerHTML=list.length?list.join(''):'<div class="builder-empty"><span>🍣</span><b>Пока нет доступных блюд</b><small>В этой категории ещё нет активных позиций в меню.</small></div>';
- $('.builder-filter').forEach(b=>b.classList.toggle('active',b.dataset.builderFilter===filter));
+ $$('.builder-filter').forEach(b=>b.classList.toggle('active',b.dataset.builderFilter===filter));
  const m=builderMetrics();
  $('#builderPositions').textContent=m.positions+' поз.';
  $('#builderPieces').textContent=m.pieces+' шт.';
@@ -176,8 +176,8 @@ function activateWorkflow(screen){
  state.activeScreen=screen;
  $('.reference-board').classList.add('workflow-mode');
  $('.catalogue-device').classList.add('workflow-mode');
- $('.workflow-screen').forEach(x=>x.classList.toggle('active',x.id===screen));
- $('.bottom-nav button').forEach(x=>x.classList.toggle('active',x.dataset.nav===screen.replace('Screen','').replace('basket','cart')));
+ $$('.workflow-screen').forEach(x=>x.classList.toggle('active',x.id===screen));
+ $$('.bottom-nav button').forEach(x=>x.classList.toggle('active',x.dataset.nav===screen.replace('Screen','').replace('basket','cart')));
  $('#detailDevice').classList.remove('mobile-active');
  document.body.classList.remove('detail-open');
  document.body.style.overflow='';
@@ -186,8 +186,8 @@ function returnToCatalogue(){
  state.activeScreen='catalogue';
  $('.reference-board').classList.remove('workflow-mode');
  $('.catalogue-device').classList.remove('workflow-mode');
- $('.workflow-screen').forEach(x=>x.classList.remove('active'));
- $('.bottom-nav button').forEach(x=>x.classList.toggle('active',x.dataset.nav==='catalogue'));
+ $$('.workflow-screen').forEach(x=>x.classList.remove('active'));
+ $$('.bottom-nav button').forEach(x=>x.classList.toggle('active',x.dataset.nav==='catalogue'));
  document.body.style.overflow='';
 }
 function showBuilderScreen(){renderBuilder();activateWorkflow('builderScreen');}
