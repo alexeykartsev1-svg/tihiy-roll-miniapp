@@ -1471,7 +1471,7 @@ function renderCart() {
     items.append(wrap);
   }
   const history=readOrderHistory();
-  if(history.length){const prev=history[0];const box=document.createElement('section');box.className='order-history';const h=document.createElement('h3');h.textContent='Заказывали раньше?';const detail=document.createElement('p');detail.className='field-hint';detail.textContent=prev.summary+' · '+money(prev.total);const repeat=document.createElement('button');repeat.type='button';repeat.className='repeat-order';repeat.textContent='Повторить прошлый заказ';repeat.addEventListener('click',()=>{Object.keys(cart).forEach(key=>delete cart[key]);prev.items.forEach(item=>{if(products.some(p=>p.id===item.id))cart[item.id]=Math.min(99,item.qty)});saveCart();renderMenu(activeFilter);updateCartBar();renderCart()});box.append(h,detail,repeat);items.append(box)}
+  if(history.length){const prev=history[0];const box=document.createElement('section');box.className='order-history';const h=document.createElement('h3');h.textContent='Заказывали раньше?';const detail=document.createElement('p');detail.className='field-hint';detail.textContent=prev.summary+' · '+money(prev.total);const repeat=document.createElement('button');repeat.type='button';repeat.className='repeat-order';repeat.textContent='Повторить прошлый заказ';repeat.addEventListener('click',()=>{Object.keys(cart).forEach(key=>delete cart[key]);prev.items.forEach(item=>{if(products.some(p=>p.id===item.id))cart[item.id]=Math.min(99,item.qty)});Object.keys(setQuantities).forEach(key=>setQuantities[key]=0);(prev.sets||[]).forEach(item=>{if(Object.prototype.hasOwnProperty.call(setQuantities,item.id))setQuantities[item.id]=Number(item.qty)||0});Object.keys(setQuantities).forEach(syncSetCount);saveCart();renderMenu(activeFilter);updateCartBar();renderCart()});box.append(h,detail,repeat);items.append(box)}
   form.hidden = false;
 }
 function openCart() {
@@ -1754,8 +1754,15 @@ document.getElementById('form').addEventListener('submit', async event => {
     succeeded = true;
     saveOrderHistory({
       orderId: result.order_id,
-      summary: order.items.map(item => { const p=products.find(product=>product.id===item.id); return (p?p.name:item.id)+' × '+item.qty; }).join(', '),
+      summary: [
+        ...order.items.map(item => { const p=products.find(product=>product.id===item.id); return (p?p.name:item.id)+' × '+item.qty; }),
+        ...(order.sets||[]).map(item=>({id:item.id,qty:item.qty})).map(item=>{
+          const title=document.querySelector('[data-set-card="'+item.id+'"] h3')?.textContent||'Готовый сет';
+          return title+' × '+item.qty;
+        })
+      ].join(', '),
       items: order.items.map(item=>({id:item.id,qty:item.qty})),
+      sets: (order.sets||[]).map(item=>({id:item.id,qty:item.qty})),
       total: Number(result.total || getTotals().total),
       date: new Date().toISOString()
     });
