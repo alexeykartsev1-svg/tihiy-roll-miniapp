@@ -105,7 +105,7 @@ async function loadOrders(){
     });
     window.__TIHIY_ADMIN_REPORT__={summary:analytics,trend:dayKeys,statusCounts,recentOrdersCount:reportOrders.length};
     window.dispatchEvent(new CustomEvent('tihiy:analytics-updated'));
-    $('analyticsSummary').textContent='Заказов: '+(analytics.orders_count||0)+' · Выручка без отмен: '+new Intl.NumberFormat('ru-RU').format(analytics.revenue||0)+' ₽ · Валовая прибыль (по заполненной себестоимости): '+new Intl.NumberFormat('ru-RU').format(analytics.gross_profit||0)+' ₽ · В работе: '+(analytics.active_orders||0);
+    $('analyticsSummary').textContent='Заказов: '+(analytics.orders_count||0)+' · Выручка без отмен: '+new Intl.NumberFormat('ru-RU').format(analytics.revenue||0)+' ₽ · Расчётная валовая прибыль: '+new Intl.NumberFormat('ru-RU').format(analytics.gross_profit||0)+' ₽ · В работе: '+(analytics.active_orders||0);
     const list=$('ordersList');list.replaceChildren();
     if(!data.orders||!data.orders.length){list.textContent='Пока нет сохранённых заказов.';return}
     data.orders.forEach(order=>{
