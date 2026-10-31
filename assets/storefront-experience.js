@@ -350,7 +350,7 @@
   window.addEventListener('tihiy:catalog-rendered',()=>{applyCatalogTools()});
   loadShopSettings();
   activateNav();
-}
+
   function initCustomerOrderHistory(){
     const modal=$('#ordersModal'),list=$('#myOrdersList'),header=$('.topbar');
     if(!modal||!list)return;
