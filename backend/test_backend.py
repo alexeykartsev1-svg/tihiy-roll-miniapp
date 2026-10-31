@@ -6,7 +6,7 @@ import time
 from pydantic import ValidationError
 from urllib.parse import urlencode
 
-from main import MENU, OrderItem, ProductPayload, calculate_order, verify_telegram_init_data, DEFAULT_STORE_SETTINGS, validate_store_settings
+from main import MENU, OrderItem, ProductPayload, calculate_order, verify_telegram_init_data, DEFAULT_STORE_SETTINGS, validate_store_settings, validate_category_update
 
 
 def make_init_data(token: str, auth_date: int, user: dict) -> str:
@@ -99,7 +99,25 @@ def main() -> None:
     else:
         raise AssertionError("Invalid opening hours should be rejected")
 
-    print("OK: Telegram auth, product gallery, server-side pricing and shop settings validation passed.")
+    # Category editing supports rename/order/icon and rejects unsafe image URLs.
+    category = {"id": "classic", "name": "Роллы", "sort_order": 0}
+    updated = validate_category_update("classic", {"name": "Классические роллы", "sort_order": 2, "icon": "🍣"}, [category])
+    assert updated["name"] == "Классические роллы"
+    assert updated["sort_order"] == 2
+    try:
+        validate_category_update("classic", {"image": "javascript:alert(1)"}, [category])
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Unsafe category image URL should be rejected")
+    try:
+        validate_category_update("missing", {"name": "Нет"}, [category])
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Unknown category should be rejected")
+
+    print("OK: Telegram auth, product gallery, pricing, category and shop settings validation passed.")
 
 
 if __name__ == "__main__":
