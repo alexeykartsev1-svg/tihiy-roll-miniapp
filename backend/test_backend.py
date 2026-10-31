@@ -6,7 +6,7 @@ import time
 from pydantic import ValidationError
 from urllib.parse import urlencode
 
-from main import MENU, OrderItem, ProductPayload, calculate_order, verify_telegram_init_data
+from main import MENU, OrderItem, ProductPayload, calculate_order, verify_telegram_init_data, DEFAULT_STORE_SETTINGS, validate_store_settings
 
 
 def make_init_data(token: str, auth_date: int, user: dict) -> str:
@@ -67,7 +67,39 @@ def main() -> None:
     items, total = calculate_order([OrderItem(id="philadelphia", qty=1), OrderItem(id="warm_salmon", qty=2)])
     assert total == MENU["philadelphia"]["price"] + 2 * MENU["warm_salmon"]["price"]
     assert len(items) == 2
-    print("OK: Telegram initData checks, product gallery schema and server-side price calculation passed.")
+    # Shop settings validation: valid hours/zones are accepted, malformed data is rejected.
+    settings = validate_store_settings({
+        "shop_name": "Тихий ролл",
+        "delivery_enabled": True,
+        "weekly_hours": [
+            {"day": "Пн", "open": "10:00", "close": "22:00", "closed": False},
+            {"day": "Вт", "open": "10:00", "close": "22:00", "closed": False},
+            {"day": "Ср", "open": "", "close": "", "closed": True},
+            {"day": "Чт", "open": "10:00", "close": "22:00", "closed": False},
+            {"day": "Пт", "open": "10:00", "close": "22:00", "closed": False},
+            {"day": "Сб", "open": "10:00", "close": "22:00", "closed": False},
+            {"day": "Вс", "open": "", "close": "", "closed": True},
+        ],
+        "delivery_zones": [{"name": "Центр", "fee": 150, "radius_km": 3, "active": True}],
+    }, DEFAULT_STORE_SETTINGS)
+    assert settings["delivery_zones"][0]["fee"] == 150
+    assert settings["weekly_hours"][2]["closed"] is True
+    try:
+        validate_store_settings({"pickup_map_url": "javascript:alert(1)"}, settings)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Unsafe map URL should be rejected")
+    try:
+        bad_hours = list(settings["weekly_hours"])
+        bad_hours[0] = {"day": "Пн", "open": "22:00", "close": "10:00", "closed": False}
+        validate_store_settings({"weekly_hours": bad_hours}, settings)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Invalid opening hours should be rejected")
+
+    print("OK: Telegram auth, product gallery, server-side pricing and shop settings validation passed.")
 
 
 if __name__ == "__main__":
