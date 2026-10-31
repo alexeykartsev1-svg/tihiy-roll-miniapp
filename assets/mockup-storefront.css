@@ -831,3 +831,126 @@
 .ingredient-grid .ingredient-chip{height:auto!important;min-height:58px!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;padding:7px 5px!important}
 .ingredient-grid .ingredient-chip strong{height:25px!important;flex:0 0 25px!important;font-size:18px!important}
 .ingredient-grid .ingredient-chip span{font-size:10px!important;line-height:1.1!important}
+
+
+/* Tihiy Roll visual refinement: logo-aligned rhythm, day chips, facts and mobile controls */
+.brand-logo svg{width:45px!important;height:45px!important;overflow:visible}
+.detail-brand-logo svg{width:52px!important;height:52px!important}
+.home-hours-card .home-hours-days{
+ display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:6px!important;
+ margin:11px 0 10px!important
+}
+.home-hours-card .day-chip{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ min-width:34px!important;height:30px!important;padding:0 8px!important;
+ border:1px solid!important;border-radius:8px!important;
+ font-size:12px!important;line-height:1!important;font-weight:850!important;
+ letter-spacing:.1px!important;backdrop-filter:blur(8px)
+}
+.home-hours-card .day-chip.day-working{
+ border-color:rgba(54,220,132,.43)!important;
+ background:rgba(36,190,105,.13)!important;color:#72e7a3!important
+}
+.home-hours-card .day-chip.day-closed{
+ border-color:rgba(255,75,79,.43)!important;
+ background:rgba(230,47,57,.13)!important;color:#ff8888!important
+}
+.home-hours-pills{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:8px!important;margin:0!important
+}
+.home-hours-pill{
+ display:grid!important;align-content:center!important;gap:5px!important;
+ min-width:0!important;min-height:56px!important;padding:8px 10px!important;
+ border:1px solid!important;border-radius:11px!important;background:rgba(255,255,255,.025)!important
+}
+.home-hours-pill small{font-size:8px!important;font-weight:900!important;letter-spacing:1px!important}
+.home-hours-pill strong{font-size:clamp(10px,2.9vw,13px)!important;font-weight:900!important;line-height:1.2!important;white-space:normal!important}
+.home-hours-pill.hours-pill-open{border-color:rgba(54,220,132,.34)!important;background:rgba(36,190,105,.09)!important}
+.home-hours-pill.hours-pill-open small,.home-hours-pill.hours-pill-open strong{color:#79e6a6!important}
+.home-hours-pill.hours-pill-closed{border-color:rgba(255,75,79,.34)!important;background:rgba(230,47,57,.09)!important}
+.home-hours-pill.hours-pill-closed small,.home-hours-pill.hours-pill-closed strong{color:#ff8989!important}
+.home-hours-note{display:block!important;margin-top:9px!important}
+.home-phone-button{
+ position:relative!important;z-index:6!important;pointer-events:auto!important;touch-action:manipulation!important;
+ -webkit-tap-highlight-color:rgba(255,255,255,.12)!important;cursor:pointer!important
+}
+.home-phone-button *{pointer-events:none!important}
+.home-phone-copy b{pointer-events:none!important}
+.detail-copy .product-facts{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ align-items:stretch!important;gap:0!important;margin-top:15px!important;
+ padding:11px 0 13px!important;
+ border-top:1px solid rgba(168,190,202,.2)!important;
+ border-bottom:1px solid rgba(168,190,202,.23)!important
+}
+.detail-copy .product-facts>.product-fact{
+ display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;
+ gap:5px!important;min-width:0!important;padding:2px 10px!important;
+ border:0!important;border-right:1px solid rgba(168,190,202,.23)!important
+}
+.detail-copy .product-facts>.product-fact:first-child{padding-left:0!important}
+.detail-copy .product-facts>.product-fact:last-child{border-right:0!important;padding-right:0!important}
+.detail-copy .product-facts>.product-fact strong{
+ display:block!important;max-width:100%!important;overflow:hidden!important;
+ font-size:clamp(17px,4.8vw,24px)!important;line-height:1.12!important;
+ font-weight:900!important;text-overflow:ellipsis!important;white-space:nowrap!important
+}
+.detail-copy .product-facts>.product-fact span{
+ display:block!important;color:#aebbc2!important;font-size:clamp(10px,2.8vw,13px)!important;
+ line-height:1.15!important;white-space:nowrap!important
+}
+.detail-copy .product-facts>.product-fact-price strong.detail-price{
+ font-size:clamp(24px,6.4vw,38px)!important;letter-spacing:-.7px!important
+}
+.detail-copy>p{height:auto!important;max-height:none!important;overflow:visible!important;white-space:normal!important;line-height:1.42!important}
+.detail-extra{display:none!important}
+.detail-device.mobile-active .detail-buy-row{
+ position:static!important;inset:auto!important;bottom:auto!important;z-index:auto!important;
+ display:grid!important;grid-template-columns:minmax(120px,.88fr) minmax(0,1.12fr)!important;
+ align-items:stretch!important;gap:9px!important;width:100%!important;
+ margin:17px 0 10px!important;padding:0!important;border:0!important;border-radius:0!important;
+ background:transparent!important;backdrop-filter:none!important;box-shadow:none!important
+}
+.detail-device.mobile-active .detail-buy-row .detail-quantity{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ width:100%!important;min-width:120px!important;max-width:none!important;
+ height:58px!important;min-height:58px!important;margin:0!important;overflow:hidden!important;
+ border:1px solid rgba(177,194,204,.52)!important;border-radius:12px!important
+}
+.detail-device.mobile-active .detail-buy-row .detail-quantity button{
+ display:grid!important;place-items:center!important;width:100%!important;min-width:0!important;
+ height:100%!important;margin:0!important;padding:0!important;font-size:26px!important
+}
+.detail-device.mobile-active .detail-buy-row .detail-quantity output{
+ display:grid!important;place-items:center!important;width:100%!important;min-width:0!important;
+ height:100%!important;border-radius:0!important;font-size:19px!important
+}
+.detail-device.mobile-active .detail-buy-row .add-cart-button{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:100%!important;min-width:0!important;min-height:58px!important;height:58px!important;
+ padding:0 8px!important;gap:6px!important;border-radius:12px!important;
+ font-size:clamp(12px,3.45vw,15px)!important;line-height:1.15!important;white-space:normal!important
+}
+.detail-device.mobile-active .detail-buy-row .add-cart-button span{
+ display:inline!important;min-width:0!important;white-space:normal!important;text-align:center!important
+}
+.detail-device.mobile-active .detail-scroll{padding-bottom:calc(110px + env(safe-area-inset-bottom))!important}
+.workflow-screen#builderScreen .builder-summary{
+ position:relative!important;z-index:105!important;flex:0 0 auto!important;
+ margin-bottom:calc(83px + env(safe-area-inset-bottom))!important
+}
+.workflow-screen#builderScreen .builder-summary .add-cart-button{
+ position:relative!important;z-index:106!important;display:flex!important;visibility:visible!important;
+ opacity:1!important;min-height:50px!important;height:50px!important
+}
+@media(max-width:420px){
+ .home-hours-card .home-hours-days{gap:5px!important}
+ .home-hours-card .day-chip{min-width:31px!important;height:28px!important;padding:0 7px!important;font-size:11px!important}
+ .home-hours-pills{gap:6px!important}
+ .home-hours-pill{min-height:55px!important;padding:7px 8px!important}
+ .home-hours-pill strong{font-size:10px!important}
+ .detail-device.mobile-active .detail-buy-row{grid-template-columns:minmax(116px,.88fr) minmax(0,1.12fr)!important;gap:8px!important}
+ .detail-device.mobile-active .detail-buy-row .detail-quantity{min-width:116px!important;height:56px!important;min-height:56px!important}
+ .detail-device.mobile-active .detail-buy-row .add-cart-button{height:56px!important;min-height:56px!important;font-size:12px!important}
+}
