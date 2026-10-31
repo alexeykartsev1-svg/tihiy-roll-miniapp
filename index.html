@@ -800,8 +800,8 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
       </article>
       <article class="set-card set-card-photo" data-set-card="newyear">
         <div class="set-card-copy">
-          <h3>🎄 Новогодний сет</h3><p data-set-description="newyear">Праздничное сочетание любимых роллов для новогоднего стола. Состав временный.</p>
-          <div class="set-meta"><span aria-label="64 штуки">▣ &nbsp;64 шт.</span><span aria-label="1600 граммов">⚖ &nbsp;1 600 г</span></div>
+          <h3>🎄 Новогодний сет</h3><p data-set-description="newyear">Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.</p>
+          <div class="set-meta"><span aria-label="40 штук">▣ &nbsp;40 шт.</span><span aria-label="1400 граммов">⚖ &nbsp;1 400 г</span></div>
           <div class="set-price" id="setNewYearPrice">—</div>
         </div>
         <div class="set-actions"><button class="set-composition" type="button" data-set-composition="newyear">☷ &nbsp; Состав</button><button class="set-add" type="button" data-set="newyear">Добавить сет</button>
@@ -1119,7 +1119,7 @@ function renderMenu(filter = activeFilter) {
   renderFavorites();
 }
 
-const SET_PRESETS={solo:[['philadelphia',1],['lava',1]],duo:[['philadelphia',1],['warm_crab',1],['lava',1]],party:[['philadelphia',2],['lava',1],['warm_crab',1],['warm_salmon',1]],newyear:[['philadelphia',2],['lava',1],['warm_crab',1],['warm_salmon',1]]};
+const SET_PRESETS={solo:[['philadelphia',1],['lava',1]],duo:[['philadelphia',1],['warm_crab',1],['lava',1]],party:[['philadelphia',2],['lava',1],['warm_crab',1],['warm_salmon',1]],newyear:[['philadelphia',1],['california',1],['lava',1],['warm_crab',1],['warm_salmon',1]]};
 function renderSetPrices(){
   Object.entries({solo:'setSoloPrice',duo:'setDuoPrice',party:'setPartyPrice',newyear:'setNewYearPrice'}).forEach(([key,id])=>{
     const el=document.getElementById(id);if(!el)return;
@@ -1143,7 +1143,7 @@ const DEFAULT_SET_CONTENT={
  solo:{description:'Филадельфия и Лава — для уютного ужина.',image:'./assets/set-solo.webp',title:'На одного'},
  duo:{description:'Филадельфия, Тёплый краб и Лава — поделиться вкусом.',image:'./assets/set-duo.webp',title:'Вечер вдвоём'},
  party:{description:'Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp',title:'Компания'},
- newyear:{description:'Праздничное сочетание любимых роллов для новогоднего стола. Состав временный.',image:'./assets/set-party.webp',title:'Новогодний сет'}
+ newyear:{description:'Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp',title:'Новогодний сет'}
 };
 let editableSetsContent={};
 function applyEditableSets(rows){
