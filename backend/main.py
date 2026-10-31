@@ -573,6 +573,30 @@ async def admin_get_orders(x_telegram_init_data: str | None = Header(default=Non
               "completed": sum(o["status"] == "completed" for o in orders)}
     return {"orders": orders, "summary": totals}
 
+@app.get("/api/my-orders")
+async def get_customer_orders(x_telegram_init_data: str | None = Header(default=None), limit: int = 20) -> dict[str, Any]:
+    if not BOT_TOKEN:
+        raise HTTPException(status_code=503, detail="Сервис заказов временно не настроен.")
+    if not x_telegram_init_data:
+        raise HTTPException(status_code=401, detail="Откройте магазин через Telegram, чтобы посмотреть заказы.")
+    try:
+        auth = verify_telegram_init_data(x_telegram_init_data, BOT_TOKEN)
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    telegram_id = int(auth["user"]["id"])
+    safe_limit = max(1, min(int(limit), 50))
+    with order_db() as connection:
+        rows = connection.execute(
+            "SELECT order_id,created_at,customer_name,pickup_time,notes,items_json,total,status FROM orders WHERE telegram_id=? ORDER BY created_at DESC LIMIT ?",
+            (telegram_id, safe_limit),
+        ).fetchall()
+    orders = []
+    for row in rows:
+        item = dict(row)
+        item["items"] = json.loads(item.pop("items_json"))
+        orders.append(item)
+    return {"orders": orders}
+
 @app.patch("/api/admin/orders/{order_id}")
 async def admin_update_order(order_id: str, payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
     admin_from_header(x_telegram_init_data)
