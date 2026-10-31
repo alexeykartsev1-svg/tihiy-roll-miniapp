@@ -377,7 +377,7 @@ function renderConfirmation(){
 }
 function showConfirmation(data){state.lastOrder=data;renderConfirmation();activateWorkflow('confirmationScreen');}
 
-function checkoutMapUrl(query){return 'https://yandex.ru/map-widget/v1/?text='+encodeURIComponent(query||'Социалистическая, 26, район «Остров», Чарышское')+'&z=17';}
+function checkoutMapUrl(query){const address=query||'Социалистическая, 26, район «Остров», Чарышское';return 'https://yandex.ru/map-widget/v1/?text='+encodeURIComponent(address+', Чарышское, Алтайский край')+'&z=17&lang=ru_RU';}
 function updateDeliveryMap(){
  const input=$('#deliveryAddress'),query=String(input?.value||'').trim();
  const frame=$('#checkoutMap'),link=$('#checkoutMapLink'),label=$('#checkoutMapLabel'),address=$('#checkoutMapAddress');
@@ -492,6 +492,7 @@ $('#sortSelect').addEventListener('change',e=>{state.sort=e.target.value;renderC
 $('#catalogSearch').addEventListener('input',e=>{state.search=e.target.value.trim().toLowerCase();renderCatalog();});
 $('#pickupDate').addEventListener('change',refreshTimes);
 $('#checkoutForm').addEventListener('submit',sendOrder);
+$('#homePhoneOrder')?.addEventListener('click',event=>{const href=event.currentTarget.getAttribute('href')||'';if(!/^tel:\+?\d+$/.test(href))return;event.preventDefault();window.location.href=href;});
 $('#deliveryAddress').addEventListener('input',updateDeliveryMap);
 $('#deliveryAddress').addEventListener('change',updateDeliveryMap);
 $$('.modal-layer').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
