@@ -331,7 +331,7 @@ function updateStoreHours(){
  if(label){label.textContent=isOpen?'Мы работаем':'Не работаем';label.classList.toggle('is-open',isOpen);label.classList.toggle('is-closed',!isOpen);}
 }
 function syncHomeShortcutState(){
- $('[data-home-filter]').forEach(button=>{
+ document.querySelectorAll('[data-home-filter]').forEach(button=>{
   const selected=button.dataset.homeFilter===state.filter;
   button.classList.toggle('active',selected);
   button.setAttribute('aria-pressed',selected?'true':'false');
@@ -339,7 +339,7 @@ function syncHomeShortcutState(){
 }
 function updateHomePhone(settings){
  const phone=String(settings?.phone||'+7 923 000-58-57').trim();
- const dial=phone.replace(/[^+\\d]/g,'');
+ const dial=phone.replace(/[^0-9+]/g,'');
  const link=$('#homePhoneOrder'),text=$('#homePhoneText');
  if(link)link.href='tel:'+dial;
  if(text)text.textContent=phone;
