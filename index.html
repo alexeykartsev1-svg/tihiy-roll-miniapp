@@ -7,9 +7,9 @@
   <meta name="description" content="Тихий ролл — роллы, сеты, азиатские хот-доги и закуски. Заказ к удобному времени.">
   <title>Тихий ролл — меню</title>
   <link rel="preconnect" href="https://tihiy-roll-order-api.onrender.com">
-  <link rel="stylesheet" href="./assets/mockup-storefront.css?v=stage1">
+  <link rel="stylesheet" href="./assets/mockup-storefront.css?v=cartbuilder1">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="./assets/mockup-storefront.js?v=stage1" defer></script>
+  <script src="./assets/mockup-storefront.js?v=cartbuilder1" defer></script>
 </head>
 <body>
   <main class="reference-board" id="referenceBoard">
@@ -47,12 +47,128 @@
         <div class="empty-state" id="emptyState" hidden>В этой категории пока нет блюд.</div>
       </div>
 
+      <section class="workflow-screen" id="builderScreen" aria-label="Конструктор сета">
+        <div class="workflow-scroll">
+          <div class="workflow-topbar">
+            <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
+            <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
+            <div class="header-actions">
+              <button class="header-icon" type="button" data-open-favorites aria-label="Избранное">♡<b id="builderFavCount">0</b></button>
+              <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="builderCartCount">0</b></button>
+            </div>
+          </div>
+          <div class="workflow-steps">
+            <div class="workflow-step current"><i>1</i><span>Выбор роллов</span></div>
+            <div class="workflow-step"><i>2</i><span>Ваш сет</span></div>
+            <div class="workflow-step"><i>3</i><span>Оформление</span></div>
+          </div>
+          <header class="workflow-title">
+            <h2>Собери свой сет</h2>
+            <p>Выбирай любимые роллы и создавай свой уникальный сет</p>
+          </header>
+          <div class="builder-filters" id="builderFilters">
+            <button class="builder-filter active" type="button" data-builder-filter="all">Все</button>
+            <button class="builder-filter" type="button" data-builder-filter="rolls">Роллы</button>
+            <button class="builder-filter" type="button" data-builder-filter="sets">Сеты</button>
+            <button class="builder-filter" type="button" data-builder-filter="dogs">Хот-доги</button>
+            <button class="builder-filter" type="button" data-builder-filter="snacks">Закуски</button>
+          </div>
+          <div class="builder-grid" id="builderGrid">
+            <div class="builder-empty"><span>🍣</span><b>Загружаем меню…</b></div>
+          </div>
+        </div>
+        <div class="builder-summary">
+          <div class="builder-summary-copy">
+            <span>Выбрано: <b id="builderPositions">0 поз.</b></span>
+            <small><span id="builderPieces">0 шт.</span> · <span id="builderWeight">0 г</span></small>
+          </div>
+          <strong id="builderTotal">0 ₽</strong>
+          <button class="add-cart-button" type="button" id="builderAddToCart" disabled>Добавить в корзину <span>›</span></button>
+        </div>
+      </section>
+
+      <section class="workflow-screen" id="basketScreen" aria-label="Корзина">
+        <div class="workflow-scroll">
+          <div class="workflow-topbar">
+            <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
+            <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
+            <div class="header-actions">
+              <button class="header-icon" type="button" data-open-favorites aria-label="Избранное">♡<b id="basketFavCount">0</b></button>
+              <button class="header-icon cart-head" type="button" aria-label="Корзина">🛒<b id="basketCartCount">0</b></button>
+            </div>
+          </div>
+          <div class="workflow-steps">
+            <div class="workflow-step"><i>1</i><span>Выбор роллов</span></div>
+            <div class="workflow-step current"><i>2</i><span>Ваш сет</span></div>
+            <div class="workflow-step"><i>3</i><span>Оформление</span></div>
+          </div>
+          <header class="workflow-title basket-title">
+            <h2>Ваша корзина</h2>
+            <p>Выбранные блюда</p>
+          </header>
+          <div class="basket-lines" id="basketLines">
+            <div class="empty-state">Корзина пока пуста.</div>
+          </div>
+          <div id="basketSetNotes"></div>
+          <section class="basket-totals">
+            <h3>Итого</h3>
+            <div class="basket-metrics">
+              <div><span>Количество роллов</span><b id="basketPieces">0 шт.</b></div>
+              <div><span>Общий вес</span><b id="basketWeight">0 г</b></div>
+            </div>
+            <div class="basket-cost"><span>Стоимость</span><strong id="basketTotal">0 ₽</strong></div>
+          </section>
+          <div class="basket-actions">
+            <button class="add-cart-button" type="button" id="cartCheckout" disabled>Перейти к оформлению <span>›</span></button>
+            <button class="basket-continue" type="button" id="cartKeepShopping">Продолжить выбор</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="workflow-screen" id="confirmationScreen" aria-label="Подтверждение заказа">
+        <div class="workflow-scroll">
+          <div class="workflow-topbar">
+            <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
+            <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
+            <div class="header-actions">
+              <button class="header-icon" type="button" data-open-favorites aria-label="Избранное">♡<b>♡</b></button>
+            </div>
+          </div>
+          <div class="workflow-steps">
+            <div class="workflow-step current"><i>1</i><span>Заказ принят</span></div>
+            <div class="workflow-step"><i>2</i><span>Готовим</span></div>
+            <div class="workflow-step"><i>3</i><span>Готов к выдаче</span></div>
+            <div class="workflow-step"><i>4</i><span>Завершён</span></div>
+          </div>
+          <div class="confirmation-hero">
+            <div class="confirmation-check">✓</div>
+            <h2>Заказ принят!</h2>
+            <p>Спасибо, что выбрали «Тихий ролл». Мы получили ваш заказ.</p>
+          </div>
+          <section class="confirmation-order">
+            <div class="confirmation-order-meta">
+              <div><small>Номер заказа</small><b id="confirmedOrderCode">—</b></div>
+              <div><small>Время заказа</small><b id="confirmedWhen">—</b></div>
+            </div>
+            <div class="confirmation-status">
+              <span class="status-current">✓</span><b>Принят</b>
+              <span>Дальше сообщим, когда заказ будет готов.</span>
+            </div>
+            <h3>Состав заказа</h3>
+            <div id="confirmedLines"></div>
+            <div class="confirmation-total"><span>Итого</span><strong id="confirmedTotal">0 ₽</strong></div>
+          </section>
+          <p class="confirmation-note">Время выдачи будет подтверждено отдельно. Онлайн-оплата не подключена.</p>
+          <button class="add-cart-button confirmation-home" type="button" id="confirmationHome">На главную <span>›</span></button>
+        </div>
+      </section>
+
       <nav class="bottom-nav" aria-label="Навигация магазина">
         <button type="button" data-nav="home"><span class="nav-icon">⌂</span>Главная</button>
         <button class="active" type="button" data-nav="catalogue"><span class="nav-icon grid-icon">▦</span>Каталог</button>
         <button type="button" data-nav="builder"><span class="nav-icon">♧</span>Конструктор</button>
         <button type="button" data-open-favorites><span class="nav-icon">♡</span>Избранное</button>
-        <button type="button" data-open-cart><span class="nav-icon">🛒<i id="navCartCount">0</i></span>Корзина</button>
+        <button type="button" data-nav="cart"><span class="nav-icon">🛒<i id="navCartCount">0</i></span>Корзина</button>
       </nav>
     </section>
 
