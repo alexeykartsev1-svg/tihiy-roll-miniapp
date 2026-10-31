@@ -89,6 +89,12 @@ class OrderItem(BaseModel):
         return {"id": item_id, "qty": row.get("qty")}
 
 
+class SetOrderItem(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(min_length=2, max_length=24, pattern=r"^[a-z0-9_-]+$")
+    qty: int = Field(ge=1, le=20)
+
+
 class OrderPayload(BaseModel):
     # Accept common field spellings from previously published Mini App builds.
     model_config = ConfigDict(extra="ignore")
@@ -99,6 +105,7 @@ class OrderPayload(BaseModel):
     time: str = Field(min_length=2, max_length=100)
     notes: str = Field(default="", max_length=1000)
     items: list[OrderItem] = Field(min_length=1, max_length=20)
+    sets: list[SetOrderItem] = Field(default_factory=list, max_length=4)
 
     @model_validator(mode="before")
     @classmethod
@@ -119,6 +126,7 @@ class OrderPayload(BaseModel):
             "time": ("time", "pickup_time", "pickupTime", "desired_time"),
             "notes": ("notes", "comment", "order_notes"),
             "items": ("items", "cart", "order_items", "orderItems"),
+            "sets": ("sets", "set_items", "setItems"),
         }
         normalized: dict[str, Any] = {}
         for field, keys in aliases.items():
@@ -219,6 +227,9 @@ def calculate_order(items: list[OrderItem]) -> tuple[list[dict[str, Any]], int]:
             raise ValueError("В заказе повторяется одна и та же позиция")
         seen.add(row.id)
         product = live_menu[row.id]
+        available_stock = product.get("stock")
+        if available_stock is not None and row.qty > int(available_stock):
+            raise ValueError(f"Недостаточно товара «{product['name']}» в наличии. Осталось: {available_stock}.")
         subtotal = product["price"] * row.qty
         total += subtotal
         clean_items.append({
@@ -323,16 +334,16 @@ def current_menu() -> dict[str, dict[str, Any]]:
             except (TypeError, ValueError):
                 continue
             if price > 0:
-                result[str(p["id"])] = {"name": str(p["name"]), "price": price, "cost": max(0, int(p.get("cost", 0) or 0))}
+                result[str(p["id"])] = {"name": str(p["name"]), "price": price, "cost": max(0, int(p.get("cost", 0) or 0)), "stock": (None if p.get("stock") is None else max(0, int(p.get("stock", 0) or 0)))}
     return result
 
 CATEGORIES_FILE = os.getenv("CATEGORIES_FILE", os.path.join(os.path.dirname(__file__), "categories.json"))
 DEFAULT_CATEGORIES = [
-    {"id":"classic","name":"Классические","sort_order":0},
-    {"id":"warm","name":"Тёплые и мясные","sort_order":1},
-    {"id":"dogs","name":"Азиатские хот-доги","sort_order":2},
-    {"id":"snacks","name":"Закуски","sort_order":3},
-    {"id":"sets","name":"Сеты","sort_order":4},
+    {"id":"classic","name":"Классические","icon":"🍣","sort_order":0},
+    {"id":"warm","name":"Тёплые и мясные","icon":"🔥","sort_order":1},
+    {"id":"dogs","name":"Азиатские хот-доги","icon":"🌭","sort_order":2},
+    {"id":"snacks","name":"Закуски","icon":"🍤","sort_order":3},
+    {"id":"sets","name":"Сеты","icon":"🎁","sort_order":4},
     {"id":"all","name":"Другое","sort_order":5},
 ]
 def read_categories() -> list[dict[str, Any]]:
@@ -376,6 +387,7 @@ class ProductPayload(BaseModel):
     desc: str = Field(default="", max_length=1000)
     photo: str = Field(default="", max_length=1200000)
     pieces: int = Field(default=8, ge=1, le=100)
+    stock: int | None = Field(default=None, ge=0, le=10000)
     details: str = Field(default="", max_length=1000)
     gallery: list[str] = Field(default_factory=list, max_length=5)
     active: bool = True
@@ -400,6 +412,42 @@ def admin_from_header(x_telegram_init_data: str | None) -> None:
 async def get_categories() -> list[dict[str, Any]]:
     return sorted(read_categories(), key=lambda c: int(c.get("sort_order",0)))
 
+def validate_category_update(category_id: str, payload: dict[str, Any], existing: list[dict[str, Any]]) -> dict[str, Any]:
+    current = next((dict(row) for row in existing if row.get("id") == category_id), None)
+    if current is None:
+        raise ValueError("Категория не найдена.")
+    name = payload.get("name", current.get("name", ""))
+    sort_order = payload.get("sort_order", current.get("sort_order", 0))
+    icon = payload.get("icon", current.get("icon", ""))
+    image = payload.get("image", current.get("image", ""))
+    if not isinstance(name, str) or not name.strip() or len(name.strip()) > 60:
+        raise ValueError("Название категории должно содержать от 1 до 60 символов.")
+    if any(row.get("id") != category_id and str(row.get("name", "")).casefold() == name.strip().casefold() for row in existing):
+        raise ValueError("Категория с таким названием уже существует.")
+    if not isinstance(sort_order, int) or isinstance(sort_order, bool) or not 0 <= sort_order <= 1000:
+        raise ValueError("Порядок категории должен быть от 0 до 1000.")
+    if not isinstance(icon, str) or len(icon) > 16:
+        raise ValueError("Значок категории должен быть коротким текстом.")
+    if not isinstance(image, str) or len(image) > 1_000_000:
+        raise ValueError("Изображение категории слишком большое.")
+    if image and not (image.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", image)):
+        raise ValueError("Изображение категории должно быть HTTPS-ссылкой или JPG, PNG, WebP.")
+    current.update({"name": name.strip(), "sort_order": sort_order, "icon": icon.strip(), "image": image.strip()})
+    return current
+
+@app.put("/api/admin/categories/{category_id}")
+async def admin_update_category(category_id: str, payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    categories = read_categories()
+    try:
+        updated_item = validate_category_update(category_id, payload, categories)
+    except ValueError as exc:
+        if str(exc) == "Категория не найдена.":
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    write_categories([updated_item if row.get("id") == category_id else row for row in categories])
+    return {"ok": True, "category": updated_item}
+
 @app.get("/api/admin/categories")
 async def admin_get_categories(x_telegram_init_data: str | None = Header(default=None)) -> list[dict[str, Any]]:
     admin_from_header(x_telegram_init_data)
@@ -415,7 +463,13 @@ async def admin_create_category(payload: dict[str, Any], x_telegram_init_data: s
     categories=read_categories()
     if any(c["id"]==category_id or c["name"].casefold()==name.casefold() for c in categories):
         raise HTTPException(status_code=409,detail="Категория с таким ID или названием уже существует.")
-    item={"id":category_id,"name":name,"sort_order":max([int(c.get("sort_order",0)) for c in categories],default=-1)+1}
+    icon=payload.get("icon","")
+    image=payload.get("image","")
+    if not isinstance(icon,str) or len(icon)>16:
+        raise HTTPException(status_code=400,detail="Значок категории должен быть коротким текстом.")
+    if not isinstance(image,str) or len(image)>1_000_000 or (image and not (image.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,",image))):
+        raise HTTPException(status_code=400,detail="Изображение категории должно быть HTTPS-ссылкой или JPG, PNG, WebP.")
+    item={"id":category_id,"name":name,"icon":icon.strip(),"image":image.strip(),"sort_order":max([int(c.get("sort_order",0)) for c in categories],default=-1)+1}
     categories.append(item);write_categories(categories)
     return {"ok":True,"category":item}
 
@@ -527,6 +581,30 @@ async def admin_get_orders(x_telegram_init_data: str | None = Header(default=Non
               "completed": sum(o["status"] == "completed" for o in orders)}
     return {"orders": orders, "summary": totals}
 
+@app.get("/api/my-orders")
+async def get_customer_orders(x_telegram_init_data: str | None = Header(default=None), limit: int = 20) -> dict[str, Any]:
+    if not BOT_TOKEN:
+        raise HTTPException(status_code=503, detail="Сервис заказов временно не настроен.")
+    if not x_telegram_init_data:
+        raise HTTPException(status_code=401, detail="Откройте магазин через Telegram, чтобы посмотреть заказы.")
+    try:
+        auth = verify_telegram_init_data(x_telegram_init_data, BOT_TOKEN)
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    telegram_id = int(auth["user"]["id"])
+    safe_limit = max(1, min(int(limit), 50))
+    with order_db() as connection:
+        rows = connection.execute(
+            "SELECT order_id,created_at,customer_name,pickup_time,notes,items_json,total,status FROM orders WHERE telegram_id=? ORDER BY created_at DESC LIMIT ?",
+            (telegram_id, safe_limit),
+        ).fetchall()
+    orders = []
+    for row in rows:
+        item = dict(row)
+        item["items"] = json.loads(item.pop("items_json"))
+        orders.append(item)
+    return {"orders": orders}
+
 @app.patch("/api/admin/orders/{order_id}")
 async def admin_update_order(order_id: str, payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
     admin_from_header(x_telegram_init_data)
@@ -554,20 +632,46 @@ async def admin_analytics(x_telegram_init_data: str | None = Header(default=None
     admin_from_header(x_telegram_init_data)
     with order_db() as connection:
         rows = connection.execute("SELECT items_json,total,status,created_at FROM orders ORDER BY created_at DESC").fetchall()
-    revenue = sum(row["total"] for row in rows if row["status"] != "cancelled")
-    gross_profit = sum(sum(int(item.get("gross_profit", 0)) for item in json.loads(row["items_json"])) for row in rows if row["status"] != "cancelled")
+    valid_rows = [row for row in rows if row["status"] != "cancelled"]
+    revenue = sum(int(row["total"] or 0) for row in valid_rows)
+    gross_profit = sum(
+        sum(int(item.get("gross_profit", 0)) for item in json.loads(row["items_json"]))
+        for row in valid_rows
+    )
     active_orders = sum(row["status"] not in ("completed", "cancelled") for row in rows)
+    status_counts = {status: sum(row["status"] == status for row in rows) for status in VALID_ORDER_STATUSES}
     popular: dict[str, int] = {}
-    for row in rows:
-        if row["status"] == "cancelled":
-            continue
+    for row in valid_rows:
         for item in json.loads(row["items_json"]):
             name = str(item.get("name", item.get("id", "Блюдо")))
             popular[name] = popular.get(name, 0) + int(item.get("qty", 0))
-    return {"orders_count": len(rows), "revenue": revenue, "gross_profit": gross_profit,
-            "active_orders": active_orders, "popular_items": sorted(
-                [{"name": name, "qty": qty} for name, qty in popular.items()],
-                key=lambda item: item["qty"], reverse=True)[:10]}
+    daily: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        try:
+            day = datetime.fromisoformat(str(row["created_at"])).date().isoformat()
+        except (TypeError, ValueError):
+            continue
+        entry = daily.setdefault(day, {"date": day, "orders": 0, "revenue": 0})
+        entry["orders"] += 1
+        if row["status"] != "cancelled":
+            entry["revenue"] += int(row["total"] or 0)
+    daily_rows = sorted(daily.values(), key=lambda item: item["date"])[-30:]
+    valid_count = len(valid_rows)
+    return {
+        "orders_count": len(rows),
+        "valid_orders_count": valid_count,
+        "revenue": revenue,
+        "average_check": round(revenue / valid_count) if valid_count else 0,
+        "gross_profit": gross_profit,
+        "active_orders": active_orders,
+        "status_counts": status_counts,
+        "daily": daily_rows,
+        "popular_items": sorted(
+            [{"name": name, "qty": qty} for name, qty in popular.items()],
+            key=lambda item: item["qty"],
+            reverse=True,
+        )[:10],
+    }
 
 MAX_ORDERS_PER_SLOT = max(1, int(os.getenv("MAX_ORDERS_PER_SLOT", "5")))
 
@@ -591,6 +695,121 @@ async def get_availability(date: str) -> dict[str, Any]:
 
 
 # Editable homepage content managed by the store owner.
+STORE_SETTINGS_FILE = os.getenv("STORE_SETTINGS_FILE", os.path.join(os.path.dirname(__file__), "store_settings.json"))
+DEFAULT_STORE_SETTINGS = {
+    "shop_name": "Тихий ролл",
+    "phone": "+7 923 000-58-57",
+    "description": "Свежие роллы и азиатские блюда, приготовленные к выбранному времени.",
+    "pickup_address": "Социалистическая, 26, район «Остров», Чарышское",
+    "pickup_map_url": "https://yandex.ru/maps/?text=%D0%A2%D0%B8%D1%85%D0%B8%D0%B9%20%D1%80%D0%BE%D0%BB%D0%BB%2C%20%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%2C%2026%2C%20%D0%A7%D0%B0%D1%80%D1%8B%D1%88%D1%81%D0%BA%D0%BE%D0%B5",
+    "pickup_enabled": True,
+    "delivery_enabled": True,
+    "minimum_order": 0,
+    "delivery_note": "Стоимость и возможность доставки подтвердим отдельно после получения заказа.",
+    "delivery_zones": [],
+    "weekly_hours": [
+        {"day": "Понедельник", "open": "12:00", "close": "21:00", "closed": False},
+        {"day": "Вторник", "open": "12:00", "close": "21:00", "closed": False},
+        {"day": "Среда", "open": "", "close": "", "closed": True},
+        {"day": "Четверг", "open": "12:00", "close": "21:00", "closed": False},
+        {"day": "Пятница", "open": "12:00", "close": "21:00", "closed": False},
+        {"day": "Суббота", "open": "12:00", "close": "21:00", "closed": False},
+        {"day": "Воскресенье", "open": "", "close": "", "closed": True},
+    ],
+}
+
+def _valid_clock(value: Any) -> bool:
+    return isinstance(value, str) and bool(re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", value))
+
+def validate_store_settings(payload: dict[str, Any], current: dict[str, Any] | None = None) -> dict[str, Any]:
+    if not isinstance(payload, dict):
+        raise ValueError("Настройки должны быть объектом.")
+    result = dict(current or DEFAULT_STORE_SETTINGS)
+    text_limits = {
+        "shop_name": 80, "phone": 50, "description": 300,
+        "pickup_address": 300, "delivery_note": 300,
+    }
+    for key, limit in text_limits.items():
+        if key in payload:
+            value = payload[key]
+            if not isinstance(value, str) or len(value.strip()) > limit:
+                raise ValueError(f"Поле {key}: проверь длину текста.")
+            result[key] = value.strip()
+    if "pickup_map_url" in payload:
+        value = payload["pickup_map_url"]
+        if not isinstance(value, str) or len(value) > 1000 or (value and not value.startswith("https://")):
+            raise ValueError("Ссылка на карту должна начинаться с HTTPS.")
+        result["pickup_map_url"] = value.strip()
+    for key in ("pickup_enabled", "delivery_enabled"):
+        if key in payload:
+            if not isinstance(payload[key], bool):
+                raise ValueError(f"Поле {key} должно быть переключателем.")
+            result[key] = payload[key]
+    if "minimum_order" in payload:
+        value = payload["minimum_order"]
+        if not isinstance(value, int) or isinstance(value, bool) or not 0 <= value <= 100000:
+            raise ValueError("Минимальная сумма заказа должна быть от 0 до 100 000 ₽.")
+        result["minimum_order"] = value
+    if "weekly_hours" in payload:
+        hours = payload["weekly_hours"]
+        if not isinstance(hours, list) or len(hours) != 7:
+            raise ValueError("График должен содержать ровно семь дней.")
+        clean_hours = []
+        for index, row in enumerate(hours):
+            if not isinstance(row, dict):
+                raise ValueError(f"График: неверная запись для дня {index + 1}.")
+            day = str(row.get("day", DEFAULT_STORE_SETTINGS["weekly_hours"][index]["day"]))[:30]
+            closed = row.get("closed", False)
+            opened, closed_at = row.get("open", ""), row.get("close", "")
+            if not isinstance(closed, bool):
+                raise ValueError("Признак выходного дня должен быть true/false.")
+            if not closed and (not _valid_clock(opened) or not _valid_clock(closed_at) or opened >= closed_at):
+                raise ValueError(f"Укажи корректное время открытия и закрытия для дня «{day}».")
+            clean_hours.append({"day": day, "open": "" if closed else opened, "close": "" if closed else closed_at, "closed": closed})
+        result["weekly_hours"] = clean_hours
+    if "delivery_zones" in payload:
+        zones = payload["delivery_zones"]
+        if not isinstance(zones, list) or len(zones) > 10:
+            raise ValueError("Можно добавить не более десяти зон доставки.")
+        clean_zones = []
+        for index, zone in enumerate(zones):
+            if not isinstance(zone, dict):
+                raise ValueError(f"Зона доставки {index + 1}: неверный формат.")
+            name = zone.get("name", "")
+            fee = zone.get("fee", 0)
+            active = zone.get("active", True)
+            radius = zone.get("radius_km", 0)
+            if not isinstance(name, str) or not name.strip() or len(name.strip()) > 80:
+                raise ValueError(f"Зона доставки {index + 1}: укажи название до 80 символов.")
+            if not isinstance(fee, int) or isinstance(fee, bool) or not 0 <= fee <= 20000:
+                raise ValueError(f"Зона доставки {index + 1}: стоимость должна быть от 0 до 20 000 ₽.")
+            if not isinstance(active, bool):
+                raise ValueError(f"Зона доставки {index + 1}: неверный статус.")
+            if not isinstance(radius, (int, float)) or isinstance(radius, bool) or not 0 <= float(radius) <= 100:
+                raise ValueError(f"Зона доставки {index + 1}: радиус должен быть от 0 до 100 км.")
+            clean_zones.append({"name": name.strip(), "fee": fee, "active": active, "radius_km": float(radius)})
+        result["delivery_zones"] = clean_zones
+    return result
+
+def read_store_settings() -> dict[str, Any]:
+    try:
+        with open(STORE_SETTINGS_FILE, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        if isinstance(data, dict):
+            return validate_store_settings(data, DEFAULT_STORE_SETTINGS)
+    except (OSError, json.JSONDecodeError, ValueError):
+        pass
+    return json.loads(json.dumps(DEFAULT_STORE_SETTINGS, ensure_ascii=False))
+
+def write_store_settings(settings: dict[str, Any]) -> None:
+    folder = os.path.dirname(STORE_SETTINGS_FILE)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    temporary = STORE_SETTINGS_FILE + ".tmp"
+    with open(temporary, "w", encoding="utf-8") as handle:
+        json.dump(settings, handle, ensure_ascii=False, indent=2)
+    os.replace(temporary, STORE_SETTINGS_FILE)
+
 SITE_CONTENT_FILE = os.getenv("SITE_CONTENT_FILE", os.path.join(os.path.dirname(__file__), "site_content.json"))
 DEFAULT_SITE_CONTENT = {
     "hero_title": "Тихо готовим, громко вкусно",
@@ -602,16 +821,22 @@ DEFAULT_SITE_CONTENT = {
         {"title":"Собери свой сет","accent":"на свой вкус","desc":"Выбирай любимые роллы и создай собственное сочетание.","image":"","button":"Собрать сет","active":True}
     ],
     "sets": [
-        {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":"","photos":[]},
-        {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":"","photos":[]},
-        {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[]},
-        {"id":"newyear","description":"Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[]}
+        {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"lava","qty":1}],"active":True,"stock":None},
+        {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"warm_crab","qty":1},{"id":"lava","qty":1}],"active":True,"stock":None},
+        {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":2},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":None},
+        {"id":"newyear","description":"Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"california","qty":1},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":None}
     ],
     "promo_title":"Закажи к удобному времени",
     "promo_text":"Выбирай блюда заранее — мы приготовим заказ к согласованному времени.",
     "promo_button":"Перейти к меню",
     "promo_link":"#menu",
     "promo_image":""
+}
+DEFAULT_SET_ITEMS = {
+    "solo": [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 1}],
+    "duo": [{"id": "philadelphia", "qty": 1}, {"id": "warm_crab", "qty": 1}, {"id": "lava", "qty": 1}],
+    "party": [{"id": "philadelphia", "qty": 2}, {"id": "lava", "qty": 1}, {"id": "warm_crab", "qty": 1}, {"id": "warm_salmon", "qty": 1}],
+    "newyear": [{"id": "philadelphia", "qty": 1}, {"id": "california", "qty": 1}, {"id": "lava", "qty": 1}, {"id": "warm_crab", "qty": 1}, {"id": "warm_salmon", "qty": 1}],
 }
 def read_site_content() -> dict[str, Any]:
     try:
@@ -621,7 +846,20 @@ def read_site_content() -> dict[str, Any]:
             merged = dict(DEFAULT_SITE_CONTENT)
             merged.update(data)
             merged["slides"] = data.get("slides", DEFAULT_SITE_CONTENT["slides"])
-            merged["sets"] = data.get("sets", DEFAULT_SITE_CONTENT["sets"])
+            saved_sets = data.get("sets", DEFAULT_SITE_CONTENT["sets"])
+            default_by_id = {row["id"]: row for row in DEFAULT_SITE_CONTENT["sets"]}
+            merged_sets = []
+            for row in saved_sets if isinstance(saved_sets, list) else DEFAULT_SITE_CONTENT["sets"]:
+                if not isinstance(row, dict):
+                    continue
+                defaults = default_by_id.get(row.get("id"), {})
+                merged_row = dict(defaults)
+                merged_row.update(row)
+                merged_row.setdefault("items", DEFAULT_SET_ITEMS.get(merged_row.get("id"), []))
+                merged_row.setdefault("active", True)
+                merged_row.setdefault("stock", None)
+                merged_sets.append(merged_row)
+            merged["sets"] = merged_sets
             return merged
     except (OSError, json.JSONDecodeError):
         pass
@@ -634,6 +872,33 @@ def write_site_content(data: dict[str, Any]) -> None:
     with open(temporary, "w", encoding="utf-8") as handle:
         json.dump(data, handle, ensure_ascii=False, indent=2)
     os.replace(temporary, SITE_CONTENT_FILE)
+
+@app.get("/api/store-settings")
+async def get_store_settings() -> dict[str, Any]:
+    return read_store_settings()
+
+@app.get("/api/admin/store-settings")
+async def admin_get_store_settings(x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    return {
+        "settings": read_store_settings(),
+        "integrations": {
+            "telegram_orders": bool(BOT_TOKEN and ADMIN_CHAT_ID),
+            "telegram_customer_updates": bool(BOT_TOKEN),
+            "online_payments": False,
+            "whatsapp": False,
+        },
+    }
+
+@app.put("/api/admin/store-settings")
+async def admin_update_store_settings(payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    try:
+        updated = validate_store_settings(payload, read_store_settings())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    write_store_settings(updated)
+    return {"ok": True, "settings": updated}
 
 @app.get("/api/site-content")
 async def get_site_content() -> dict[str, Any]:
@@ -707,7 +972,30 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 if photo and not (photo.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", photo)):
                     raise HTTPException(status_code=400, detail=f"Фото {photo_index+1} сета {index+1}: нужен HTTPS URL или JPG, PNG, WebP.")
                 clean_photos.append(photo.strip())
-            clean_sets.append({"id": set_id, "description": description.strip(), "image": image.strip(), "photos": clean_photos})
+            items = item.get("items", DEFAULT_SET_ITEMS[set_id])
+            if not isinstance(items, list) or not items or len(items) > 12:
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: укажи от 1 до 12 позиций.")
+            available_ids = {str(product.get("id")) for product in read_products()}
+            clean_items = []
+            used_item_ids = set()
+            for item_index, row in enumerate(items):
+                if not isinstance(row, dict):
+                    raise HTTPException(status_code=400, detail=f"Сет {index+1}, позиция {item_index+1}: неверный формат.")
+                product_id = row.get("id")
+                quantity = row.get("qty", 1)
+                if product_id not in available_ids or product_id in used_item_ids:
+                    raise HTTPException(status_code=400, detail=f"Сет {index+1}: товар не найден или повторяется.")
+                if not isinstance(quantity, int) or isinstance(quantity, bool) or not 1 <= quantity <= 50:
+                    raise HTTPException(status_code=400, detail=f"Сет {index+1}: количество позиции должно быть от 1 до 50.")
+                clean_items.append({"id": product_id, "qty": quantity})
+                used_item_ids.add(product_id)
+            active = item.get("active", True)
+            stock = item.get("stock")
+            if not isinstance(active, bool):
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: признак активности должен быть true/false.")
+            if stock is not None and (not isinstance(stock, int) or isinstance(stock, bool) or not 0 <= stock <= 10000):
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: остаток должен быть пустым (без учёта) или от 0 до 10 000.")
+            clean_sets.append({"id": set_id, "description": description.strip(), "image": image.strip(), "photos": clean_photos, "items": clean_items, "active": active, "stock": stock})
             seen.add(set_id)
         current["sets"] = clean_sets
     write_site_content(current)
@@ -747,6 +1035,7 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
         "time": payload.time,
         "notes": payload.notes,
         "items": [{"id": item["id"], "qty": item["qty"]} for item in items],
+        "sets": [{"id": item.id, "qty": item.qty} for item in payload.sets],
     }
     fingerprint = hashlib.sha256(json.dumps(canonical, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
     idem_key = (user_id, payload.client_order_id)
@@ -760,6 +1049,33 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
             if not hmac.compare_digest(fingerprint, previous_fingerprint):
                 raise HTTPException(status_code=409, detail="Этот идентификатор уже использован для другого заказа. Обновите страницу корзины.")
             return previous_result
+
+        # Re-check managed stock while holding the order lock so concurrent orders cannot oversell.
+        try:
+            items, total = calculate_order(payload.items)
+            saved_sets = read_site_content().get("sets", [])
+            sets_by_id = {str(row.get("id")): row for row in saved_sets if isinstance(row, dict)}
+            required_products: dict[str, int] = {}
+            seen_set_ids: set[str] = set()
+            for requested_set in payload.sets:
+                if requested_set.id in seen_set_ids:
+                    raise ValueError("Один и тот же сет не может повторяться в составе заказа.")
+                seen_set_ids.add(requested_set.id)
+                set_row = sets_by_id.get(requested_set.id)
+                if not set_row or set_row.get("active") is False:
+                    raise ValueError("Один из выбранных сетов временно недоступен.")
+                set_stock = set_row.get("stock")
+                if set_stock is not None and requested_set.qty > int(set_stock):
+                    raise ValueError(f"Сета «{requested_set.id}» осталось: {int(set_stock)}.")
+                composition = set_row.get("items") or DEFAULT_SET_ITEMS.get(requested_set.id, [])
+                for component in composition:
+                    product_id = str(component.get("id", ""))
+                    required_products[product_id] = required_products.get(product_id, 0) + int(component.get("qty", 0)) * requested_set.qty
+            cart_quantities = {item.id: item.qty for item in payload.items}
+            if any(cart_quantities.get(product_id, 0) < required for product_id, required in required_products.items()):
+                raise ValueError("Состав корзины не совпадает с выбранными сетами. Обновите корзину и попробуйте ещё раз.")
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
         recent = _recent_orders[user_id]
         if len(recent) >= _MAX_ORDERS_PER_HOUR:
@@ -803,6 +1119,31 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
             else:
                 detail = "Telegram временно не принял заказ. Попробуйте ещё раз чуть позже."
             raise HTTPException(status_code=502, detail=detail)
+
+        # Decrement explicitly managed stock only after Telegram accepted the order.
+        stock_by_id = {item["id"]: item["qty"] for item in items}
+        if stock_by_id:
+            products_on_disk = read_products()
+            changed_stock = False
+            for product in products_on_disk:
+                product_id = str(product.get("id", ""))
+                if product_id in stock_by_id:
+                    available_stock = product.get("stock")
+                    if available_stock is not None:
+                        product["stock"] = max(0, int(available_stock) - stock_by_id[product_id])
+                        changed_stock = True
+            if changed_stock:
+                write_products(products_on_disk)
+        if payload.sets:
+            site_content = read_site_content()
+            content_sets = [dict(row) for row in site_content.get("sets", []) if isinstance(row, dict)]
+            requested_counts = {row.id: row.qty for row in payload.sets}
+            for set_row in content_sets:
+                set_id = str(set_row.get("id", ""))
+                if set_id in requested_counts and set_row.get("stock") is not None:
+                    set_row["stock"] = max(0, int(set_row.get("stock", 0)) - requested_counts[set_id])
+            site_content["sets"] = content_sets
+            write_site_content(site_content)
 
         with order_db() as connection:
             connection.execute(

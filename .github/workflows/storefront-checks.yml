@@ -5,6 +5,7 @@ on:
     branches:
       - storefront-gallery-newyear-20261031
       - premium-redesign-20261031
+      - full-premium-experience-20261031
   pull_request:
     branches:
       - main
@@ -39,12 +40,13 @@ jobs:
             console.log(`OK: ${file} (${scripts.length} script block(s))`);
           }
           new Function(fs.readFileSync('assets/admin-workspace.js', 'utf8'));
-          console.log('OK: assets/admin-workspace.js');
+          new Function(fs.readFileSync('assets/storefront-experience.js', 'utf8'));
+          console.log('OK: external storefront and admin scripts');
           const front = fs.readFileSync('index.html', 'utf8');
           const admin = fs.readFileSync('admin.html', 'utf8');
-          for (const asset of ['assets/premium-storefront.css', 'assets/premium-admin.css', 'assets/admin-workspace.js']) {
+          for (const asset of ['assets/premium-storefront.css', 'assets/premium-admin.css', 'assets/admin-workspace.js', 'assets/full-storefront.css', 'assets/full-admin.css', 'assets/storefront-experience.js']) {
             if (!fs.existsSync(asset)) throw new Error('Missing redesign asset: ' + asset);
           }
-          if (!front.includes('premium-storefront.css')) throw new Error('Storefront theme is not linked');
-          if (!admin.includes('premium-admin.css') || !admin.includes('admin-workspace.js')) throw new Error('Admin redesign assets are not linked');
+          if (!front.includes('premium-storefront.css') || !front.includes('full-storefront.css') || !front.includes('storefront-experience.js')) throw new Error('Storefront theme is not linked');
+          if (!admin.includes('premium-admin.css') || !admin.includes('full-admin.css') || !admin.includes('admin-workspace.js')) throw new Error('Admin redesign assets are not linked');
           NODE

@@ -54,13 +54,15 @@ textarea { min-height:100px; }
 .slide-photo-preview{display:block;width:100%;max-width:220px;height:110px;object-fit:cover;border:1px solid var(--line);border-radius:10px;margin:7px 0;background:#130f0b}
 @media(max-width:700px){.admin-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-</style><link rel="stylesheet" href="./assets/premium-admin.css"></head><body><main class="wrap"><header class="head"><div class="brand">ТИХИЙ РОЛЛ<small>ПАНЕЛЬ УПРАВЛЕНИЯ</small></div><span class="tag">🔐 Только владелец</span></header><div id="status" class="status">Проверяем доступ Telegram…</div><section id="login" class="panel login hidden"><h2>Панель владельца</h2><p class="muted">Открой эту страницу через кнопку «Управление» внутри Telegram-магазина. Доступ проверяется на сервере по Telegram ID.</p><button class="btn" id="retry">Проверить ещё раз</button></section><section id="app" class="hidden"><div class="panel"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Меню и товары</h2><div class="muted">Меняй фотографии, названия, цены и описание — покупатели увидят обновления после перезагрузки магазина.</div></div><button class="btn primary" id="add">＋ Добавить товар</button></div><div id="list" class="list"></div></div><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Заказы</h2><div class="muted">Статусы заказов и сводка по продажам</div></div><button class="btn" id="refreshOrders" type="button">Обновить</button></div><div id="analyticsSummary" class="muted" style="margin-bottom:12px">Загружаем статистику…</div><div id="ordersList" class="list"></div></section><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 22px Georgia,serif;margin:0">Категории меню</h2><div class="muted">Создавай новые категории. Удалить можно только пустую категорию.</div></div></div><div class="formgrid" style="margin-top:14px"><div class="field"><label for="newCategoryName">Название категории</label><input id="newCategoryName" maxlength="60" placeholder="Например, Запечённые роллы"></div><div class="field"><label for="newCategoryId">ID (латиница)</label><input id="newCategoryId" maxlength="30" pattern="[A-Za-z0-9_-]{2,30}" placeholder="baked-rolls"></div><div class="field full"><button class="btn primary" id="addCategory" type="button">Добавить категорию</button></div></div><div id="categoriesList" class="list" style="margin-top:12px"></div></section><section id="editor" class="panel editor"><div class="toolbar"><h2 id="editorTitle" style="font:700 22px Georgia,serif;margin:0">Карточка товара</h2><span class="tag">Изменения сохраняются на сервере</span></div><form id="productForm"><div class="formgrid">
+</style><link rel="stylesheet" href="./assets/premium-admin.css">
+<link rel="stylesheet" href="./assets/full-admin.css"></head><body><main class="wrap"><header class="head"><div class="brand">ТИХИЙ РОЛЛ<small>ПАНЕЛЬ УПРАВЛЕНИЯ</small></div><span class="tag">🔐 Только владелец</span></header><div id="status" class="status">Проверяем доступ Telegram…</div><section id="login" class="panel login hidden"><h2>Панель владельца</h2><p class="muted">Открой эту страницу через кнопку «Управление» внутри Telegram-магазина. Доступ проверяется на сервере по Telegram ID.</p><button class="btn" id="retry">Проверить ещё раз</button></section><section id="app" class="hidden"><div class="panel"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Меню и товары</h2><div class="muted">Меняй фотографии, названия, цены и описание — покупатели увидят обновления после перезагрузки магазина.</div></div><button class="btn primary" id="add">＋ Добавить товар</button></div><div id="list" class="list"></div></div><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Заказы</h2><div class="muted">Статусы заказов и сводка по продажам</div></div><button class="btn" id="refreshOrders" type="button">Обновить</button></div><div id="analyticsSummary" class="muted" style="margin-bottom:12px">Загружаем статистику…</div><div id="ordersList" class="list"></div></section><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 22px Georgia,serif;margin:0">Категории меню</h2><div class="muted">Создавай новые категории. Удалить можно только пустую категорию.</div></div></div><div class="formgrid" style="margin-top:14px"><div class="field"><label for="newCategoryName">Название категории</label><input id="newCategoryName" maxlength="60" placeholder="Например, Запечённые роллы"></div><div class="field"><label for="newCategoryId">ID (латиница)</label><input id="newCategoryId" maxlength="30" pattern="[A-Za-z0-9_-]{2,30}" placeholder="baked-rolls"></div><div class="field"><label for="newCategoryIcon">Значок (эмодзи)</label><input id="newCategoryIcon" maxlength="16" placeholder="🍣"></div><div class="field"><label for="newCategoryImage">Фото категории (HTTPS, необязательно)</label><input id="newCategoryImage" maxlength="2000" placeholder="https://..."></div><div class="field full"><button class="btn primary" id="addCategory" type="button">Добавить категорию</button></div></div><div id="categoriesList" class="list" style="margin-top:12px"></div></section><section id="editor" class="panel editor"><div class="toolbar"><h2 id="editorTitle" style="font:700 22px Georgia,serif;margin:0">Карточка товара</h2><span class="tag">Изменения сохраняются на сервере</span></div><form id="productForm"><div class="formgrid">
 <div class="field"><label for="pid">ID товара (латиница, не менять у существующего)</label><input id="pid" required pattern="[A-Za-z0-9_-]{2,48}" maxlength="48"></div>
 <div class="field"><label for="name">Название</label><input id="name" required maxlength="100"></div>
 <div class="field"><label for="price">Цена, ₽</label><input id="price" type="number" required min="1" max="100000"></div>
 <div class="field"><label for="cost">Себестоимость, ₽</label><input id="cost" type="number" min="0" max="100000" value="0"></div>
 <div class="field"><label for="weight">Вес / размер</label><input id="weight" maxlength="30" placeholder="280 г"></div>
 <div class="field"><label for="pieces">Количество, шт.</label><input id="pieces" type="number" min="1" max="100" value="8"></div>
+<div class="field"><label for="stock">Остаток товара (пусто — без ограничений)</label><input id="stock" type="number" min="0" max="10000" placeholder="Без ограничений"></div>
 <div class="field"><label for="cat">Категория</label><select id="cat"><option value="classic">Классические</option></select></div>
 <div class="field"><label for="badge">Плашка</label><select id="badge"><option value="">Без плашки</option><option value="ХИТ">ХИТ</option><option value="НОВИНКА">НОВИНКА</option><option value="СКИДКА">СКИДКА</option></select></div>
 <div class="field full"><label for="desc">Краткое описание</label><textarea id="desc" maxlength="1000"></textarea></div>
@@ -89,21 +91,11 @@ async function loadOrders(){
     const summary=data.summary||{};
     const analytics=await api('/api/admin/analytics');
     const reportOrders=Array.isArray(data.orders)?data.orders:[];
-    const now=new Date();
-    const dayKeys=[];
-    for(let offset=6;offset>=0;offset--){const day=new Date(now);day.setDate(now.getDate()-offset);day.setHours(0,0,0,0);dayKeys.push({key:day.toLocaleDateString('ru-RU'),label:day.toLocaleDateString('ru-RU',{weekday:'short',day:'numeric'}),revenue:0,orders:0})}
-    const dayIndex=new Map(dayKeys.map((day,index)=>[day.key,index]));
-    const statusCounts={new:0,accepted:0,preparing:0,ready:0,completed:0,cancelled:0};
-    reportOrders.forEach(order=>{
-      if(statusCounts[order.status]!==undefined)statusCounts[order.status]++;
-      const when=new Date(order.created_at||'');
-      if(Number.isNaN(when.getTime()))return;
-      const index=dayIndex.get(when.toLocaleDateString('ru-RU'));
-      if(index===undefined)return;
-      dayKeys[index].orders++;
-      if(order.status!=='cancelled')dayKeys[index].revenue+=Number(order.total)||0;
-    });
-    window.__TIHIY_ADMIN_REPORT__={summary:analytics,trend:dayKeys,statusCounts,recentOrdersCount:reportOrders.length};
+    window.__TIHIY_ADMIN_ORDERS=reportOrders;
+    window.dispatchEvent(new CustomEvent('tihiy:orders-updated'));
+    const trend=Array.isArray(analytics.daily)?analytics.daily:[];
+    const statusCounts=analytics.status_counts||{};
+    window.__TIHIY_ADMIN_REPORT__={summary:analytics,trend,statusCounts,recentOrdersCount:reportOrders.length};
     window.dispatchEvent(new CustomEvent('tihiy:analytics-updated'));
     $('analyticsSummary').textContent='Заказов: '+(analytics.orders_count||0)+' · Выручка без отмен: '+new Intl.NumberFormat('ru-RU').format(analytics.revenue||0)+' ₽ · Расчётная валовая прибыль: '+new Intl.NumberFormat('ru-RU').format(analytics.gross_profit||0)+' ₽ · В работе: '+(analytics.active_orders||0);
     const list=$('ordersList');list.replaceChildren();
@@ -134,16 +126,46 @@ async function loadCategories(){
   categories.forEach(cat=>{const option=document.createElement('option');option.value=cat.id;option.textContent=cat.name;select.append(option)});
   if(categories.some(cat=>cat.id===previous))select.value=previous;
   const list=$('categoriesList');list.replaceChildren();
-  categories.forEach(cat=>{const row=document.createElement('article');row.className='row';row.style.gridTemplateColumns='minmax(0,1fr) auto';const label=document.createElement('div');label.innerHTML='';label.textContent=cat.name+' · '+cat.id;const remove=document.createElement('button');remove.type='button';remove.className='btn danger';remove.textContent='Удалить';remove.onclick=async()=>{if(!confirm('Удалить категорию «'+cat.name+'»?'))return;try{await api('/api/admin/categories/'+encodeURIComponent(cat.id),{method:'DELETE'});await loadCategories();status('Категория удалена','ok')}catch(e){status(e.message,'error')}};row.append(label,remove);list.append(row)});
+  categories.forEach((cat,index)=>{
+    const row=document.createElement('article');row.className='row category-admin-row';
+    const label=document.createElement('div');label.textContent=(cat.icon?cat.icon+' ':'')+cat.name+' · '+cat.id+' · позиция '+(index+1);
+    const actions=document.createElement('div');actions.className='row-actions';
+    const edit=document.createElement('button');edit.type='button';edit.className='btn';edit.textContent='Изменить';
+    const up=document.createElement('button');up.type='button';up.className='btn';up.textContent='↑';up.disabled=index===0;
+    const down=document.createElement('button');down.type='button';down.className='btn';down.textContent='↓';down.disabled=index===categories.length-1;
+    const remove=document.createElement('button');remove.type='button';remove.className='btn danger';remove.textContent='Удалить';
+    const form=document.createElement('div');form.className='category-inline-editor hidden';
+    form.innerHTML='<input data-cat-name maxlength="60" aria-label="Название категории"><input data-cat-icon maxlength="16" aria-label="Значок категории" placeholder="🍣"><input data-cat-image maxlength="2000" aria-label="HTTPS фото категории" placeholder="HTTPS-ссылка на фото (необязательно)"><div><button class="btn primary" type="button" data-cat-save>Сохранить</button><button class="btn" type="button" data-cat-cancel>Отмена</button></div>';
+    form.querySelector('[data-cat-name]').value=cat.name;
+    form.querySelector('[data-cat-icon]').value=cat.icon||'';
+    form.querySelector('[data-cat-image]').value=cat.image||'';
+    edit.onclick=()=>form.classList.toggle('hidden');
+    form.querySelector('[data-cat-cancel]').onclick=()=>form.classList.add('hidden');
+    form.querySelector('[data-cat-save]').onclick=async()=>{
+      const payload={name:form.querySelector('[data-cat-name]').value.trim(),icon:form.querySelector('[data-cat-icon]').value.trim(),image:form.querySelector('[data-cat-image]').value.trim(),sort_order:Number(cat.sort_order||0)};
+      try{await api('/api/admin/categories/'+encodeURIComponent(cat.id),{method:'PUT',body:JSON.stringify(payload)});await loadCategories();status('Категория обновлена','ok')}catch(e){status(e.message,'error')}
+    };
+    const move=async direction=>{
+      const other=categories[index+direction];if(!other)return;
+      try{
+        await api('/api/admin/categories/'+encodeURIComponent(cat.id),{method:'PUT',body:JSON.stringify({name:cat.name,icon:cat.icon||'',image:cat.image||'',sort_order:Number(other.sort_order||0)})});
+        await api('/api/admin/categories/'+encodeURIComponent(other.id),{method:'PUT',body:JSON.stringify({name:other.name,icon:other.icon||'',image:other.image||'',sort_order:Number(cat.sort_order||0)})});
+        await loadCategories();status('Порядок категорий изменён','ok');
+      }catch(e){status(e.message,'error')}
+    };
+    up.onclick=()=>move(-1);down.onclick=()=>move(1);
+    remove.onclick=async()=>{if(!confirm('Удалить категорию «'+cat.name+'»?'))return;try{await api('/api/admin/categories/'+encodeURIComponent(cat.id),{method:'DELETE'});await loadCategories();status('Категория удалена','ok')}catch(e){status(e.message,'error')}};
+    actions.append(edit,up,down,remove);row.append(label,actions,form);list.append(row);
+  });
 }
-$('addCategory').addEventListener('click',async()=>{const name=$('newCategoryName').value.trim();let id=$('newCategoryId').value.trim();if(!id)id=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');if(!id){status('Введи ID категории латиницей, например baked-rolls.','error');return}try{await api('/api/admin/categories',{method:'POST',body:JSON.stringify({id,name})});$('newCategoryName').value='';$('newCategoryId').value='';await loadCategories();status('Категория добавлена','ok')}catch(e){status(e.message,'error')}});
-async function loadProducts(){try{await loadCategories();products=await api('/api/admin/products');renderList();status('Загружено товаров: '+products.length,'ok')}catch(e){status(e.message,'error')}}function renderList(){const list=$('list');list.replaceChildren();if(!products.length){list.textContent='Товаров пока нет. Добавь первую карточку.';return}products.forEach(p=>{const row=document.createElement('article');row.className='row';const img=document.createElement('img');img.className='thumb';img.src=safeImage(p.photo);img.alt='';const content=document.createElement('div');const title=document.createElement('h3');title.textContent=p.name;const desc=document.createElement('p');desc.textContent=(p.active?'На сайте':'Скрыт')+' · '+(p.badge||'без плашки')+' · '+(p.weight||'вес не указан');const price=document.createElement('div');price.className='price';price.textContent=new Intl.NumberFormat('ru-RU').format(p.price)+' ₽';const margin=document.createElement('p');margin.className='muted';margin.textContent=p.cost>0?'Себестоимость '+new Intl.NumberFormat('ru-RU').format(p.cost)+' ₽ · валовая прибыль '+new Intl.NumberFormat('ru-RU').format(p.price-p.cost)+' ₽ ('+Math.round((p.price-p.cost)/p.price*100)+'%)':'Себестоимость не указана';content.append(title,desc,price,margin);const actions=document.createElement('div');actions.className='row-actions';const edit=document.createElement('button');edit.className='btn';edit.textContent='✏️ Изменить';edit.onclick=()=>openEditor(p);const toggle=document.createElement('button');toggle.className='btn';toggle.textContent=p.active?'Скрыть':'Показать';toggle.onclick=async()=>{try{await api('/api/admin/products/'+encodeURIComponent(p.id),{method:'PUT',body:JSON.stringify({...p,active:!p.active})});await loadProducts()}catch(e){status(e.message,'error')}};actions.append(edit,toggle);row.append(img,content,actions);list.append(row)})}function openEditor(p=null){
+$('addCategory').addEventListener('click',async()=>{const name=$('newCategoryName').value.trim();let id=$('newCategoryId').value.trim();const icon=$('newCategoryIcon')?.value.trim()||'';const image=$('newCategoryImage')?.value.trim()||'';if(!id)id=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');if(!id){status('Введи ID категории латиницей, например baked-rolls.','error');return}try{await api('/api/admin/categories',{method:'POST',body:JSON.stringify({id,name,icon,image})});$('newCategoryName').value='';$('newCategoryId').value='';if($('newCategoryIcon'))$('newCategoryIcon').value='';if($('newCategoryImage'))$('newCategoryImage').value='';await loadCategories();status('Категория добавлена','ok')}catch(e){status(e.message,'error')}});
+async function loadProducts(){try{await loadCategories();products=await api('/api/admin/products');renderList();status('Загружено товаров: '+products.length,'ok')}catch(e){status(e.message,'error')}}function renderList(){const list=$('list');list.replaceChildren();if(!products.length){list.textContent='Товаров пока нет. Добавь первую карточку.';return}products.forEach(p=>{const row=document.createElement('article');row.className='row';const img=document.createElement('img');img.className='thumb';img.src=safeImage(p.photo);img.alt='';const content=document.createElement('div');const title=document.createElement('h3');title.textContent=p.name;const desc=document.createElement('p');desc.textContent=(p.active?'На сайте':'Скрыт')+' · '+(p.badge||'без плашки')+' · '+(p.weight||'вес не указан')+' · '+(p.stock==null?'остаток не ограничен':(p.stock>0?'остаток '+p.stock:'нет в наличии'));const price=document.createElement('div');price.className='price';price.textContent=new Intl.NumberFormat('ru-RU').format(p.price)+' ₽';const margin=document.createElement('p');margin.className='muted';margin.textContent=p.cost>0?'Себестоимость '+new Intl.NumberFormat('ru-RU').format(p.cost)+' ₽ · валовая прибыль '+new Intl.NumberFormat('ru-RU').format(p.price-p.cost)+' ₽ ('+Math.round((p.price-p.cost)/p.price*100)+'%)':'Себестоимость не указана';content.append(title,desc,price,margin);const actions=document.createElement('div');actions.className='row-actions';const edit=document.createElement('button');edit.className='btn';edit.textContent='✏️ Изменить';edit.onclick=()=>openEditor(p);const toggle=document.createElement('button');toggle.className='btn';toggle.textContent=p.active?'Скрыть':'Показать';toggle.onclick=async()=>{try{await api('/api/admin/products/'+encodeURIComponent(p.id),{method:'PUT',body:JSON.stringify({...p,active:!p.active})});await loadProducts()}catch(e){status(e.message,'error')}};actions.append(edit,toggle);row.append(img,content,actions);list.append(row)})}function openEditor(p=null){
  editingId=p?p.id:null;photoData=p?p.photo||'':'';
  productGalleryPhotos=p&&Array.isArray(p.gallery)?p.gallery.slice(0,5):[];
  $('editorTitle').textContent=p?'Редактировать товар':'Новый товар';
  $('pid').value=p?p.id:'';$('pid').disabled=!!p;$('name').value=p?p.name:'';
  $('price').value=p?p.price:'';$('cost').value=p?p.cost||0:0;
- $('weight').value=p?p.weight||'280 г':'280 г';$('pieces').value=p?p.pieces||8:8;
+ $('weight').value=p?p.weight||'280 г':'280 г';$('pieces').value=p?p.pieces||8:8;$('stock').value=p&&p.stock!=null?String(p.stock):'';
  $('cat').value=p?p.cat||'all':'classic';$('badge').value=p?p.badge||'':'';
  $('desc').value=p?p.desc||'':'';$('details').value=p?p.details||'':'';
  $('active').checked=p?p.active:true;$('photoFile').value='';
@@ -163,7 +185,7 @@ function renderProductGalleryEditor(){
   item.append(img,input,clear);root.append(item);
  }
 }
-function closeEditor(){$('editor').classList.remove('open');editingId=null}function compressImage(file){return new Promise((resolve,reject)=>{if(!file.type.match(/^image\/(jpeg|png|webp)$/))return reject(new Error('Выбери JPG, PNG или WebP.'));const reader=new FileReader();reader.onerror=()=>reject(new Error('Не удалось прочитать файл'));reader.onload=()=>{const img=new Image();img.onerror=()=>reject(new Error('Не удалось открыть изображение'));img.onload=()=>{const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);let mime=file.type==='image/png'?'image/png':'image/jpeg';const out=canvas.toDataURL('image/jpeg',0.78);if(out.length>900000)return reject(new Error('Фото слишком большое после сжатия. Выбери другое изображение.')); resolve(out)};img.src=reader.result};reader.readAsDataURL(file)})}$('photoFile').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;try{photoData=await compressImage(file);$('photoPreview').src=photoData;status('Фото готово к сохранению.')}catch(err){status(err.message,'error');e.target.value=''}});$('clearPhoto').onclick=()=>{photoData='';$('photoPreview').src=safeImage('');$('photoFile').value=''};$('add').onclick=()=>openEditor();$('cancel').onclick=closeEditor;$('retry').onclick=boot;$('productForm').addEventListener('submit',async e=>{e.preventDefault();const payload={id:$('pid').value.trim(),name:$('name').value.trim(),price:Number($('price').value),cost:Number($('cost').value||0),weight:$('weight').value.trim()||'280 г',pieces:Number($('pieces').value||8),details:$('details').value.trim(),gallery:productGalleryPhotos.filter(Boolean).slice(0,5),cat:$('cat').value,badge:$('badge').value,desc:$('desc').value.trim(),photo:photoData,active:$('active').checked,sort_order:Math.max(0,products.findIndex(p=>p.id===editingId))};if(!payload.photo&&editingId){const old=products.find(p=>p.id===editingId);payload.photo=old?old.photo||'':''}try{$('save').disabled=true;$('save').textContent='Сохраняем…';if(editingId)await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'PUT',body:JSON.stringify(payload)});else await api('/api/admin/products',{method:'POST',body:JSON.stringify(payload)});closeEditor();await loadProducts();status('Изменения сохранены на сервере. Открой магазин заново, чтобы увидеть обновления.','ok')}catch(err){status(err.message,'error')}finally{$('save').disabled=false;$('save').textContent='Сохранить'}});$('delete').onclick=async()=>{if(!editingId||!confirm('Удалить товар «'+($('name').value)+'»?'))return;try{await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'DELETE'});closeEditor();await loadProducts();status('Товар удалён.','ok')}catch(e){status(e.message,'error')}};let siteContent=null;let siteSetPhotos={};let siteSetGalleryPhotos={};let siteSlidePhotos=[];let sitePromoImage='';
+function closeEditor(){$('editor').classList.remove('open');editingId=null}function compressImage(file){return new Promise((resolve,reject)=>{if(!file.type.match(/^image\/(jpeg|png|webp)$/))return reject(new Error('Выбери JPG, PNG или WebP.'));const reader=new FileReader();reader.onerror=()=>reject(new Error('Не удалось прочитать файл'));reader.onload=()=>{const img=new Image();img.onerror=()=>reject(new Error('Не удалось открыть изображение'));img.onload=()=>{const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);let mime=file.type==='image/png'?'image/png':'image/jpeg';const out=canvas.toDataURL('image/jpeg',0.78);if(out.length>900000)return reject(new Error('Фото слишком большое после сжатия. Выбери другое изображение.')); resolve(out)};img.src=reader.result};reader.readAsDataURL(file)})}$('photoFile').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;try{photoData=await compressImage(file);$('photoPreview').src=photoData;status('Фото готово к сохранению.')}catch(err){status(err.message,'error');e.target.value=''}});$('clearPhoto').onclick=()=>{photoData='';$('photoPreview').src=safeImage('');$('photoFile').value=''};$('add').onclick=()=>openEditor();$('cancel').onclick=closeEditor;$('retry').onclick=boot;$('productForm').addEventListener('submit',async e=>{e.preventDefault();const payload={id:$('pid').value.trim(),name:$('name').value.trim(),price:Number($('price').value),cost:Number($('cost').value||0),weight:$('weight').value.trim()||'280 г',pieces:Number($('pieces').value||8),stock:$('stock').value===''?null:Number($('stock').value),details:$('details').value.trim(),gallery:productGalleryPhotos.filter(Boolean).slice(0,5),cat:$('cat').value,badge:$('badge').value,desc:$('desc').value.trim(),photo:photoData,active:$('active').checked,sort_order:Math.max(0,products.findIndex(p=>p.id===editingId))};if(!payload.photo&&editingId){const old=products.find(p=>p.id===editingId);payload.photo=old?old.photo||'':''}try{$('save').disabled=true;$('save').textContent='Сохраняем…';if(editingId)await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'PUT',body:JSON.stringify(payload)});else await api('/api/admin/products',{method:'POST',body:JSON.stringify(payload)});closeEditor();await loadProducts();status('Изменения сохранены на сервере. Открой магазин заново, чтобы увидеть обновления.','ok')}catch(err){status(err.message,'error')}finally{$('save').disabled=false;$('save').textContent='Сохранить'}});$('delete').onclick=async()=>{if(!editingId||!confirm('Удалить товар «'+($('name').value)+'»?'))return;try{await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'DELETE'});closeEditor();await loadProducts();status('Товар удалён.','ok')}catch(e){status(e.message,'error')}};let siteContent=null;let siteSetPhotos={};let siteSetGalleryPhotos={};let siteSetItems={};let siteSetActive={};let siteSetStock={};let siteSlidePhotos=[];let sitePromoImage='';
 async function loadSiteContent(){
  try{
   siteContent=await api('/api/admin/site-content');
@@ -201,20 +223,24 @@ async function loadSiteContent(){
 function renderSetContentEditor(){
  const root=$('setEditor');if(!root||!siteContent)return;
  const definitions=[
-  {id:'solo',title:'Сет «На одного»',description:'Филадельфия и Лава — для уютного ужина.',image:'./assets/set-solo.webp'},
-  {id:'duo',title:'Сет «Вечер вдвоём»',description:'Филадельфия, Тёплый краб и Лава — поделиться вкусом.',image:'./assets/set-duo.webp'},
-  {id:'party',title:'Сет «Компания»',description:'Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp'},
-  {id:'newyear',title:'Новогодний сет',description:'Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp'}
+  {id:'solo',title:'Сет «На одного»',description:'Филадельфия и Лава — для уютного ужина.',image:'./assets/set-solo.webp',items:[['philadelphia',1],['lava',1]]},
+  {id:'duo',title:'Сет «Вечер вдвоём»',description:'Филадельфия, Тёплый краб и Лава — поделиться вкусом.',image:'./assets/set-duo.webp',items:[['philadelphia',1],['warm_crab',1],['lava',1]]},
+  {id:'party',title:'Сет «Компания»',description:'Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp',items:[['philadelphia',2],['lava',1],['warm_crab',1],['warm_salmon',1]]},
+  {id:'newyear',title:'Новогодний сет',description:'Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp',items:[['philadelphia',1],['california',1],['lava',1],['warm_crab',1],['warm_salmon',1]]}
  ];
  const savedSets=Array.isArray(siteContent.sets)?siteContent.sets:[];
- root.replaceChildren();siteSetPhotos={};siteSetGalleryPhotos={};
+ root.replaceChildren();siteSetPhotos={};siteSetGalleryPhotos={};siteSetItems={};siteSetActive={};siteSetStock={};
  definitions.forEach(def=>{
   const saved=savedSets.find(row=>row&&row.id===def.id)||{};
   const image=typeof saved.image==='string'?saved.image:'';
   siteSetPhotos[def.id]=image.startsWith('data:image/')?image:'';
   siteSetGalleryPhotos[def.id]=Array.isArray(saved.photos)?saved.photos.slice(0,5):[];
+  const existingItems=Array.isArray(saved.items)?saved.items:def.items.map(([id,qty])=>({id,qty}));
+  siteSetItems[def.id]=existingItems.map(row=>({id:row.id,qty:Number(row.qty)||0})).filter(row=>row.qty>0);
+  siteSetActive[def.id]=saved.active!==false;
+  siteSetStock[def.id]=saved.stock==null?null:Number(saved.stock);
   const box=document.createElement('div');box.className='set-admin-card';
-  box.innerHTML='<div class="set-admin-fields"><strong></strong><div class="field"><label>Описание на карточке</label><textarea maxlength="300" data-set-field="'+def.id+'"></textarea></div><div class="field"><label>Ссылка на главное фото (можно оставить пустой)</label><input type="url" maxlength="2000" data-set-url="'+def.id+'" placeholder="HTTPS или загрузить файл ниже"></div><div class="field"><label>Главное фото</label><input class="set-admin-file" type="file" accept="image/jpeg,image/png,image/webp" data-set-file="'+def.id+'"></div><div class="field"><label>Дополнительные фото — до 5</label><div class="admin-gallery-grid" data-set-gallery="'+def.id+'"></div></div></div><div class="set-admin-image"><img class="set-admin-preview" data-set-preview="'+def.id+'" alt=""><button class="btn" type="button" data-set-clear="'+def.id+'">Сбросить главное фото</button><div class="help">Фото загружаются с компьютера и сжимаются автоматически.</div></div>';
+  box.innerHTML='<div class="set-admin-fields"><strong></strong><div class="field"><label>Описание на карточке</label><textarea maxlength="300" data-set-field="'+def.id+'"></textarea></div><div class="field"><label>Ссылка на главное фото (можно оставить пустой)</label><input type="url" maxlength="2000" data-set-url="'+def.id+'" placeholder="HTTPS или загрузить файл ниже"></div><div class="field"><label>Главное фото</label><input class="set-admin-file" type="file" accept="image/jpeg,image/png,image/webp" data-set-file="'+def.id+'"></div><div class="field"><label>Дополнительные фото — до 5</label><div class="admin-gallery-grid" data-set-gallery="'+def.id+'"></div></div></div><div class="set-admin-image"><img class="set-admin-preview" data-set-preview="'+def.id+'" alt=""><button class="btn" type="button" data-set-clear="'+def.id+'">Сбросить главное фото</button><div class="help">Фото загружаются с компьютера и сжимаются автоматически.</div></div><div class="set-composition-admin"><h4>Состав сета</h4><p class="help">Выбирай товары и указывай количество порций в составе.</p><div data-set-items="'+def.id+'"></div><div class="set-admin-options"><label><input type="checkbox" data-set-active="'+def.id+'"> Показывать на сайте</label><label>Остаток наборов (пусто — без учёта; 0 — нет в наличии) <input type="number" min="0" max="10000" placeholder="Без ограничений" data-set-stock="'+def.id+'"></label></div></div>';
   root.append(box);
   box.querySelector('strong').textContent=def.title;
   box.querySelector('[data-set-field="'+def.id+'"]').value=typeof saved.description==='string'?saved.description:def.description;
@@ -223,6 +249,24 @@ function renderSetContentEditor(){
   const isData=image.startsWith('data:image/');
   url.value=isData?'':image;
   preview.src=safeImage(image||def.image);
+  box.querySelector('[data-set-active="'+def.id+'"]').checked=siteSetActive[def.id];
+  box.querySelector('[data-set-stock="'+def.id+'"]').value=siteSetStock[def.id]==null?'':String(siteSetStock[def.id]);
+  box.querySelector('[data-set-active="'+def.id+'"]').addEventListener('change',event=>siteSetActive[def.id]=event.target.checked);
+  box.querySelector('[data-set-stock="'+def.id+'"]').addEventListener('input',event=>siteSetStock[def.id]=event.target.value===''?null:Math.max(0,Math.min(10000,Number(event.target.value)||0)));
+  const itemsRoot=box.querySelector('[data-set-items="'+def.id+'"]');
+  (Array.isArray(products)?products:[]).forEach(product=>{
+   const row=document.createElement('div');row.className='set-product-choice';
+   const label=document.createElement('label');label.textContent=product.name;
+   const qty=document.createElement('input');qty.type='number';qty.min='0';qty.max='50';qty.value=String(siteSetItems[def.id].find(item=>item.id===product.id)?.qty||0);qty.setAttribute('aria-label','Количество '+product.name);
+   qty.addEventListener('input',()=>{
+    const amount=Math.max(0,Math.min(50,Number(qty.value)||0));
+    const index=siteSetItems[def.id].findIndex(item=>item.id===product.id);
+    if(amount===0){if(index>=0)siteSetItems[def.id].splice(index,1)}
+    else if(index>=0)siteSetItems[def.id][index].qty=amount;
+    else siteSetItems[def.id].push({id:product.id,qty:amount});
+   });
+   row.append(label,qty);itemsRoot.append(row);
+  });
   url.addEventListener('input',()=>{siteSetPhotos[def.id]='';preview.src=safeImage(url.value.trim()||def.image)});
   box.querySelector('[data-set-file="'+def.id+'"]').addEventListener('change',async event=>{
    const file=event.target.files&&event.target.files[0];if(!file)return;
@@ -257,10 +301,20 @@ $('saveContent').addEventListener('click',async()=>{
   payload.sets=['solo','duo','party','newyear'].map(id=>{
    const description=document.querySelector('[data-set-field="'+id+'"]');
    const url=document.querySelector('[data-set-url="'+id+'"]');
-   return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5)};
+   return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5),items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
   });
   $('saveContent').disabled=true;await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify(payload)});status('Оформление, описания и фото готовых сетов сохранены. Открой магазин заново, чтобы увидеть обновления.','ok');
  }catch(e){status(e.message,'error')}finally{$('saveContent').disabled=false}
 });
+window.TihiyAdmin={
+  api,
+  reloadOrders:loadOrders,
+  reloadProducts:loadProducts,
+  reloadContent:loadSiteContent,
+  openEditor,
+  getProducts:()=>products,
+  getOrders:()=>window.__TIHIY_ADMIN_ORDERS||[],
+  getInitData:()=>initData
+};
 boot();
 </script><script src="./assets/admin-workspace.js"></script></body></html>
