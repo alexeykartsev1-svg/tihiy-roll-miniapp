@@ -1073,3 +1073,32 @@
 }
 .field-error[hidden]{display:none!important}
 #deliveryAddress{font-size:14px!important}
+
+
+/* Restore readable descriptions on all product cards without hiding composition/action controls */
+.product-card .card-info{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:7px!important}
+.product-card .card-description{
+ display:-webkit-box!important;overflow:hidden!important;margin:0!important;
+ color:#b7c4ca!important;font-size:clamp(10px,2.7vw,12px)!important;
+ font-weight:500!important;line-height:1.35!important;min-height:2.7em!important;
+ -webkit-line-clamp:2!important;-webkit-box-orient:vertical!important
+}
+.product-card .card-meta{margin:0!important}
+.product-card .card-composition{margin:0!important}
+.product-card .card-purchase{margin-top:1px!important}
+.home-popular-grid .product-card .card-description{font-size:10px!important;min-height:2.65em!important;line-height:1.32!important}
+.builder-card-copy{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:6px!important}
+.builder-card-description{
+ display:-webkit-box!important;overflow:hidden!important;margin:0!important;
+ color:#aebdc4!important;font-size:11px!important;font-weight:500!important;
+ line-height:1.35!important;min-height:2.7em!important;
+ -webkit-line-clamp:2!important;-webkit-box-orient:vertical!important
+}
+.builder-card-copy small{margin:0!important}
+.builder-card-composition{margin:0!important;align-self:flex-start!important}
+.builder-card-footer{margin-top:1px!important}
+@media(max-width:600px){
+ .product-card .card-description{font-size:9px!important;min-height:2.65em!important;line-height:1.32!important}
+ .home-popular-grid .product-card .card-description{font-size:9px!important}
+ .builder-card-description{font-size:9px!important;min-height:2.65em!important}
+}
