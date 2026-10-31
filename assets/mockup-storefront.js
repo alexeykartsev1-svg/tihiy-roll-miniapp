@@ -37,7 +37,7 @@ function allRows(){
   state.filter==='rolls'?state.products.filter(p=>productCategory(p)==='rolls'):
   state.filter==='dogs'?state.products.filter(p=>productCategory(p)==='dogs'):
   state.filter==='snacks'?state.products.filter(p=>productCategory(p)==='snacks'):
-  [sets.find(s=>s.set.id==='newyear'),...state.products].filter(Boolean);
+  [...sets,...state.products];
  if(state.search)a=a.filter(p=>(p.name+' '+(p.desc||'')).toLowerCase().includes(state.search));
  if(state.sort==='price-asc')a.sort((x,y)=>x.price-y.price);
  if(state.sort==='price-desc')a.sort((x,y)=>y.price-x.price);
