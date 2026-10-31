@@ -6,6 +6,7 @@ on:
       - storefront-gallery-newyear-20261031
       - premium-redesign-20261031
       - full-premium-experience-20261031
+      - storefront-complete-rebuild
   pull_request:
     branches:
       - main
@@ -28,25 +29,48 @@ jobs:
       - name: Run backend smoke tests
         working-directory: backend
         run: python test_backend.py
-      - name: Check storefront JavaScript syntax
+      - name: Check storefront JavaScript syntax and assets
         run: |
           node - <<'NODE'
           const fs = require('node:fs');
           for (const file of ['index.html', 'admin.html']) {
             const html = fs.readFileSync(file, 'utf8');
-            const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)];
+            const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)];
             if (!scripts.length) throw new Error(`No script in ${file}`);
-            scripts.forEach((match) => new Function(match[1]));
-            console.log(`OK: ${file} (${scripts.length} script block(s))`);
+            scripts.forEach((match) => {
+              if (!/\bsrc\s*=/.test(match[1])) new Function(match[2]);
+            });
+            console.log(`OK: ${file} (${scripts.length} script tag(s))`);
           }
-          new Function(fs.readFileSync('assets/admin-workspace.js', 'utf8'));
-          new Function(fs.readFileSync('assets/storefront-experience.js', 'utf8'));
-          console.log('OK: external storefront and admin scripts');
+
           const front = fs.readFileSync('index.html', 'utf8');
           const admin = fs.readFileSync('admin.html', 'utf8');
-          for (const asset of ['assets/premium-storefront.css', 'assets/premium-admin.css', 'assets/admin-workspace.js', 'assets/full-storefront.css', 'assets/full-admin.css', 'assets/storefront-experience.js']) {
-            if (!fs.existsSync(asset)) throw new Error('Missing redesign asset: ' + asset);
+          const isNewStorefront = front.includes('assets/new-storefront.css') && front.includes('assets/new-storefront.js');
+
+          if (isNewStorefront) {
+            new Function(fs.readFileSync('assets/new-storefront.js', 'utf8'));
+            JSON.parse(fs.readFileSync('assets/local-catalog-fallback.json', 'utf8'));
+            for (const asset of ['assets/new-storefront.css', 'assets/new-storefront.js', 'assets/local-catalog-fallback.json']) {
+              if (!fs.existsSync(asset)) throw new Error('Missing new storefront asset: ' + asset);
+            }
+            console.log('OK: standalone storefront assets and product photo fallback');
+          } else {
+            new Function(fs.readFileSync('assets/storefront-experience.js', 'utf8'));
+            for (const asset of ['assets/premium-storefront.css', 'assets/full-storefront.css', 'assets/storefront-experience.js']) {
+              if (!fs.existsSync(asset)) throw new Error('Missing legacy storefront asset: ' + asset);
+            }
+            if (!front.includes('premium-storefront.css') || !front.includes('full-storefront.css') || !front.includes('storefront-experience.js')) {
+              throw new Error('Legacy storefront theme is not linked');
+            }
+            console.log('OK: legacy storefront assets');
           }
-          if (!front.includes('premium-storefront.css') || !front.includes('full-storefront.css') || !front.includes('storefront-experience.js')) throw new Error('Storefront theme is not linked');
-          if (!admin.includes('premium-admin.css') || !admin.includes('full-admin.css') || !admin.includes('admin-workspace.js')) throw new Error('Admin redesign assets are not linked');
+
+          for (const asset of ['assets/premium-admin.css', 'assets/full-admin.css', 'assets/admin-workspace.js']) {
+            if (!fs.existsSync(asset)) throw new Error('Missing admin redesign asset: ' + asset);
+          }
+          new Function(fs.readFileSync('assets/admin-workspace.js', 'utf8'));
+          if (!admin.includes('premium-admin.css') || !admin.includes('full-admin.css') || !admin.includes('admin-workspace.js')) {
+            throw new Error('Admin redesign assets are not linked');
+          }
+          console.log('OK: admin workspace assets');
           NODE
