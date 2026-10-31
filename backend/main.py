@@ -89,6 +89,12 @@ class OrderItem(BaseModel):
         return {"id": item_id, "qty": row.get("qty")}
 
 
+class SetOrderItem(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(min_length=2, max_length=24, pattern=r"^[a-z0-9_-]+$")
+    qty: int = Field(ge=1, le=20)
+
+
 class OrderPayload(BaseModel):
     # Accept common field spellings from previously published Mini App builds.
     model_config = ConfigDict(extra="ignore")
@@ -99,6 +105,7 @@ class OrderPayload(BaseModel):
     time: str = Field(min_length=2, max_length=100)
     notes: str = Field(default="", max_length=1000)
     items: list[OrderItem] = Field(min_length=1, max_length=20)
+    sets: list[SetOrderItem] = Field(default_factory=list, max_length=4)
 
     @model_validator(mode="before")
     @classmethod
@@ -119,6 +126,7 @@ class OrderPayload(BaseModel):
             "time": ("time", "pickup_time", "pickupTime", "desired_time"),
             "notes": ("notes", "comment", "order_notes"),
             "items": ("items", "cart", "order_items", "orderItems"),
+            "sets": ("sets", "set_items", "setItems"),
         }
         normalized: dict[str, Any] = {}
         for field, keys in aliases.items():
@@ -813,10 +821,10 @@ DEFAULT_SITE_CONTENT = {
         {"title":"Собери свой сет","accent":"на свой вкус","desc":"Выбирай любимые роллы и создай собственное сочетание.","image":"","button":"Собрать сет","active":True}
     ],
     "sets": [
-        {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"lava","qty":1}],"active":True,"stock":0},
-        {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"warm_crab","qty":1},{"id":"lava","qty":1}],"active":True,"stock":0},
-        {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":2},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":0},
-        {"id":"newyear","description":"Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"california","qty":1},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":0}
+        {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"lava","qty":1}],"active":True,"stock":None},
+        {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"warm_crab","qty":1},{"id":"lava","qty":1}],"active":True,"stock":None},
+        {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":2},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":None},
+        {"id":"newyear","description":"Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"california","qty":1},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":None}
     ],
     "promo_title":"Закажи к удобному времени",
     "promo_text":"Выбирай блюда заранее — мы приготовим заказ к согласованному времени.",
@@ -849,7 +857,7 @@ def read_site_content() -> dict[str, Any]:
                 merged_row.update(row)
                 merged_row.setdefault("items", DEFAULT_SET_ITEMS.get(merged_row.get("id"), []))
                 merged_row.setdefault("active", True)
-                merged_row.setdefault("stock", 0)
+                merged_row.setdefault("stock", None)
                 merged_sets.append(merged_row)
             merged["sets"] = merged_sets
             return merged
@@ -982,11 +990,11 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 clean_items.append({"id": product_id, "qty": quantity})
                 used_item_ids.add(product_id)
             active = item.get("active", True)
-            stock = item.get("stock", 0)
+            stock = item.get("stock")
             if not isinstance(active, bool):
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: признак активности должен быть true/false.")
-            if not isinstance(stock, int) or isinstance(stock, bool) or not 0 <= stock <= 10000:
-                raise HTTPException(status_code=400, detail=f"Сет {index+1}: остаток должен быть от 0 до 10 000.")
+            if stock is not None and (not isinstance(stock, int) or isinstance(stock, bool) or not 0 <= stock <= 10000):
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: остаток должен быть пустым (без учёта) или от 0 до 10 000.")
             clean_sets.append({"id": set_id, "description": description.strip(), "image": image.strip(), "photos": clean_photos, "items": clean_items, "active": active, "stock": stock})
             seen.add(set_id)
         current["sets"] = clean_sets
@@ -1027,6 +1035,7 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
         "time": payload.time,
         "notes": payload.notes,
         "items": [{"id": item["id"], "qty": item["qty"]} for item in items],
+        "sets": [{"id": item.id, "qty": item.qty} for item in payload.sets],
     }
     fingerprint = hashlib.sha256(json.dumps(canonical, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
     idem_key = (user_id, payload.client_order_id)
@@ -1040,6 +1049,33 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
             if not hmac.compare_digest(fingerprint, previous_fingerprint):
                 raise HTTPException(status_code=409, detail="Этот идентификатор уже использован для другого заказа. Обновите страницу корзины.")
             return previous_result
+
+        # Re-check managed stock while holding the order lock so concurrent orders cannot oversell.
+        try:
+            items, total = calculate_order(payload.items)
+            saved_sets = read_site_content().get("sets", [])
+            sets_by_id = {str(row.get("id")): row for row in saved_sets if isinstance(row, dict)}
+            required_products: dict[str, int] = {}
+            seen_set_ids: set[str] = set()
+            for requested_set in payload.sets:
+                if requested_set.id in seen_set_ids:
+                    raise ValueError("Один и тот же сет не может повторяться в составе заказа.")
+                seen_set_ids.add(requested_set.id)
+                set_row = sets_by_id.get(requested_set.id)
+                if not set_row or set_row.get("active") is False:
+                    raise ValueError("Один из выбранных сетов временно недоступен.")
+                set_stock = set_row.get("stock")
+                if set_stock is not None and requested_set.qty > int(set_stock):
+                    raise ValueError(f"Сета «{requested_set.id}» осталось: {int(set_stock)}.")
+                composition = set_row.get("items") or DEFAULT_SET_ITEMS.get(requested_set.id, [])
+                for component in composition:
+                    product_id = str(component.get("id", ""))
+                    required_products[product_id] = required_products.get(product_id, 0) + int(component.get("qty", 0)) * requested_set.qty
+            cart_quantities = {item.id: item.qty for item in payload.items}
+            if any(cart_quantities.get(product_id, 0) < required for product_id, required in required_products.items()):
+                raise ValueError("Состав корзины не совпадает с выбранными сетами. Обновите корзину и попробуйте ещё раз.")
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
         recent = _recent_orders[user_id]
         if len(recent) >= _MAX_ORDERS_PER_HOUR:
@@ -1098,6 +1134,16 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
                         changed_stock = True
             if changed_stock:
                 write_products(products_on_disk)
+        if payload.sets:
+            site_content = read_site_content()
+            content_sets = [dict(row) for row in site_content.get("sets", []) if isinstance(row, dict)]
+            requested_counts = {row.id: row.qty for row in payload.sets}
+            for set_row in content_sets:
+                set_id = str(set_row.get("id", ""))
+                if set_id in requested_counts and set_row.get("stock") is not None:
+                    set_row["stock"] = max(0, int(set_row.get("stock", 0)) - requested_counts[set_id])
+            site_content["sets"] = content_sets
+            write_site_content(site_content)
 
         with order_db() as connection:
             connection.execute(
