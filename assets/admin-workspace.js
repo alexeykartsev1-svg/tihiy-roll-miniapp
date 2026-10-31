@@ -208,7 +208,7 @@
       if(!ordersFrom&&!ordersTo)return true;
       const date=new Date(order.created_at||'');
       if(Number.isNaN(date.getTime()))return false;
-      const day=date.toISOString().slice(0,10);
+      const day=[date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');
       return (!ordersFrom||day>=ordersFrom)&&(!ordersTo||day<=ordersTo);
     }
     function renderOrders(){
@@ -271,6 +271,9 @@
       }
       return orderStoreSettingsPromise;
     }
+    function setOrderNotice(message,type='ok'){
+      if(!status)return;status.textContent=message;status.className='status'+(type?' '+type:'');
+    }
     function makeOrderCard(title,contentClass){
       const card=document.createElement('section');card.className='admin-order-side-card '+(contentClass||'');
       const heading=document.createElement('h3');heading.textContent=title;card.append(heading);return card;
@@ -300,8 +303,8 @@
       if(!phoneDigits){message.classList.add('disabled');message.setAttribute('aria-disabled','true')}
       const more=document.createElement('details');more.className='admin-order-more';
       more.innerHTML='<summary aria-label="Дополнительные действия">•••</summary><div class="admin-order-more-menu"><button type="button" data-copy-phone>Скопировать телефон</button><button type="button" data-copy-order>Скопировать номер заказа</button></div>';
-      more.querySelector('[data-copy-phone]').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(order.phone||''));more.open=false;status('Телефон скопирован','ok')}catch(_){status('Не удалось скопировать телефон','error')}});
-      more.querySelector('[data-copy-order]').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(order.order_id));more.open=false;status('Номер заказа скопирован','ok')}catch(_){status('Не удалось скопировать номер','error')}});
+      more.querySelector('[data-copy-phone]').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(order.phone||''));more.open=false;setOrderNotice('Телефон скопирован','ok')}catch(_){setOrderNotice('Не удалось скопировать телефон','error')}});
+      more.querySelector('[data-copy-order]').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(order.order_id));more.open=false;setOrderNotice('Номер заказа скопирован','ok')}catch(_){setOrderNotice('Не удалось скопировать номер','error')}});
       controls.append(print,message,more);detailHeader.append(heading,controls);orderDetail.append(detailHeader);
 
       const flow=[['accepted','Принят'],['preparing','Готовим'],['ready','Готов к выдаче'],['completed','Выдан']];
@@ -357,8 +360,8 @@
         try{
           await window.TihiyAdmin.api('/api/admin/orders/'+encodeURIComponent(order.order_id),{method:'PATCH',body:JSON.stringify({status:next})});
           await window.TihiyAdmin.reloadOrders();
-          status('Статус заказа обновлён'+(next!=='cancelled'?' · клиенту отправлено уведомление при доступности Telegram':'') ,'ok');
-        }catch(error){status(error.message,'error');statusSelect.value=order.status;statusSelect.disabled=false}
+          setOrderNotice('Статус заказа обновлён'+(next!=='cancelled'?' · клиенту отправлено уведомление при доступности Telegram':''),'ok');
+        }catch(error){setOrderNotice(error.message,'error');statusSelect.value=order.status;statusSelect.disabled=false}
       });
       statusHeading.append(statusSelect);
       const quickActions=document.createElement('div');quickActions.className='admin-order-actions';
@@ -368,8 +371,8 @@
         const nextButton=document.createElement('button');nextButton.type='button';nextButton.className='btn primary';nextButton.textContent=nextLabel;
         nextButton.addEventListener('click',async()=>{
           nextButton.disabled=true;
-          try{await window.TihiyAdmin.api('/api/admin/orders/'+encodeURIComponent(order.order_id),{method:'PATCH',body:JSON.stringify({status:nextStatus})});await window.TihiyAdmin.reloadOrders();status('Статус заказа обновлён','ok')}
-          catch(error){status(error.message,'error');nextButton.disabled=false}
+          try{await window.TihiyAdmin.api('/api/admin/orders/'+encodeURIComponent(order.order_id),{method:'PATCH',body:JSON.stringify({status:nextStatus})});await window.TihiyAdmin.reloadOrders();setOrderNotice('Статус заказа обновлён','ok')}
+          catch(error){setOrderNotice(error.message,'error');nextButton.disabled=false}
         });
         quickActions.append(nextButton);
       }
@@ -378,8 +381,8 @@
         cancel.addEventListener('click',async()=>{
           if(!confirm('Отменить заказ #'+order.order_id+'?'))return;
           cancel.disabled=true;
-          try{await window.TihiyAdmin.api('/api/admin/orders/'+encodeURIComponent(order.order_id),{method:'PATCH',body:JSON.stringify({status:'cancelled'})});await window.TihiyAdmin.reloadOrders();status('Заказ отменён','ok')}
-          catch(error){status(error.message,'error');cancel.disabled=false}
+          try{await window.TihiyAdmin.api('/api/admin/orders/'+encodeURIComponent(order.order_id),{method:'PATCH',body:JSON.stringify({status:'cancelled'})});await window.TihiyAdmin.reloadOrders();setOrderNotice('Заказ отменён','ok')}
+          catch(error){setOrderNotice(error.message,'error');cancel.disabled=false}
         });quickActions.append(cancel);
       }
       actionCard.append(statusHeading,quickActions);mainColumn.append(actionCard);
