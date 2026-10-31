@@ -338,12 +338,13 @@
     if(!modal||!list)return;
     const tg=window.Telegram&&window.Telegram.WebApp;
     const open=document.createElement('button');open.type='button';open.id='myOrdersOpen';open.className='my-orders-open';open.textContent='Мои заказы';
-    open.addEventListener('click',()=>{modal.classList.add('show');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';loadMyOrders()});
+    open.addEventListener('click',()=>window.__TIHIY_OPEN_MY_ORDERS?.());
     if(header)header.append(open);
     const close=()=>{
       modal.classList.remove('show');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';
     };
     $('#closeOrders')?.addEventListener('click',close);
+    window.__TIHIY_OPEN_MY_ORDERS=()=>{modal.classList.add('show');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';loadMyOrders()};
     modal.addEventListener('click',event=>{if(event.target===modal)close()});
     document.addEventListener('keydown',event=>{if(event.key==='Escape'&&modal.classList.contains('show'))close()});
     $('#refreshMyOrders')?.addEventListener('click',loadMyOrders);
@@ -386,7 +387,7 @@
           (order.items||[]).forEach(item=>{
             const product=store.products.find(p=>p.id===item.id);
             const line=document.createElement('div');line.className='customer-order-item';
-            const img=document.createElement('img');img.src=safeImage(product?.photo||'');img.alt='';
+            const img=document.createElement('img');img.src=product?.photo||'';img.alt='';
             const name=document.createElement('span');name.textContent=(item.name||product?.name||item.id)+' × '+item.qty;
             const total=document.createElement('b');total.textContent=money(item.subtotal||((item.price||product?.price||0)*(item.qty||0)));
             line.append(img,name,total);items.append(line);
