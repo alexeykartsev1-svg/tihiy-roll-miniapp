@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from urllib.parse import urlencode
 import tempfile
 import os
-import main
+import main as backend
 
 from main import MENU, OrderItem, ProductPayload, calculate_order, verify_telegram_init_data, DEFAULT_STORE_SETTINGS, validate_store_settings, validate_category_update
 
@@ -103,15 +103,15 @@ def main() -> None:
         raise AssertionError("Invalid opening hours should be rejected")
 
     # Explicit product stock is enforced by the server-side order calculator; null means unlimited.
-    original_products_file = main.PRODUCTS_FILE
+    original_products_file = backend.PRODUCTS_FILE
     try:
         with tempfile.TemporaryDirectory() as temporary:
             main.PRODUCTS_FILE = os.path.join(temporary, "products.json")
-            main.write_products([{
+            backend.write_products([{
                 "id": "limited_roll", "name": "Ограниченный ролл", "price": 300, "cost": 100,
                 "weight": "250 г", "pieces": 8, "stock": 2, "active": True
             }])
-            _, stock_total = main.calculate_order([OrderItem(id="limited_roll", qty=2)])
+            _, stock_total = backend.calculate_order([OrderItem(id="limited_roll", qty=2)])
             assert stock_total == 600
             try:
                 main.calculate_order([OrderItem(id="limited_roll", qty=3)])
