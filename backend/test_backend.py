@@ -5,6 +5,9 @@ import json
 import time
 from pydantic import ValidationError
 from urllib.parse import urlencode
+import tempfile
+import os
+import main
 
 from main import MENU, OrderItem, ProductPayload, calculate_order, verify_telegram_init_data, DEFAULT_STORE_SETTINGS, validate_store_settings, validate_category_update
 
@@ -98,6 +101,31 @@ def main() -> None:
         pass
     else:
         raise AssertionError("Invalid opening hours should be rejected")
+
+    # Explicit product stock is enforced by the server-side order calculator; null means unlimited.
+    original_products_file = main.PRODUCTS_FILE
+    try:
+        with tempfile.TemporaryDirectory() as temporary:
+            main.PRODUCTS_FILE = os.path.join(temporary, "products.json")
+            main.write_products([{
+                "id": "limited_roll", "name": "Ограниченный ролл", "price": 300, "cost": 100,
+                "weight": "250 г", "pieces": 8, "stock": 2, "active": True
+            }])
+            _, stock_total = main.calculate_order([OrderItem(id="limited_roll", qty=2)])
+            assert stock_total == 600
+            try:
+                main.calculate_order([OrderItem(id="limited_roll", qty=3)])
+            except ValueError:
+                pass
+            else:
+                raise AssertionError("Order calculator should reject quantities above managed stock")
+            main.write_products([{
+                "id": "unlimited_roll", "name": "Ролл без лимита", "price": 300, "stock": None, "active": True
+            }])
+            _, unlimited_total = main.calculate_order([OrderItem(id="unlimited_roll", qty=3)])
+            assert unlimited_total == 900
+    finally:
+        main.PRODUCTS_FILE = original_products_file
 
     # Category editing supports rename/order/icon and rejects unsafe image URLs.
     category = {"id": "classic", "name": "Роллы", "sort_order": 0}
