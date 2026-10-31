@@ -902,6 +902,13 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 </div>
 
 
+<div class="orders-modal" id="ordersModal" aria-hidden="true">
+  <section class="orders-dialog" role="dialog" aria-modal="true" aria-labelledby="myOrdersTitle">
+    <header class="orders-dialog-head"><div><span>ТИХИЙ РОЛЛ · ЛИЧНЫЙ КАБИНЕТ</span><h2 id="myOrdersTitle">Мои заказы</h2></div><button type="button" id="closeOrders" aria-label="Закрыть">×</button></header>
+    <div class="orders-dialog-toolbar"><p id="myOrdersHint">История ваших заказов и текущие статусы.</p><button type="button" id="refreshMyOrders">↻ Обновить</button></div>
+    <div id="myOrdersList"><div class="orders-empty">Загружаем заказы…</div></div>
+  </section>
+</div>
 <div class="product-modal" id="productModal" aria-hidden="true"><section class="product-dialog" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><button type="button" class="close-product" id="closeProduct" aria-label="Закрыть">×</button><div class="product-gallery-stage"><button type="button" class="gallery-arrow prev" id="detailPrev" aria-label="Предыдущее фото">‹</button><img class="detail-photo" id="detailPhoto" alt=""><button type="button" class="gallery-arrow next" id="detailNext" aria-label="Следующее фото">›</button></div><div class="gallery-count" id="galleryCount"></div><div class="gallery-dots" id="galleryDots" aria-label="Фотографии товара"></div><h2 id="detailTitle"></h2><div class="detail-price" id="detailPrice"></div><p class="detail-desc" id="detailDesc"></p><p class="detail-desc" id="detailExtra"></p><button type="button" class="primary" id="detailAdd">Добавить в корзину</button></section></div>
 
 <script>
