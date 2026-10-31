@@ -328,11 +328,11 @@ def current_menu() -> dict[str, dict[str, Any]]:
 
 CATEGORIES_FILE = os.getenv("CATEGORIES_FILE", os.path.join(os.path.dirname(__file__), "categories.json"))
 DEFAULT_CATEGORIES = [
-    {"id":"classic","name":"Классические","sort_order":0},
-    {"id":"warm","name":"Тёплые и мясные","sort_order":1},
-    {"id":"dogs","name":"Азиатские хот-доги","sort_order":2},
-    {"id":"snacks","name":"Закуски","sort_order":3},
-    {"id":"sets","name":"Сеты","sort_order":4},
+    {"id":"classic","name":"Классические","icon":"🍣","sort_order":0},
+    {"id":"warm","name":"Тёплые и мясные","icon":"🔥","sort_order":1},
+    {"id":"dogs","name":"Азиатские хот-доги","icon":"🌭","sort_order":2},
+    {"id":"snacks","name":"Закуски","icon":"🍤","sort_order":3},
+    {"id":"sets","name":"Сеты","icon":"🎁","sort_order":4},
     {"id":"all","name":"Другое","sort_order":5},
 ]
 def read_categories() -> list[dict[str, Any]]:
@@ -451,7 +451,13 @@ async def admin_create_category(payload: dict[str, Any], x_telegram_init_data: s
     categories=read_categories()
     if any(c["id"]==category_id or c["name"].casefold()==name.casefold() for c in categories):
         raise HTTPException(status_code=409,detail="Категория с таким ID или названием уже существует.")
-    item={"id":category_id,"name":name,"sort_order":max([int(c.get("sort_order",0)) for c in categories],default=-1)+1}
+    icon=payload.get("icon","")
+    image=payload.get("image","")
+    if not isinstance(icon,str) or len(icon)>16:
+        raise HTTPException(status_code=400,detail="Значок категории должен быть коротким текстом.")
+    if not isinstance(image,str) or len(image)>1_000_000 or (image and not (image.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,",image))):
+        raise HTTPException(status_code=400,detail="Изображение категории должно быть HTTPS-ссылкой или JPG, PNG, WebP.")
+    item={"id":category_id,"name":name,"icon":icon.strip(),"image":image.strip(),"sort_order":max([int(c.get("sort_order",0)) for c in categories],default=-1)+1}
     categories.append(item);write_categories(categories)
     return {"ok":True,"category":item}
 
