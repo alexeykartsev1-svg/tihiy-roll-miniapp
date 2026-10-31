@@ -67,22 +67,18 @@
               <span>Собрать<br>свой сет</span><i>›</i>
             </button>
           </div>
-          <section class="home-section home-category-section">
-            <div class="home-section-heading"><span>ВЫБИРАЙТЕ СВОЁ</span><h3>Что сегодня хочется?</h3></div>
-            <div class="home-shortcuts home-category-grid">
-              <button class="home-category-card" type="button" data-home-filter="sets" aria-pressed="false">
-                <img data-home-category-image="sets" src="./assets/set-party.webp" alt="" loading="lazy"><span><b>Сеты</b><i>›</i></span>
-              </button>
-              <button class="home-category-card" type="button" data-home-filter="rolls" aria-pressed="false">
-                <img data-home-category-image="rolls" src="./assets/set-duo.webp" alt="" loading="lazy"><span><b>Роллы</b><i>›</i></span>
-              </button>
-              <button class="home-category-card" type="button" data-home-filter="dogs" aria-pressed="false">
-                <img data-home-category-image="dogs" src="./assets/set-duo.webp" alt="" loading="lazy"><span><b>Хот-доги</b><i>›</i></span>
-              </button>
-              <button class="home-category-card" type="button" data-home-filter="snacks" aria-pressed="false">
-                <img data-home-category-image="snacks" src="./assets/set-solo.webp" alt="" loading="lazy"><span><b>Закуски</b><i>›</i></span>
-              </button>
-            </div>
+          <section class="home-promo-section" aria-label="Горячее предложение">
+            <div class="home-promo-kicker"><span>✦</span> ГОРЯЧЕЕ ПРЕДЛОЖЕНИЕ</div>
+            <button class="home-newyear-card" type="button" data-home-newyear>
+              <img id="homeNewYearImage" src="./assets/set-party.webp" alt="Новогодний сет" loading="lazy">
+              <span class="home-newyear-shade"></span>
+              <span class="home-newyear-copy">
+                <small>СУПЕРПРЕДЛОЖЕНИЕ</small>
+                <b id="homeNewYearTitle">Новогодний сет</b>
+                <span id="homeNewYearText">Праздничный набор для особенного вечера</span>
+                <strong><span id="homeNewYearPrice">— ₽</span><i>Посмотреть сет&nbsp; ›</i></strong>
+              </span>
+            </button>
           </section>
           <section class="home-service-panel" aria-label="Режим работы и заказ по телефону">
             <div class="home-hours-card">
@@ -329,6 +325,23 @@
         </form></section></div>
   <div class="modal-layer" id="favoritesModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>СОХРАНЁННЫЕ БЛЮДА</small><h2>Избранное</h2></div><button type="button" class="sheet-close" data-close="favoritesModal">×</button></header><div id="favoritesList"></div></section></div>
   <div class="modal-layer" id="filtersModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>МЕНЮ МАГАЗИНА</small><h2>Разделы и фильтры</h2></div><button type="button" class="sheet-close" data-close="filtersModal">×</button></header><div class="filter-options" id="filterOptions"></div><a class="admin-panel-entry" id="adminPanelEntry" href="./admin.html"><span class="admin-panel-entry-icon">⚙</span><span class="admin-panel-entry-copy"><b>Админ-панель</b><small>Управление заказами и магазином</small></span><span class="admin-panel-entry-arrow">↗</span></a><button class="add-cart-button" id="applyFilters">Показать блюда</button></section></div>
+    <div class="modal-layer builder-info-modal" id="builderInfoModal" aria-hidden="true">
+    <section class="sheet builder-info-sheet" role="dialog" aria-modal="true" aria-labelledby="builderInfoName">
+      <header class="sheet-head">
+        <div><small>СОСТАВ БЛЮДА</small><h2 id="builderInfoName">Состав</h2></div>
+        <button type="button" class="sheet-close" data-close="builderInfoModal" aria-label="Закрыть">×</button>
+      </header>
+      <p class="builder-info-description" id="builderInfoDescription"></p>
+      <div class="builder-info-facts">
+        <div><strong id="builderInfoPieces">8 шт.</strong><span>Количество</span></div>
+        <div><strong id="builderInfoWeight">280 г</strong><span>Вес</span></div>
+        <div><strong id="builderInfoPrice">0 ₽</strong><span>Цена</span></div>
+      </div>
+      <h3>Что внутри</h3>
+      <div class="builder-info-ingredients" id="builderInfoIngredients"></div>
+      <button type="button" class="add-cart-button builder-info-close" data-close="builderInfoModal">Понятно</button>
+    </section>
+  </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
