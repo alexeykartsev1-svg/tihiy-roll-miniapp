@@ -106,7 +106,7 @@ def main() -> None:
     original_products_file = backend.PRODUCTS_FILE
     try:
         with tempfile.TemporaryDirectory() as temporary:
-            main.PRODUCTS_FILE = os.path.join(temporary, "products.json")
+            backend.PRODUCTS_FILE = os.path.join(temporary, "products.json")
             backend.write_products([{
                 "id": "limited_roll", "name": "Ограниченный ролл", "price": 300, "cost": 100,
                 "weight": "250 г", "pieces": 8, "stock": 2, "active": True
@@ -114,18 +114,18 @@ def main() -> None:
             _, stock_total = backend.calculate_order([OrderItem(id="limited_roll", qty=2)])
             assert stock_total == 600
             try:
-                main.calculate_order([OrderItem(id="limited_roll", qty=3)])
+                backend.calculate_order([OrderItem(id="limited_roll", qty=3)])
             except ValueError:
                 pass
             else:
                 raise AssertionError("Order calculator should reject quantities above managed stock")
-            main.write_products([{
+            backend.write_products([{
                 "id": "unlimited_roll", "name": "Ролл без лимита", "price": 300, "stock": None, "active": True
             }])
-            _, unlimited_total = main.calculate_order([OrderItem(id="unlimited_roll", qty=3)])
+            _, unlimited_total = backend.calculate_order([OrderItem(id="unlimited_roll", qty=3)])
             assert unlimited_total == 900
     finally:
-        main.PRODUCTS_FILE = original_products_file
+        backend.PRODUCTS_FILE = original_products_file
 
     # Category editing supports rename/order/icon and rejects unsafe image URLs.
     category = {"id": "classic", "name": "Роллы", "sort_order": 0}
