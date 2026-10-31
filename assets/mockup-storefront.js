@@ -147,9 +147,10 @@ function renderBuilder(){
 }
 function changeBuilderProduct(id,delta){
  const p=find(id);if(!p)return;
- const next=Math.max(0,Number(state.builderItems[id]||0)+delta),limit=stock(p);
- if(limit!==null&&qty(id)+next>limit){toast('Доступно ещё '+Math.max(0,limit-qty(id))+' шт.');return;}
+ const next=Math.max(0,Number(state.builderItems[id]||0)+delta),previous=state.builderItems[id];
  if(next)state.builderItems[id]=next;else delete state.builderItems[id];
+ const effective=builderEffective(),invalid=Object.entries(effective).some(([productId,n])=>{const row=find(productId),limit=stock(row);return !row||(limit!==null&&qty(productId)+Number(n)>limit);});
+ if(invalid){if(previous)state.builderItems[id]=previous;else delete state.builderItems[id];toast('Недостаточно остатков для выбранного количества.');return;}
  renderBuilder();
 }
 function changeBuilderSet(id,delta){
@@ -197,7 +198,7 @@ function renderConfirmation(){
  $('#confirmedOrderCode').textContent=data.order_id||'Принят';
  $('#confirmedTotal').textContent=money(data.total);
  $('#confirmedWhen').textContent=data.time||'Время получения подтвердим отдельно';
- $('#confirmedLines').innerHTML=(data.items||[]).map(row=>{const p=find(row.id);return p?'<div class="confirmation-line"><img src="'+photo(p)+'" alt=""><span>'+esc(p.name)+' × '+row.qty+'</span><b>'+money(Number(p.price||0)*Number(row.qty||0))+'</b></div>':'';}).join('');
+ const lines=(data.items||[]).map(row=>{const p=find(row.id);return p?'<div class="confirmation-line"><img src="'+photo(p)+'" alt=""><span>'+esc(p.name)+' × '+row.qty+'</span><b>'+money(Number(p.price||0)*Number(row.qty||0))+'</b></div>':'';}).join('');const setNotes=(data.sets||[]).map(row=>(SET_NAMES[row.id]||'Готовый сет')+' × '+row.qty);$('#confirmedLines').innerHTML=lines+(setNotes.length?'<p class="cart-set-note">'+setNotes.map(esc).join(' · ')+'</p>':'');
 }
 function showConfirmation(data){state.lastOrder=data;renderConfirmation();activateWorkflow('confirmationScreen');}
 
