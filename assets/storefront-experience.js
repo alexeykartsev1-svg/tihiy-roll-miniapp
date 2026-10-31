@@ -266,6 +266,24 @@
         $('input[name="fulfillment"][value="Самовывоз"]').dispatchEvent(new Event('change',{bubbles:true}));
       }
       const note=$('#deliveryNote');if(note)note.textContent=settings.delivery_note||'Стоимость доставки подтвердим отдельно.';
+      const deliveryWrap=$('#deliveryAddressWrap');
+      if(deliveryWrap){
+        let zoneList=$('#deliveryZoneList');
+        if(zoneList)zoneList.remove();
+        const activeZones=Array.isArray(settings.delivery_zones)?settings.delivery_zones.filter(zone=>zone&&zone.active!==false):[];
+        if(activeZones.length){
+          zoneList=document.createElement('div');zoneList.id='deliveryZoneList';zoneList.className='delivery-zone-list';
+          const heading=document.createElement('p');heading.className='field-hint';heading.textContent='Ориентировочная стоимость по зонам:';
+          zoneList.append(heading);
+          activeZones.forEach(zone=>{
+            const row=document.createElement('div');row.className='delivery-zone-row';
+            const name=document.createElement('span');name.textContent=zone.name+(zone.radius_km?' · до '+zone.radius_km+' км':'');
+            const fee=document.createElement('strong');fee.textContent=Number(zone.fee)===0?'Бесплатно':money(zone.fee);
+            row.append(name,fee);zoneList.append(row);
+          });
+          deliveryWrap.append(zoneList);
+        }
+      }
       const minimum=Number(settings.minimum_order||0);
       if(minimum>0){
         const info=document.createElement('p');info.id='minimumOrderInfo';info.className='delivery-note';
