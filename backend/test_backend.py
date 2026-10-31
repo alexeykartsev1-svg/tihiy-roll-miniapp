@@ -3,9 +3,10 @@ import hashlib
 import hmac
 import json
 import time
+from pydantic import ValidationError
 from urllib.parse import urlencode
 
-from main import MENU, OrderItem, calculate_order, verify_telegram_init_data
+from main import MENU, OrderItem, ProductPayload, calculate_order, verify_telegram_init_data
 
 
 def make_init_data(token: str, auth_date: int, user: dict) -> str:
@@ -41,10 +42,32 @@ def main() -> None:
     except ValueError:
         pass
 
+    catalog_item = ProductPayload(
+        id="test_roll",
+        name="Тестовый ролл",
+        price=350,
+        pieces=8,
+        details="Рис, нори, лосось",
+        gallery=["data:image/jpeg;base64,YQ=="],
+    )
+    assert catalog_item.pieces == 8
+    assert catalog_item.gallery == ["data:image/jpeg;base64,YQ=="]
+    try:
+        ProductPayload(
+            id="bad_roll",
+            name="Неверный ролл",
+            price=350,
+            gallery=["file:///tmp/photo.jpg"],
+        )
+    except ValidationError:
+        pass
+    else:
+        raise AssertionError("Unsafe gallery source should fail")
+
     items, total = calculate_order([OrderItem(id="philadelphia", qty=1), OrderItem(id="warm_salmon", qty=2)])
     assert total == MENU["philadelphia"]["price"] + 2 * MENU["warm_salmon"]["price"]
     assert len(items) == 2
-    print("OK: Telegram initData valid/tampered/stale cases and server-side price calculation passed.")
+    print("OK: Telegram initData checks, product gallery schema and server-side price calculation passed.")
 
 
 if __name__ == "__main__":

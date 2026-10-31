@@ -663,7 +663,31 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 @keyframes setCompositionFadeIn{from{opacity:0}to{opacity:1}}
 @keyframes setCompositionCardIn{from{transform:translateY(8px) scale(.985);opacity:.7}to{transform:translateY(0) scale(1);opacity:1}}
 @media(max-width:420px){.set-composition-dialog{padding:12px}.set-composition-panel{border-radius:20px;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px)}.set-composition-header{padding:20px 17px 14px}.set-composition-summary{padding:13px 17px 0}.set-composition-body{padding:11px 17px 13px}.set-composition-footer{padding:13px 17px 16px}.set-composition-item{padding:11px 10px}.set-composition-item-name{font-size:14px}.set-composition-item-amount{font-size:11px;padding:5px 7px}}
+.pickup-address-card{margin:12px 0 16px;padding:14px;border:1px solid rgba(226,190,112,.28);border-radius:14px;background:linear-gradient(145deg,rgba(226,190,112,.08),rgba(0,0,0,.1))}
+.pickup-address-card p{margin:7px 0 12px;color:var(--text);line-height:1.5}
+.pickup-map-link{display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;color:var(--gold-light);font-size:13px;font-weight:800;text-decoration:none}
+.pickup-map{display:block;width:100%;height:220px;border:0;border-radius:10px;background:#17130d}
+.product-gallery-stage,.set-detail-gallery{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
+.product-gallery-stage .detail-photo,.set-detail-gallery img{display:block;width:100%;max-height:380px;aspect-ratio:4/3;object-fit:cover;border-radius:14px;border:1px solid #4a3822;background:#17130f;touch-action:pan-y}
+.gallery-arrow,.set-gallery-arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:38px;height:38px;border:1px solid rgba(229,185,111,.65);border-radius:50%;background:rgba(12,10,8,.78);color:#f2d49c;font-size:25px;line-height:1;cursor:pointer}
+.gallery-arrow.prev,.set-gallery-arrow.prev{left:10px}.gallery-arrow.next,.set-gallery-arrow.next{right:10px}
+.gallery-count,.set-gallery-count{margin-top:7px;text-align:center;color:#c7b596;font-size:12px}
+.product-dialog .gallery-dots,.set-detail-dots{display:flex;justify-content:center;gap:7px;margin:10px 0}
+.product-dialog .gallery-dots button,.set-detail-dots button{width:8px;height:8px;flex:0 0 8px;padding:0;border:0;border-radius:50%;background:#6c5b43;cursor:pointer}
+.product-dialog .gallery-dots button.active,.set-detail-dots button.active{background:#f2d49c}
+.set-detail-gallery img{max-height:230px}
+.category-teaser{display:grid;grid-template-columns:112px minmax(0,1fr);gap:14px;align-items:center;padding:12px;border:1px solid rgba(229,185,111,.22);border-radius:16px;background:linear-gradient(135deg,rgba(229,185,111,.08),rgba(0,0,0,.08))}
+.category-teaser img{width:112px;height:94px;object-fit:cover;border-radius:12px}
+.category-teaser strong{display:block;margin-bottom:5px;color:var(--gold-light)}
+.category-teaser p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+@media(max-width:520px){.pickup-map{height:190px}.gallery-arrow,.set-gallery-arrow{width:34px;height:34px}.category-teaser{grid-template-columns:88px minmax(0,1fr);gap:10px}.category-teaser img{width:88px;height:84px}}
 @media(prefers-reduced-motion:reduce){.set-composition-dialog,.set-composition-panel{animation:none}}
+.card-actions{flex-wrap:wrap}
+.card-actions .premium-qty{flex:1 1 100%}
+.card-actions .details-link{flex:1 1 100%;width:100%;margin-top:0;min-height:38px}
+.set-card .set-add.is-added{background:linear-gradient(135deg,#d9c18d,#b38b4b);color:#20170d;border-color:#f2d49c}
+.editable-promo-image{display:block;width:100%;max-height:320px;object-fit:cover;border-radius:14px;margin:0 0 14px;border:1px solid rgba(229,185,111,.25)}
+
 
 </style>
 </head>
@@ -710,7 +734,7 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
     <span class="phone-arrow" aria-hidden="true">↗</span>
   </a>
 
-  <section class="section" id="editablePromo" hidden style="margin-top:14px;border:1px solid var(--gold-line);border-radius:20px;padding:20px;background:linear-gradient(135deg,#24180e,#100e0b)"><div class="section-heading"><h2 id="editablePromoTitle"></h2><span class="section-note">ТИХИЙ РОЛЛ</span></div><p id="editablePromoText"></p><a class="btn-primary" id="editablePromoButton" href="#menu-section" style="display:inline-flex;text-decoration:none;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px"></a></section>
+  <section class="section" id="editablePromo" hidden style="margin-top:14px;border:1px solid var(--gold-line);border-radius:20px;padding:20px;background:linear-gradient(135deg,#24180e,#100e0b)"><div class="section-heading"><h2 id="editablePromoTitle"></h2><span class="section-note">ТИХИЙ РОЛЛ</span></div><img id="editablePromoImage" alt="" hidden style="display:block;width:100%;max-height:320px;object-fit:cover;border-radius:14px;margin:0 0 14px;border:1px solid rgba(229,185,111,.25)"><p id="editablePromoText"></p><a class="btn-primary" id="editablePromoButton" href="#menu-section" style="display:inline-flex;text-decoration:none;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px"></a></section>
   <section class="section order-guide" id="how-to-order" aria-labelledby="guide-title">
     <div class="section-heading"><h2 id="guide-title">Как заказать?</h2><span class="section-note">Всего 4 простых шага&nbsp; ↗</span></div>
     <div class="guide-grid">
@@ -767,12 +791,22 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
       <article class="set-card set-card-photo" data-set-card="party">
         <div class="set-card-copy">
           <h3>🎉 Сет «Компания»</h3><p data-set-description="party">Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.</p>
-          <div class="set-meta"><span aria-label="64 штук">▣ &nbsp;64 шт.</span><span aria-label="1600 граммов">⚖ &nbsp;1 600 г</span></div>
+          <div class="set-meta"><span aria-label="64 штуки">▣ &nbsp;64 шт.</span><span aria-label="1600 граммов">⚖ &nbsp;1 600 г</span></div>
           <div class="set-price" id="setPartyPrice">—</div>
         </div>
         <div class="set-actions"><button class="set-composition" type="button" data-set-composition="party">☷ &nbsp; Состав</button><button class="set-add" type="button" data-set="party">Добавить сет</button>
             <div class="set-qty" aria-label="Количество сетов"><button type="button" data-set-qty="minus" data-set-key="party" aria-label="Уменьшить количество">−</button><output data-set-count="party">0</output><button type="button" data-set-qty="plus" data-set-key="party" aria-label="Увеличить количество">+</button></div>
           </div><div class="set-card-visual" aria-hidden="true"><img data-set-image="party" alt="" loading="lazy"></div>
+      </article>
+      <article class="set-card set-card-photo" data-set-card="newyear">
+        <div class="set-card-copy">
+          <h3>🎄 Новогодний сет</h3><p data-set-description="newyear">Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.</p>
+          <div class="set-meta"><span aria-label="40 штук">▣ &nbsp;40 шт.</span><span aria-label="1400 граммов">⚖ &nbsp;1 400 г</span></div>
+          <div class="set-price" id="setNewYearPrice">—</div>
+        </div>
+        <div class="set-actions"><button class="set-composition" type="button" data-set-composition="newyear">☷ &nbsp; Состав</button><button class="set-add" type="button" data-set="newyear">Добавить сет</button>
+            <div class="set-qty" aria-label="Количество новогодних сетов"><button type="button" data-set-qty="minus" data-set-key="newyear" aria-label="Уменьшить количество">−</button><output data-set-count="newyear">0</output><button type="button" data-set-qty="plus" data-set-key="newyear" aria-label="Увеличить количество">+</button></div>
+          </div><div class="set-card-visual" aria-hidden="true"><img data-set-image="newyear" alt="" loading="lazy"></div>
       </article>
       
     </div>
@@ -818,6 +852,12 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
         <label class="fulfillment-option"><input type="radio" name="fulfillment" value="Самовывоз" checked><span>Самовывоз</span></label>
         <label class="fulfillment-option"><input type="radio" name="fulfillment" value="Доставка"><span>Доставка</span></label>
       </div>
+      <div id="pickupAddressWrap" class="pickup-address-card">
+        <span class="field-label">Адрес самовывоза</span>
+        <p><strong>Тихий ролл</strong><br>Социалистическая, 26<br>район «Остров», Чарышское</p>
+        <a class="pickup-map-link" href="https://yandex.ru/maps/?text=%D0%A2%D0%B8%D1%85%D0%B8%D0%B9%20%D1%80%D0%BE%D0%BB%D0%BB%2C%20%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%2C%2026%2C%20%D0%A7%D0%B0%D1%80%D1%8B%D1%88%D1%81%D0%BA%D0%BE%D0%B5" target="_blank" rel="noopener noreferrer">📍 Открыть адрес на карте</a>
+        <iframe title="Карта адреса самовывоза — Тихий ролл" class="pickup-map" src="https://yandex.ru/map-widget/v1/?text=%D0%A2%D0%B8%D1%85%D0%B8%D0%B9%20%D1%80%D0%BE%D0%BB%D0%BB%2C%20%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%2C%2026%2C%20%D0%A7%D0%B0%D1%80%D1%8B%D1%88%D1%81%D0%BA%D0%BE%D0%B5" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
       <div id="deliveryAddressWrap" hidden>
         <label class="field-label" for="deliveryAddress">Адрес доставки</label>
         <input id="deliveryAddress" name="delivery_address" maxlength="250" placeholder="Улица, дом, квартира">
@@ -858,7 +898,7 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline-offset:3px; }
 </div>
 
 
-<div class="product-modal" id="productModal" aria-hidden="true"><section class="product-dialog" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><button type="button" class="close-product" id="closeProduct" aria-label="Закрыть">×</button><img class="detail-photo" id="detailPhoto" alt=""><div class="gallery-dots" id="galleryDots" aria-label="Фотографии товара"></div><h2 id="detailTitle"></h2><div class="detail-price" id="detailPrice"></div><p class="detail-desc" id="detailDesc"></p><p class="detail-desc" id="detailExtra"></p><button type="button" class="primary" id="detailAdd">Добавить в корзину</button></section></div>
+<div class="product-modal" id="productModal" aria-hidden="true"><section class="product-dialog" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><button type="button" class="close-product" id="closeProduct" aria-label="Закрыть">×</button><div class="product-gallery-stage"><button type="button" class="gallery-arrow prev" id="detailPrev" aria-label="Предыдущее фото">‹</button><img class="detail-photo" id="detailPhoto" alt=""><button type="button" class="gallery-arrow next" id="detailNext" aria-label="Следующее фото">›</button></div><div class="gallery-count" id="galleryCount"></div><div class="gallery-dots" id="galleryDots" aria-label="Фотографии товара"></div><h2 id="detailTitle"></h2><div class="detail-price" id="detailPrice"></div><p class="detail-desc" id="detailDesc"></p><p class="detail-desc" id="detailExtra"></p><button type="button" class="primary" id="detailAdd">Добавить в корзину</button></section></div>
 
 <script>
 // After deploying backend/ on Render, replace this placeholder with the service URL + /api/order.
@@ -996,6 +1036,13 @@ let activeFilter = 'all';
 function renderProductCards(target, visible) {
   target.replaceChildren();
   if (!visible.length) {
+    if(target.id==='menu' && (activeFilter==='dogs'||activeFilter==='snacks')){
+      const teaser=document.createElement('article');teaser.className='category-teaser';
+      const img=document.createElement('img');img.src=placeholderImage(activeFilter==='dogs'?'Азиатские хот-доги':'Закуски',activeFilter==='dogs'?'🌭':'🍤');img.alt='';
+      const copy=document.createElement('div');const title=document.createElement('strong');title.textContent=activeFilter==='dogs'?'Азиатские хот-доги':'Закуски';
+      const desc=document.createElement('p');desc.textContent=activeFilter==='dogs'?'Готовим раздел с хрустящими азиатскими хот-догами. Фото и ассортимент скоро появятся.':'Готовим раздел с горячими и хрустящими закусками. Фото и ассортимент скоро появятся.';
+      copy.append(title,desc);teaser.append(img,copy);target.append(teaser);return;
+    }
     const empty = document.createElement('div');
     empty.className = 'empty-category';
     empty.innerHTML = target.id === 'favoritesGrid'
@@ -1022,6 +1069,7 @@ function renderProductCards(target, visible) {
         <div class="price-weight-row">
           <span class="price">${money(product.price)}</span>
           <span class="weight-chip" aria-label="Вес ${product.weight || '280 г'}"><span aria-hidden="true">⚖</span> ${product.weight || '280 г'}</span>
+          <span class="weight-chip" aria-label="Количество ${product.pieces || 8} штук">▣ ${product.pieces || 8} шт.</span>
         </div>
         <div class="card-actions">
           <div class="qty premium-qty">
@@ -1029,6 +1077,7 @@ function renderProductCards(target, visible) {
             <b>${quantity}</b>
             <button type="button" data-act="plus" data-id="${product.id}" aria-label="Увеличить количество ${product.name}">+</button>
           </div>
+          <button class="details-link" type="button" data-details="${product.id}">☷ &nbsp; Состав</button>
         </div>
       </div>`;
     target.append(card);
@@ -1058,7 +1107,7 @@ async function loadCategoryFilters(){
     root.querySelectorAll('.filter').forEach(button=>{const selected=button.dataset.filter===activeFilter;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});
   }catch(error){console.warn('Не удалось загрузить категории меню:',error)}
 }
-document.addEventListener('click',function(event){const filterButton=event.target.closest('#categoryFilters .filter, .filter[data-filter]');if(!filterButton)return;event.preventDefault();const nextFilter=filterButton.dataset.filter||'all';if(typeof renderMenu==='function')renderMenu(nextFilter);});
+document.addEventListener('click',function(event){const filterButton=event.target.closest('#categoryFilters .filter, .filter[data-filter]');if(!filterButton)return;event.preventDefault();const nextFilter=filterButton.dataset.filter||'all';if(nextFilter==='sets'){activeFilter='sets';document.querySelectorAll('#categoryFilters .filter').forEach(button=>{const selected=button.dataset.filter==='sets';button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});document.getElementById('sets-section')?.scrollIntoView({behavior:'smooth',block:'start'});return;}if(typeof renderMenu==='function')renderMenu(nextFilter);});
 function renderMenu(filter = activeFilter) {
   activeFilter = filter;
   document.querySelectorAll('.filter').forEach(button => {
@@ -1070,7 +1119,7 @@ function renderMenu(filter = activeFilter) {
   renderFavorites();
 }
 
-const SET_PRESETS={solo:[['philadelphia',1],['lava',1]],duo:[['philadelphia',1],['warm_crab',1],['lava',1]],party:[['philadelphia',2],['lava',1],['warm_crab',1],['warm_salmon',1]],newyear:[['philadelphia',2],['lava',1],['warm_crab',1],['warm_salmon',1]]};
+const SET_PRESETS={solo:[['philadelphia',1],['lava',1]],duo:[['philadelphia',1],['warm_crab',1],['lava',1]],party:[['philadelphia',2],['lava',1],['warm_crab',1],['warm_salmon',1]],newyear:[['philadelphia',1],['california',1],['lava',1],['warm_crab',1],['warm_salmon',1]]};
 function renderSetPrices(){
   Object.entries({solo:'setSoloPrice',duo:'setDuoPrice',party:'setPartyPrice',newyear:'setNewYearPrice'}).forEach(([key,id])=>{
     const el=document.getElementById(id);if(!el)return;
@@ -1080,21 +1129,28 @@ function renderSetPrices(){
     el.textContent=available?money(total):'Временно недоступен';
   });
   populateSetImages();
+  if(typeof setQuantities!=='undefined')Object.keys(setQuantities).forEach(syncSetCount);
 }
 
 const setQuantities={solo:0,duo:0,party:0,newyear:0};
-function syncSetCount(key){const out=document.querySelector('[data-set-count="'+key+'"]');if(out)out.textContent=String(setQuantities[key]||0)}
+function syncSetCount(key){
+ const count=Number(setQuantities[key]||0),out=document.querySelector('[data-set-count="'+key+'"]');
+ if(out)out.textContent=String(count);
+ const add=document.querySelector('[data-set-card="'+key+'"] [data-set="'+key+'"]');
+ if(add){add.textContent=count?'Добавлено ✓':'Добавить сет';add.classList.toggle('is-added',count>0);add.setAttribute('aria-pressed',String(count>0));}
+}
 const DEFAULT_SET_CONTENT={
  solo:{description:'Филадельфия и Лава — для уютного ужина.',image:'./assets/set-solo.webp',title:'На одного'},
  duo:{description:'Филадельфия, Тёплый краб и Лава — поделиться вкусом.',image:'./assets/set-duo.webp',title:'Вечер вдвоём'},
  party:{description:'Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp',title:'Компания'},
+ newyear:{description:'Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp',title:'Новогодний сет'}
 };
 let editableSetsContent={};
 function applyEditableSets(rows){
  if(!Array.isArray(rows))return;
  rows.forEach(row=>{
   if(!row||!Object.prototype.hasOwnProperty.call(DEFAULT_SET_CONTENT,row.id))return;
-  editableSetsContent[row.id]={description:typeof row.description==='string'?row.description:DEFAULT_SET_CONTENT[row.id].description,image:typeof row.image==='string'?row.image:''};
+  editableSetsContent[row.id]={description:typeof row.description==='string'?row.description:DEFAULT_SET_CONTENT[row.id].description,image:typeof row.image==='string'?row.image:'',photos:Array.isArray(row.photos)?row.photos.filter(x=>typeof x==='string').slice(0,5):[]};
   const card=document.querySelector('[data-set-card="'+row.id+'"]');
   const description=card&&card.querySelector('[data-set-description]');
   if(description)description.textContent=editableSetsContent[row.id].description;
@@ -1140,10 +1196,18 @@ document.addEventListener('click',event=>{
   dialog.setAttribute('aria-label','Состав готового сета');
   dialog.innerHTML='<section class="set-composition-panel" role="dialog" aria-modal="true" aria-labelledby="setCompositionTitle">'+
    '<div class="set-composition-header"><div class="set-composition-title-wrap"><span class="set-composition-kicker">ТИХИЙ РОЛЛ · ГОТОВЫЙ СЕТ</span><h2 id="setCompositionTitle"></h2><p class="set-composition-subtitle">Что входит в набор</p></div><button class="set-composition-x" type="button" aria-label="Закрыть окно">×</button></div>'+
-   '<div class="set-composition-summary"></div><div class="set-composition-body"><ul class="set-composition-list"></ul></div>'+
+   '<div class="set-detail-gallery"><button type="button" class="set-gallery-arrow prev" aria-label="Предыдущее фото">‹</button><img alt="" data-set-gallery-photo><button type="button" class="set-gallery-arrow next" aria-label="Следующее фото">›</button></div><div class="set-gallery-count"></div><div class="set-detail-dots"></div><div class="set-composition-summary"></div><div class="set-composition-body"><ul class="set-composition-list"></ul></div>'+
    '<div class="set-composition-footer"><span>Свежеприготовленные роллы</span><button class="set-composition-done" type="button">Понятно</button></div></section>';
   const panel=dialog.querySelector('.set-composition-panel');
   dialog.querySelector('#setCompositionTitle').textContent=title;
+  const setPhotos=[(editableSetsContent[key]&&editableSetsContent[key].image)||DEFAULT_SET_CONTENT[key]?.image||'',...((editableSetsContent[key]&&editableSetsContent[key].photos)||[])].filter(Boolean).slice(0,6);
+  let setPhotoIndex=0;
+  const setPhoto=dialog.querySelector('[data-set-gallery-photo]'),setDots=dialog.querySelector('.set-detail-dots'),setGalleryCount=dialog.querySelector('.set-gallery-count');
+  const showSetPhoto=(index)=>{if(!setPhotos.length)return;setPhotoIndex=(index+setPhotos.length)%setPhotos.length;setPhoto.src=setPhotos[setPhotoIndex];setPhoto.alt=title+' — фото '+(setPhotoIndex+1);setGalleryCount.textContent='Фото '+(setPhotoIndex+1)+' из '+setPhotos.length;setDots.replaceChildren();setPhotos.forEach((src,i)=>{const dot=document.createElement('button');dot.type='button';dot.classList.toggle('active',i===setPhotoIndex);dot.setAttribute('aria-label','Фото '+(i+1));dot.addEventListener('click',()=>showSetPhoto(i));setDots.append(dot)});};
+  if(setPhotos.length){showSetPhoto(0)}else{dialog.querySelector('.set-detail-gallery').hidden=true;setGalleryCount.hidden=true;setDots.hidden=true}
+  dialog.querySelector('.set-gallery-arrow.prev').addEventListener('click',()=>showSetPhoto(setPhotoIndex-1));
+  dialog.querySelector('.set-gallery-arrow.next').addEventListener('click',()=>showSetPhoto(setPhotoIndex+1));
+  let setTouchX=0;setPhoto.addEventListener('touchstart',e=>{setTouchX=e.changedTouches[0].clientX},{passive:true});setPhoto.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-setTouchX;if(Math.abs(dx)>35)showSetPhoto(setPhotoIndex+(dx<0?1:-1))},{passive:true});
   const summary=dialog.querySelector('.set-composition-summary');
   if(card){
    card.querySelectorAll('.set-meta span').forEach(metric=>{
@@ -1177,6 +1241,8 @@ document.addEventListener('click',event=>{
   };
   const handleDialogKeydown=e=>{
    if(e.key==='Escape'){e.preventDefault();closeDialog();return}
+   if(e.key==='ArrowLeft'&&setPhotos.length){e.preventDefault();showSetPhoto(setPhotoIndex-1);return}
+   if(e.key==='ArrowRight'&&setPhotos.length){e.preventDefault();showSetPhoto(setPhotoIndex+1);return}
    if(e.key==='Tab'){
     const buttons=dialog.querySelectorAll('button');
     if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons[buttons.length-1].focus()}
@@ -1195,15 +1261,23 @@ document.addEventListener('click',event=>{
  const qtyButton=event.target.closest('[data-set-qty]');
  if(qtyButton){const key=qtyButton.dataset.setKey;const rows=SET_PRESETS[key]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;
   if(qtyButton.dataset.setQty==='plus'){rows.forEach(([id,qty])=>cart[id]=Math.min(99,(cart[id]||0)+qty));setQuantities[key]=(setQuantities[key]||0)+1}
-  else {if((setQuantities[key]||0)<=0)return;rows.forEach(([id,qty])=>cart[id]=Math.max(0,(cart[id]||0)-qty));setQuantities[key]--; }
+  else {if((setQuantities[key]||0)<=0)return;rows.forEach(([id,qty])=>{const next=Math.max(0,(cart[id]||0)-qty);if(next)cart[id]=next;else delete cart[id]});setQuantities[key]--; }
   saveCart();renderMenu(activeFilter);updateCartBar();renderCart();syncSetCount(key);return
  }
 });
 
-document.addEventListener('click',event=>{const button=event.target.closest('[data-set]');if(!button)return;const key=button.dataset.set;const rows=SET_PRESETS[key]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;rows.forEach(([id,qty])=>{cart[id]=Math.min(99,(cart[id]||0)+qty)});setQuantities[key]=(setQuantities[key]||0)+1;syncSetCount(key);saveCart();renderMenu(activeFilter);updateCartBar();renderCart();button.textContent='Добавлено ✓';setTimeout(()=>{button.textContent='Добавить сет'},1400)});
+document.addEventListener('click',event=>{
+ const button=event.target.closest('[data-set]');if(!button)return;
+ const key=button.dataset.set,rows=SET_PRESETS[key]||[];
+ if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;
+ const current=Number(setQuantities[key]||0),direction=current>0?-1:1;
+ rows.forEach(([id,qty])=>{const next=Math.max(0,Math.min(99,(cart[id]||0)+(qty*direction)));if(next)cart[id]=next;else delete cart[id]});
+ setQuantities[key]=Math.max(0,current+direction);syncSetCount(key);
+ saveCart();renderMenu(activeFilter);updateCartBar();renderCart();
+});
 function renderCustomSetBuilder(){
   const root=document.getElementById('customSetOptions');if(!root)return;root.replaceChildren();
-  products.forEach(product=>{
+  products.filter(product=>['classic','warm'].includes(product.cat)).forEach(product=>{
     const row=document.createElement('label');row.className='custom-set-option';
     const image=document.createElement('img');image.src=product.photo;image.alt='';image.loading='lazy';
     const details=document.createElement('span');details.className='custom-set-details';
@@ -1380,11 +1454,13 @@ pickupDate.addEventListener('change', () => {
 });
 
 const deliveryAddressWrap = document.getElementById('deliveryAddressWrap');
+const pickupAddressWrap = document.getElementById('pickupAddressWrap');
 const deliveryAddress = document.getElementById('deliveryAddress');
 document.querySelectorAll('input[name="fulfillment"]').forEach(input => {
   input.addEventListener('change', () => {
     const delivery = document.querySelector('input[name="fulfillment"]:checked')?.value === 'Доставка';
     deliveryAddressWrap.hidden = !delivery;
+    if(pickupAddressWrap)pickupAddressWrap.hidden=delivery;
     deliveryAddress.required = delivery;
     if (!delivery) deliveryAddress.setCustomValidity('');
   });
@@ -1645,15 +1721,21 @@ const productModal = document.getElementById('productModal');
 function openProductDetails(id) {
   const product = products.find(p => p.id === id); if (!product) return;
   currentDetailProduct = product;
-  const photos = product.gallery || [product.photo, product.photo, product.photo];
+  const photos = [product.photo,...(Array.isArray(product.gallery)?product.gallery:[])].filter((src,index,all)=>typeof src==='string'&&src&&all.indexOf(src)===index).slice(0,6);
+  const safePhotos=photos.length?photos:[placeholderImage(product.name)];
+  let detailPhotoIndex=0;
   const photo = document.getElementById('detailPhoto');
-  photo.src = photos[0]; photo.alt = product.name;
   document.getElementById('detailTitle').textContent = product.name;
-  document.getElementById('detailPrice').textContent = money(product.price) + (product.details ? ' · тестовая цена' : '');
-  document.getElementById('detailDesc').textContent = product.desc;
-  document.getElementById('detailExtra').textContent = product.details || 'Состав: ' + product.desc + ' Вес и количество кусочков добавим после подтверждения точных данных.';
+  document.getElementById('detailPrice').textContent = money(product.price);
+  document.getElementById('detailDesc').textContent = product.desc || '';
+  document.getElementById('detailExtra').textContent = product.details || ('Состав: '+(product.desc||'уточняется')+'. Вес: '+(product.weight||'уточняется')+'. Количество: '+(product.pieces||8)+' шт.');
   const dots = document.getElementById('galleryDots'); dots.replaceChildren();
-  photos.forEach((src,i) => { const b=document.createElement('button'); b.type='button'; b.className=i===0?'active':''; b.setAttribute('aria-label','Фото '+(i+1)); b.addEventListener('click',()=>{photo.src=src;dots.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');}); dots.append(b); });
+  const showDetailPhoto=(index)=>{detailPhotoIndex=(index+safePhotos.length)%safePhotos.length;photo.src=safePhotos[detailPhotoIndex];photo.alt=product.name+' — фото '+(detailPhotoIndex+1);document.getElementById('galleryCount').textContent='Фото '+(detailPhotoIndex+1)+' из '+safePhotos.length;dots.querySelectorAll('button').forEach((dot,i)=>dot.classList.toggle('active',i===detailPhotoIndex));};
+  safePhotos.forEach((src,i) => { const b=document.createElement('button'); b.type='button'; b.className=i===0?'active':''; b.setAttribute('aria-label','Фото '+(i+1)); b.addEventListener('click',()=>showDetailPhoto(i)); dots.append(b); });
+  showDetailPhoto(0);
+  document.getElementById('detailPrev').onclick=()=>showDetailPhoto(detailPhotoIndex-1);
+  document.getElementById('detailNext').onclick=()=>showDetailPhoto(detailPhotoIndex+1);
+  let detailTouchX=0;photo.ontouchstart=e=>{detailTouchX=e.changedTouches[0].clientX};photo.ontouchend=e=>{const dx=e.changedTouches[0].clientX-detailTouchX;if(Math.abs(dx)>35)showDetailPhoto(detailPhotoIndex+(dx<0?1:-1))};
   productModal.classList.add('show'); productModal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
 }
 function closeProductDetails(){ productModal.classList.remove('show'); productModal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; currentDetailProduct=null; }
@@ -1675,6 +1757,7 @@ async function loadServerCatalog() {
     });
     // Keep local photos for products not yet seeded by server; normal admin-created products arrive from API.
     products.splice(0, products.length, ...merged);
+    renderCustomSetBuilder();
     await loadCategoryFilters();
     Object.keys(cart).forEach(id => { if (!products.some(p => p.id === id)) delete cart[id]; });
     [...favorites].forEach(id => { if (!products.some(p => p.id === id)) favorites.delete(id); });
@@ -1693,7 +1776,7 @@ async function showAdminButtonIfAllowed() {
     if (response.ok && result.is_admin) document.getElementById('adminPanelLink').hidden = false;
   } catch (error) { console.warn('Проверка доступа к панели управления не удалась.'); }
 }
-async function loadEditableSiteContent(){try{const response=await fetch(API_BASE_URL+'/api/site-content',{cache:'no-store'});if(!response.ok)return;const data=await response.json();applyEditableSets(data.sets);const title=document.getElementById('heroTitleMain'),accent=document.getElementById('heroTitleAccent'),desc=document.getElementById('heroDescription'),cta=document.getElementById('shopCta');const slides=(data.slides||[]).filter(x=>x.active!==false);if(title&&slides.length){const first=slides[0];if(first.title)title.textContent=first.title;if(first.accent)accent.textContent=first.accent;if(first.desc)desc.textContent=first.desc;if(first.button&&cta)cta.firstChild.textContent=first.button+' ';const container=document.getElementById('heroSlides'),existing=container&&container.querySelector('.hero-slide');if(existing){existing.dataset.title=first.title||existing.dataset.title;existing.dataset.accent=first.accent||existing.dataset.accent;existing.dataset.desc=first.desc||existing.dataset.desc;const img=existing.querySelector('.hero-slide-image');if(img&&first.image&&first.image.startsWith('https://'))img.src=first.image;}if(container&&slides.length>1){slides.slice(1).forEach(slide=>{if(!slide.image||!slide.image.startsWith('https://'))return;const el=document.createElement('div');el.className='hero-slide';el.dataset.title=slide.title||'';el.dataset.accent=slide.accent||'';el.dataset.desc=slide.desc||'';const img=document.createElement('img');img.className='hero-slide-image';img.src=slide.image;img.alt='';img.loading='lazy';el.append(img);container.append(el);});}}const promo=document.getElementById('editablePromo');if(promo&&(data.promo_title||data.promo_text)){document.getElementById('editablePromoTitle').textContent=data.promo_title||'';document.getElementById('editablePromoText').textContent=data.promo_text||'';const button=document.getElementById('editablePromoButton');button.textContent=(data.promo_button||'Перейти к меню')+' ↗';const link=data.promo_link||'#menu-section';button.href=/^(#|https:\/\/|tel:)/i.test(link)?link:'#menu-section';promo.hidden=false;}}catch(error){console.warn('Не удалось загрузить оформление главного экрана:',error)}}
+async function loadEditableSiteContent(){try{const response=await fetch(API_BASE_URL+'/api/site-content',{cache:'no-store'});if(!response.ok)return;const data=await response.json();applyEditableSets(data.sets);const title=document.getElementById('heroTitleMain'),accent=document.getElementById('heroTitleAccent'),desc=document.getElementById('heroDescription'),cta=document.getElementById('shopCta');const slides=(data.slides||[]).filter(x=>x.active!==false);if(title&&slides.length){const first=slides[0];if(first.title)title.textContent=first.title;if(first.accent)accent.textContent=first.accent;if(first.desc)desc.textContent=first.desc;if(first.button&&cta)cta.firstChild.textContent=first.button+' ';const container=document.getElementById('heroSlides'),existing=container&&container.querySelector('.hero-slide');if(existing){existing.dataset.title=first.title||existing.dataset.title;existing.dataset.accent=first.accent||existing.dataset.accent;existing.dataset.desc=first.desc||existing.dataset.desc;const img=existing.querySelector('.hero-slide-image');if(img&&first.image&&(first.image.startsWith('https://')||first.image.startsWith('data:image/')))img.src=first.image;}if(container&&slides.length>1){slides.slice(1).forEach(slide=>{if(!slide.image||!(slide.image.startsWith('https://')||slide.image.startsWith('data:image/')))return;const el=document.createElement('div');el.className='hero-slide';el.dataset.title=slide.title||'';el.dataset.accent=slide.accent||'';el.dataset.desc=slide.desc||'';const img=document.createElement('img');img.className='hero-slide-image';img.src=slide.image;img.alt='';img.loading='lazy';el.append(img);container.append(el);});}}const promo=document.getElementById('editablePromo');if(promo&&(data.promo_title||data.promo_text||data.promo_image)){document.getElementById('editablePromoTitle').textContent=data.promo_title||'';document.getElementById('editablePromoText').textContent=data.promo_text||'';const promoImage=document.getElementById('editablePromoImage');if(promoImage&&data.promo_image){promoImage.src=data.promo_image;promoImage.hidden=false}else if(promoImage){promoImage.removeAttribute('src');promoImage.hidden=true}const button=document.getElementById('editablePromoButton');button.textContent=(data.promo_button||'Перейти к меню')+' ↗';const link=data.promo_link||'#menu-section';button.href=/^(#|https:\/\/|tel:)/i.test(link)?link:'#menu-section';promo.hidden=false;}}catch(error){console.warn('Не удалось загрузить оформление главного экрана:',error)}}
 renderMenu();
 loadCategoryFilters();
 loadEditableSiteContent();

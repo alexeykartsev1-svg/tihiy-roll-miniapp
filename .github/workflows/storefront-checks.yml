@@ -1,0 +1,40 @@
+name: Storefront checks
+
+on:
+  push:
+    branches:
+      - storefront-gallery-newyear-20261031
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install backend dependencies
+        run: pip install -r backend/requirements.txt
+      - name: Compile backend
+        run: python -m py_compile backend/main.py
+      - name: Run backend smoke tests
+        working-directory: backend
+        run: python test_backend.py
+      - name: Check storefront JavaScript syntax
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          for (const file of ['index.html', 'admin.html']) {
+            const html = fs.readFileSync(file, 'utf8');
+            const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)];
+            if (!scripts.length) throw new Error(`No script in ${file}`);
+            scripts.forEach((match) => new Function(match[1]));
+            console.log(`OK: ${file} (${scripts.length} script block(s))`);
+          }
+          NODE

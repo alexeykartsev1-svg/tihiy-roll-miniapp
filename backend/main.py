@@ -375,8 +375,21 @@ class ProductPayload(BaseModel):
     badge: str = Field(default="", max_length=30)
     desc: str = Field(default="", max_length=1000)
     photo: str = Field(default="", max_length=1200000)
+    pieces: int = Field(default=8, ge=1, le=100)
+    details: str = Field(default="", max_length=1000)
+    gallery: list[str] = Field(default_factory=list, max_length=5)
     active: bool = True
     sort_order: int = Field(default=0, ge=0, le=10000)
+
+    @field_validator("gallery")
+    @classmethod
+    def validate_gallery(cls, value: list[str]) -> list[str]:
+        for image in value:
+            if not isinstance(image, str) or len(image) > 1_000_000:
+                raise ValueError("Каждая дополнительная фотография должна быть не больше 1 МБ.")
+            if image and not (image.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", image)):
+                raise ValueError("Дополнительные фотографии должны быть HTTPS-ссылками или JPG, PNG, WebP.")
+        return value
 
 def admin_from_header(x_telegram_init_data: str | None) -> None:
     if not x_telegram_init_data:
@@ -589,14 +602,16 @@ DEFAULT_SITE_CONTENT = {
         {"title":"Собери свой сет","accent":"на свой вкус","desc":"Выбирай любимые роллы и создай собственное сочетание.","image":"","button":"Собрать сет","active":True}
     ],
     "sets": [
-        {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":""},
-        {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":""},
-        {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":""},
-            ],
+        {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":"","photos":[]},
+        {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":"","photos":[]},
+        {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[]},
+        {"id":"newyear","description":"Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[]}
+    ],
     "promo_title":"Закажи к удобному времени",
     "promo_text":"Выбирай блюда заранее — мы приготовим заказ к согласованному времени.",
     "promo_button":"Перейти к меню",
-    "promo_link":"#menu"
+    "promo_link":"#menu",
+    "promo_image":""
 }
 def read_site_content() -> dict[str, Any]:
     try:
@@ -633,12 +648,14 @@ async def admin_get_site_content(x_telegram_init_data: str | None = Header(defau
 async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
     admin_from_header(x_telegram_init_data)
     current = read_site_content()
-    limits = {"hero_title":160, "hero_subtitle":300, "hero_button":50, "promo_title":120, "promo_text":500, "promo_button":50, "promo_link":300}
+    limits = {"hero_title":160, "hero_subtitle":300, "hero_button":50, "promo_title":120, "promo_text":500, "promo_button":50, "promo_link":300, "promo_image":1_000_000}
     for key, limit in limits.items():
         if key in payload:
             value = payload[key]
             if not isinstance(value, str) or len(value.strip()) > limit:
                 raise HTTPException(status_code=400, detail=f"Поле {key}: слишком длинный текст или неверный формат.")
+            if key == "promo_image" and value and not (value.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", value)):
+                raise HTTPException(status_code=400, detail="Для рекламного фото загрузи JPG, PNG, WebP или укажи HTTPS-ссылку.")
             current[key] = value.strip()
     if "slides" in payload:
         slides = payload["slides"]
@@ -649,19 +666,19 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
             if not isinstance(slide, dict):
                 raise HTTPException(status_code=400, detail=f"Слайд {i+1}: неверный формат.")
             row = {}
-            for key, limit in (("title",120),("accent",120),("desc",300),("image",1500),("button",50)):
+            for key, limit in (("title",120),("accent",120),("desc",300),("image",1_000_000),("button",50)):
                 value = slide.get(key, "")
                 if not isinstance(value, str) or len(value) > limit:
                     raise HTTPException(status_code=400, detail=f"Слайд {i+1}: проверь поле {key}.")
-                if key == "image" and value and not value.startswith(("https://", "data:image/")):
-                    raise HTTPException(status_code=400, detail="Для изображения укажи HTTPS-ссылку или загруженное изображение.")
+                if key == "image" and value and not (value.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", value)):
+                    raise HTTPException(status_code=400, detail="Для изображения укажи HTTPS-ссылку или загрузи JPG, PNG, WebP.")
                 row[key] = value.strip()
             row["active"] = bool(slide.get("active", True))
             clean.append(row)
         current["slides"] = clean
     if "sets" in payload:
         sets = payload["sets"]
-        allowed_set_ids = {"solo", "duo", "party"}
+        allowed_set_ids = {"solo", "duo", "party", "newyear"}
         if not isinstance(sets, list) or len(sets) > 4:
             raise HTTPException(status_code=400, detail="Можно настроить не более 4 готовых сетов.")
         clean_sets = []
@@ -678,10 +695,19 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: описание должно быть до 300 символов.")
             if not isinstance(image, str) or len(image) > 1_000_000:
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: фотография слишком большая.")
-            if image and not image.startswith("https://"):
-                if not re.match(r"^data:image/(jpeg|png|webp);base64,", image):
-                    raise HTTPException(status_code=400, detail=f"Сет {index+1}: используй HTTPS-ссылку или загрузи JPG, PNG, WebP.")
-            clean_sets.append({"id": set_id, "description": description.strip(), "image": image.strip()})
+            if image and not (image.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", image)):
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: используй HTTPS-ссылку или загрузи JPG, PNG, WebP.")
+            photos = item.get("photos", [])
+            if not isinstance(photos, list) or len(photos) > 5:
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: можно загрузить не более 5 дополнительных фотографий.")
+            clean_photos = []
+            for photo_index, photo in enumerate(photos):
+                if not isinstance(photo, str) or len(photo) > 1_000_000:
+                    raise HTTPException(status_code=400, detail=f"Фото {photo_index+1} сета {index+1}: файл слишком большой.")
+                if photo and not (photo.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", photo)):
+                    raise HTTPException(status_code=400, detail=f"Фото {photo_index+1} сета {index+1}: нужен HTTPS URL или JPG, PNG, WebP.")
+                clean_photos.append(photo.strip())
+            clean_sets.append({"id": set_id, "description": description.strip(), "image": image.strip(), "photos": clean_photos})
             seen.add(set_id)
         current["sets"] = clean_sets
     write_site_content(current)
