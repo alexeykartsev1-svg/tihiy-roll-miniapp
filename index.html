@@ -47,6 +47,43 @@
         <div class="empty-state" id="emptyState" hidden>В этой категории пока нет блюд.</div>
       </div>
 
+      <section class="workflow-screen home-screen" id="homeScreen" aria-label="Главная">
+        <div class="workflow-scroll home-scroll">
+          <div class="workflow-topbar">
+            <span class="home-top-spacer"></span>
+            <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
+            <div class="header-actions">
+              <button class="header-icon" type="button" data-open-favorites aria-label="Избранное">♡<b id="homeFavCount">0</b></button>
+              <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="homeCartCount">0</b></button>
+            </div>
+          </div>
+          <section class="home-hero">
+            <span class="home-eyebrow">СВЕЖЕЕ К ВАШЕМУ ВРЕМЕНИ</span>
+            <h2>Тихий ролл</h2>
+            <p>Любимые роллы, сеты и азиатские закуски. Готовим к выбранному времени — чтобы вы получили заказ свежим.</p>
+            <div class="home-actions">
+              <button class="add-cart-button" type="button" data-home-catalog>Открыть каталог <span>›</span></button>
+              <button class="home-secondary" type="button" data-home-builder>Собрать свой сет</button>
+            </div>
+          </section>
+          <section class="home-section">
+            <div class="home-section-heading"><span>ВЫБИРАЙТЕ СВОЁ</span><h3>Что сегодня хочется?</h3></div>
+            <div class="home-shortcuts">
+              <button type="button" data-home-filter="sets"><span>🍱</span><b>Сеты</b><small>Готовые наборы</small></button>
+              <button type="button" data-home-filter="rolls"><span>🍣</span><b>Роллы</b><small>Любимая классика</small></button>
+              <button type="button" data-home-filter="dogs"><span>🌭</span><b>Хот-доги</b><small>Азиатский вкус</small></button>
+              <button type="button" data-home-filter="snacks"><span>🍤</span><b>Закуски</b><small>К заказу</small></button>
+            </div>
+          </section>
+          <section class="home-pickup-card">
+            <span class="home-eyebrow">САМОВЫВОЗ</span>
+            <b>Забрать заказ</b>
+            <p id="homePickupAddress">Адрес загрузится из настроек магазина</p>
+            <button type="button" data-home-catalog>Выбрать блюда <span>›</span></button>
+          </section>
+        </div>
+      </section>
+
       <section class="workflow-screen" id="builderScreen" aria-label="Конструктор сета">
         <div class="workflow-scroll">
           <div class="workflow-topbar">
@@ -82,7 +119,7 @@
             <span>Выбрано: <b id="builderPositions">0 поз.</b></span>
             <small><span id="builderPieces">0 шт.</span> · <span id="builderWeight">0 г</span></small>
           </div>
-          <strong id="builderTotal">0 ₽</strong>
+          <div class="builder-summary-total"><span>Стоимость</span><strong id="builderTotal">0 ₽</strong></div>
           <button class="add-cart-button" type="button" id="builderAddToCart" disabled>Добавить в корзину <span>›</span></button>
         </div>
       </section>
