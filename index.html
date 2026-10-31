@@ -60,7 +60,7 @@
     <section class="device-frame detail-device" id="detailDevice" aria-label="Карточка выбранного товара">
       <div class="detail-image-stage">
         <div class="device-status detail-status"><span>9:41</span><span class="status-icons"><i class="signal"></i><i class="wifi"></i><i class="battery"></i></span></div>
-        <img id="detailHero" src="./assets/set-party.webp" alt="Филадельфия">
+        <img id="detailHero" src="./assets/set-party.webp" alt="Филадельфия"><div class="detail-photo-count" id="detailPhotoCount">1 / 5</div>
         <div class="detail-topbar">
           <button class="round-icon detail-back" type="button" id="detailBack" aria-label="Назад">‹</button>
           <div class="detail-top-actions">
@@ -87,18 +87,13 @@
             <strong class="detail-price" id="detailPrice">450 ₽</strong>
           </div>
           <div class="composition-block">
-            <h3>Состав</h3>
+            <h3 id="detailCompositionTitle">Состав</h3>
             <div class="ingredient-grid" id="ingredientGrid">
               <div><strong class="ingredient-emoji">🐟</strong><span>Лосось</span></div>
               <div><strong class="ingredient-emoji">🧀</strong><span>Сливочный<br>сыр</span></div>
               <div><strong class="ingredient-emoji">🥒</strong><span>Огурец</span></div>
               <div><strong class="ingredient-emoji">🍚</strong><span>Рис</span></div>
               <div><strong class="ingredient-emoji">🌿</strong><span>Нори</span></div>
-            </div>
-              <div><img src="./assets/set-party.webp" alt="><span>Сливочный<br>сыр</span></div>
-              <div><img src="./assets/set-party.webp" alt="><span>Огурец</span></div>
-              <div><img src="./assets/set-party.webp" alt="><span>Рис</span></div>
-              <div><img src="./assets/set-party.webp" alt="><span>Нори</span></div>
             </div>
           </div>
           <div class="detail-buy-row">
@@ -107,7 +102,8 @@
           </div>
           <div class="quality-strip">
             <div><span>♧</span><small>Всегда<br>свежие продукты</small></div>
-            <div><span>♧</span><small>Готовим<br>в день заказа</small></div>
+            <div><span>♙</span><small>Готовим<br>в день заказа</small></div>
+            <div><span>🚚</span><small>Быстрая<br>доставка</small></div>
             <div><span>♙</span><small>Гарантия<br>качества</small></div>
           </div>
           <div class="detail-extra" id="detailExtra"></div>
