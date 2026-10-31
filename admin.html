@@ -238,9 +238,9 @@ function renderSetContentEditor(){
   const existingItems=Array.isArray(saved.items)?saved.items:def.items.map(([id,qty])=>({id,qty}));
   siteSetItems[def.id]=existingItems.map(row=>({id:row.id,qty:Number(row.qty)||0})).filter(row=>row.qty>0);
   siteSetActive[def.id]=saved.active!==false;
-  siteSetStock[def.id]=Number(saved.stock)||0;
+  siteSetStock[def.id]=saved.stock==null?null:Number(saved.stock);
   const box=document.createElement('div');box.className='set-admin-card';
-  box.innerHTML='<div class="set-admin-fields"><strong></strong><div class="field"><label>Описание на карточке</label><textarea maxlength="300" data-set-field="'+def.id+'"></textarea></div><div class="field"><label>Ссылка на главное фото (можно оставить пустой)</label><input type="url" maxlength="2000" data-set-url="'+def.id+'" placeholder="HTTPS или загрузить файл ниже"></div><div class="field"><label>Главное фото</label><input class="set-admin-file" type="file" accept="image/jpeg,image/png,image/webp" data-set-file="'+def.id+'"></div><div class="field"><label>Дополнительные фото — до 5</label><div class="admin-gallery-grid" data-set-gallery="'+def.id+'"></div></div></div><div class="set-admin-image"><img class="set-admin-preview" data-set-preview="'+def.id+'" alt=""><button class="btn" type="button" data-set-clear="'+def.id+'">Сбросить главное фото</button><div class="help">Фото загружаются с компьютера и сжимаются автоматически.</div></div><div class="set-composition-admin"><h4>Состав сета</h4><p class="help">Выбирай товары и указывай количество порций в составе.</p><div data-set-items="'+def.id+'"></div><div class="set-admin-options"><label><input type="checkbox" data-set-active="'+def.id+'"> Показывать на сайте</label><label>Остаток наборов <input type="number" min="0" max="10000" data-set-stock="'+def.id+'"></label></div></div>';
+  box.innerHTML='<div class="set-admin-fields"><strong></strong><div class="field"><label>Описание на карточке</label><textarea maxlength="300" data-set-field="'+def.id+'"></textarea></div><div class="field"><label>Ссылка на главное фото (можно оставить пустой)</label><input type="url" maxlength="2000" data-set-url="'+def.id+'" placeholder="HTTPS или загрузить файл ниже"></div><div class="field"><label>Главное фото</label><input class="set-admin-file" type="file" accept="image/jpeg,image/png,image/webp" data-set-file="'+def.id+'"></div><div class="field"><label>Дополнительные фото — до 5</label><div class="admin-gallery-grid" data-set-gallery="'+def.id+'"></div></div></div><div class="set-admin-image"><img class="set-admin-preview" data-set-preview="'+def.id+'" alt=""><button class="btn" type="button" data-set-clear="'+def.id+'">Сбросить главное фото</button><div class="help">Фото загружаются с компьютера и сжимаются автоматически.</div></div><div class="set-composition-admin"><h4>Состав сета</h4><p class="help">Выбирай товары и указывай количество порций в составе.</p><div data-set-items="'+def.id+'"></div><div class="set-admin-options"><label><input type="checkbox" data-set-active="'+def.id+'"> Показывать на сайте</label><label>Остаток наборов (пусто — без учёта; 0 — нет в наличии) <input type="number" min="0" max="10000" placeholder="Без ограничений" data-set-stock="'+def.id+'"></label></div></div>';
   root.append(box);
   box.querySelector('strong').textContent=def.title;
   box.querySelector('[data-set-field="'+def.id+'"]').value=typeof saved.description==='string'?saved.description:def.description;
@@ -250,9 +250,9 @@ function renderSetContentEditor(){
   url.value=isData?'':image;
   preview.src=safeImage(image||def.image);
   box.querySelector('[data-set-active="'+def.id+'"]').checked=siteSetActive[def.id];
-  box.querySelector('[data-set-stock="'+def.id+'"]').value=siteSetStock[def.id];
+  box.querySelector('[data-set-stock="'+def.id+'"]').value=siteSetStock[def.id]==null?'':String(siteSetStock[def.id]);
   box.querySelector('[data-set-active="'+def.id+'"]').addEventListener('change',event=>siteSetActive[def.id]=event.target.checked);
-  box.querySelector('[data-set-stock="'+def.id+'"]').addEventListener('input',event=>siteSetStock[def.id]=Math.max(0,Number(event.target.value)||0));
+  box.querySelector('[data-set-stock="'+def.id+'"]').addEventListener('input',event=>siteSetStock[def.id]=event.target.value===''?null:Math.max(0,Math.min(10000,Number(event.target.value)||0)));
   const itemsRoot=box.querySelector('[data-set-items="'+def.id+'"]');
   (Array.isArray(products)?products:[]).forEach(product=>{
    const row=document.createElement('div');row.className='set-product-choice';
@@ -301,7 +301,7 @@ $('saveContent').addEventListener('click',async()=>{
   payload.sets=['solo','duo','party','newyear'].map(id=>{
    const description=document.querySelector('[data-set-field="'+id+'"]');
    const url=document.querySelector('[data-set-url="'+id+'"]');
-   return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5),items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:Math.max(0,Number(siteSetStock[id])||0)};
+   return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5),items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
   });
   $('saveContent').disabled=true;await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify(payload)});status('Оформление, описания и фото готовых сетов сохранены. Открой магазин заново, чтобы увидеть обновления.','ok');
  }catch(e){status(e.message,'error')}finally{$('saveContent').disabled=false}
