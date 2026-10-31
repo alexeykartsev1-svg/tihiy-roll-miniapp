@@ -142,14 +142,16 @@
       const id=b.dataset.go;activate(id);
       if(id==='products'&&$('add'))$('add').focus({preventScroll:true});
     }));
-    const observer=new MutationObserver(()=>{
+    const syncHome=()=>{
       if($('analyticsSummary'))$('homeOrders').textContent=$('analyticsSummary').textContent.replace(/^Заказов:\s*/,'').slice(0,45)||'Нет данных';
       if($('status')&&$('status').classList.contains('ok'))$('homeAccess').textContent='Доступ подтверждён';
       if($('list'))$('homeProductCount').textContent=$('list').querySelectorAll('.row').length||'0';
-    });
+    };
+    const observer=new MutationObserver(syncHome);
     if($('analyticsSummary'))observer.observe($('analyticsSummary'),{childList:true,subtree:true,characterData:true});
     if($('list'))observer.observe($('list'),{childList:true,subtree:true});
     if($('status'))observer.observe($('status'),{childList:true,subtree:true,attributes:true});
+    syncHome();
     const preferred=(()=>{try{return sessionStorage.getItem('tihiy-admin-page')}catch(_){return null}})();
     activate(navItems.some(x=>x[0]===preferred)?preferred:'home');
   }
