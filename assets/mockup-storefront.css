@@ -351,3 +351,92 @@
 .cart-line .cart-qty button{width:31px;height:31px;border:1px solid rgba(179,199,211,.4);border-radius:9px;font-size:20px}
 .cart-line .cart-qty span{font-size:13px;font-weight:800}
 .cart-line .basket-item-price{font-size:14px;font-weight:850}
+
+/* Favorites, category states and compact add/remove controls */
+.favorites-screen .workflow-scroll{background:radial-gradient(ellipse at 18% 0,rgba(255,88,63,.16),transparent 42%),linear-gradient(180deg,#090e12 0%,#03080c 64%,#020609 100%)}
+.favorites-page-heading{padding:12px 2px 16px}
+.favorites-page-heading h2{margin:0 0 3px;color:#f7f8f9;font-size:clamp(30px,8vw,38px);line-height:1.05;font-weight:900;letter-spacing:-.8px}
+.favorites-page-heading p{margin:0;color:#c1cbd1;font-size:16px;line-height:1.35}
+.favorites-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-bottom:20px}
+.favorites-grid .product-card{border-color:rgba(156,181,195,.28);border-radius:15px;background:linear-gradient(155deg,rgba(15,25,32,.98),rgba(4,10,15,.99))}
+.favorites-grid .card-photo{height:clamp(118px,31vw,160px)}
+.favorites-grid .card-info{padding:8px 9px 10px}
+.favorites-grid .card-title{font-size:15px;line-height:1.12;white-space:normal;min-height:2.1em}
+.favorites-grid .card-meta{gap:10px;font-size:12px}
+.favorites-grid .card-price{font-size:21px}
+.favorites-empty{padding:28px 18px;line-height:1.5}
+.card-add{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.23);border-radius:12px;background:linear-gradient(145deg,#ff5543,#ef2928);color:#fff;font-size:31px;font-weight:500;line-height:1;box-shadow:0 5px 14px rgba(255,45,34,.23)}
+.card-add:active{transform:scale(.94);filter:brightness(1.18)}
+.card-quantity{display:grid;grid-template-columns:34px 26px 34px;align-items:center;justify-items:stretch;flex:0 0 auto;height:42px;overflow:hidden;border:1px solid rgba(177,198,209,.34);border-radius:12px;background:rgba(5,13,19,.94);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.card-quantity button{height:100%;min-width:0;border:0;background:linear-gradient(145deg,rgba(255,82,66,.98),rgba(224,42,39,.98));color:white;font-size:23px;line-height:1;font-weight:650}
+.card-quantity button:disabled{opacity:.4}
+.card-quantity span{display:grid;place-items:center;height:100%;color:#fff;font-size:14px;font-weight:850}
+.card-bottom{gap:6px}
+.card-bottom .card-price{min-width:0;font-size:clamp(17px,4.8vw,22px)}
+.category-tile{transition:transform .14s,border-color .14s,background .14s,box-shadow .14s}
+.category-tile.active{border:1px solid rgba(255,151,133,.86);background:linear-gradient(145deg,#ff7047,#f72b26);box-shadow:0 0 0 3px rgba(255,65,54,.12),0 8px 20px rgba(255,54,38,.32);color:#fff}
+.category-tile:active,.builder-filter:active,.home-shortcuts button:active,.home-secondary:active{transform:scale(.97);filter:brightness(1.15)}
+.builder-filter.active{border-color:#ff7869;box-shadow:0 0 0 3px rgba(255,65,54,.12),0 7px 18px rgba(255,48,45,.28);color:#fff}
+.bottom-nav button.active{color:#ff5147}
+.bottom-nav button.active .nav-icon{color:#ff5147;text-shadow:0 0 15px rgba(255,69,58,.32)}
+.home-actions .add-cart-button:active,.home-secondary:active{box-shadow:0 0 0 3px rgba(255,76,60,.16)}
+/* Equal-size date and time controls on narrow Telegram WebViews */
+.checkout-form .form-row{
+ display:grid!important;
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ align-items:start!important;
+ gap:11px!important;
+ width:100%!important;
+}
+.checkout-form .form-row>label{
+ display:grid!important;
+ grid-template-rows:min-content 56px!important;
+ align-content:start!important;
+ align-self:start!important;
+ gap:7px!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:100%!important;
+ margin:0!important;
+}
+.checkout-form .form-row input,
+.checkout-form .form-row select{
+ display:block!important;
+ box-sizing:border-box!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:100%!important;
+ height:56px!important;
+ min-height:56px!important;
+ max-height:56px!important;
+ margin:0!important;
+ padding:0 9px!important;
+ font-size:14px!important;
+ line-height:1.1!important;
+}
+.checkout-form .form-row input[type="date"]{
+ -webkit-appearance:none;
+ appearance:none;
+ color-scheme:dark;
+ letter-spacing:-.25px;
+}
+.checkout-form .form-row select{
+ -webkit-appearance:none;
+ appearance:none;
+ padding-right:25px!important;
+ background-image:linear-gradient(45deg,transparent 50%,#ff9a8e 50%),linear-gradient(135deg,#ff9a8e 50%,transparent 50%);
+ background-position:calc(100% - 14px) 24px,calc(100% - 9px) 24px;
+ background-size:5px 5px,5px 5px;
+ background-repeat:no-repeat;
+}
+@media(max-width:380px){
+ .checkout-form .form-row{gap:7px!important}
+ .checkout-form .form-row input,.checkout-form .form-row select{padding-left:7px!important;padding-right:7px!important;font-size:13px!important}
+ .favorites-grid{gap:8px}
+ .favorites-grid .card-info{padding:7px}
+ .favorites-grid .card-title{font-size:13px}
+ .favorites-grid .card-meta{font-size:10px;gap:7px}
+ .favorites-grid .card-price{font-size:18px}
+ .card-add{width:40px;height:40px;flex-basis:40px}
+ .card-quantity{grid-template-columns:30px 23px 30px;height:38px}
+}
