@@ -1823,6 +1823,7 @@ async function loadServerCatalog() {
     // Keep local photos for products not yet seeded by server; normal admin-created products arrive from API.
     products.splice(0, products.length, ...merged);
     renderCustomSetBuilder();
+    renderSetPrices();
     await loadCategoryFilters();
     Object.keys(cart).forEach(id => {
       const product=products.find(p=>p.id===id);
