@@ -31,13 +31,15 @@ jobs:
         run: |
           node - <<'NODE'
           const fs = require('node:fs');
-          for (const file of ['index.html', 'admin.html', 'assets/admin-workspace.js']) {
+          for (const file of ['index.html', 'admin.html']) {
             const html = fs.readFileSync(file, 'utf8');
             const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)];
             if (!scripts.length) throw new Error(`No script in ${file}`);
             scripts.forEach((match) => new Function(match[1]));
             console.log(`OK: ${file} (${scripts.length} script block(s))`);
           }
+          new Function(fs.readFileSync('assets/admin-workspace.js', 'utf8'));
+          console.log('OK: assets/admin-workspace.js');
           const front = fs.readFileSync('index.html', 'utf8');
           const admin = fs.readFileSync('admin.html', 'utf8');
           for (const asset of ['assets/premium-storefront.css', 'assets/premium-admin.css', 'assets/admin-workspace.js']) {
