@@ -88,6 +88,23 @@ async function loadOrders(){
     const data=await api('/api/admin/orders?limit=100');
     const summary=data.summary||{};
     const analytics=await api('/api/admin/analytics');
+    const reportOrders=Array.isArray(data.orders)?data.orders:[];
+    const now=new Date();
+    const dayKeys=[];
+    for(let offset=6;offset>=0;offset--){const day=new Date(now);day.setDate(now.getDate()-offset);day.setHours(0,0,0,0);dayKeys.push({key:day.toLocaleDateString('ru-RU'),label:day.toLocaleDateString('ru-RU',{weekday:'short',day:'numeric'}),revenue:0,orders:0})}
+    const dayIndex=new Map(dayKeys.map((day,index)=>[day.key,index]));
+    const statusCounts={new:0,accepted:0,preparing:0,ready:0,completed:0,cancelled:0};
+    reportOrders.forEach(order=>{
+      if(statusCounts[order.status]!==undefined)statusCounts[order.status]++;
+      const when=new Date(order.created_at||'');
+      if(Number.isNaN(when.getTime()))return;
+      const index=dayIndex.get(when.toLocaleDateString('ru-RU'));
+      if(index===undefined)return;
+      dayKeys[index].orders++;
+      if(order.status!=='cancelled')dayKeys[index].revenue+=Number(order.total)||0;
+    });
+    window.__TIHIY_ADMIN_REPORT__={summary:analytics,trend:dayKeys,statusCounts,recentOrdersCount:reportOrders.length};
+    window.dispatchEvent(new CustomEvent('tihiy:analytics-updated'));
     $('analyticsSummary').textContent='Заказов: '+(analytics.orders_count||0)+' · Выручка без отмен: '+new Intl.NumberFormat('ru-RU').format(analytics.revenue||0)+' ₽ · Валовая прибыль (по заполненной себестоимости): '+new Intl.NumberFormat('ru-RU').format(analytics.gross_profit||0)+' ₽ · В работе: '+(analytics.active_orders||0);
     const list=$('ordersList');list.replaceChildren();
     if(!data.orders||!data.orders.length){list.textContent='Пока нет сохранённых заказов.';return}
