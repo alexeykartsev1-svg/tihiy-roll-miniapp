@@ -489,6 +489,6 @@ $('#checkoutForm').addEventListener('submit',sendOrder);
 $('#deliveryAddress').addEventListener('change',updateDeliveryMap);
 
 $$('.modal-layer').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
-window.addEventListener('keydown',e=>{if(e.key==='Escape'){['cartModal','favoritesModal','filtersModal'].forEach(closeModal);$('#detailDevice').classList.remove('mobile-active');}});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){['cartModal','favoritesModal','filtersModal','builderInfoModal'].forEach(closeModal);$('#detailDevice').classList.remove('mobile-active');}});
 load().catch(e=>{console.error(e);toast('Не удалось загрузить меню.');});
 })();
