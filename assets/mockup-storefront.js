@@ -101,10 +101,18 @@ function renderAll(){renderCatalog();renderBadges();renderCart();renderFavorites
 function openModal(id){const n=$('#'+id);n.classList.add('show');n.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';if(id==='cartModal'){renderCart();preparePickup();updateCheckoutFulfillment($('#fulfillment').value||'Самовывоз');}if(id==='favoritesModal')renderFavorites();if(id==='filtersModal')renderFilterOptions();}
 function closeModal(id){const n=$('#'+id);if(!n)return;n.classList.remove('show');n.setAttribute('aria-hidden','true');if(!$('.modal-layer.show'))document.body.style.overflow='';}
 function renderFilterOptions(){const options=[['all','Все позиции'],['sets','Сеты'],['rolls','Роллы'],['dogs','Азиатские хот-доги'],['snacks','Закуски']];$('#filterOptions').innerHTML=options.map(x=>'<button type="button" data-filter-option="'+x[0]+'" class="'+(state.filter===x[0]?'active':'')+'">'+x[1]+'</button>').join('');}
+function showGalleryPhoto(index){
+ if(!state.photos.length)return;
+ state.photoIndex=((index%state.photos.length)+state.photos.length)%state.photos.length;
+ $('#detailHero').src=state.photos[state.photoIndex];
+ $('.thumb').forEach((button,i)=>button.classList.toggle('active',i===state.photoIndex));
+ const counter=$('#detailPhotoCount');
+ if(counter)counter.textContent=(state.photoIndex+1)+' / '+state.photos.length;
+}
 function detail(p,openOnMobile=true){
  if(!p)return;
  state.selected=p;state.detailQty=1;
- state.photos=p.set?setGallery(p.set):[photo(p),...state.products.filter(x=>x.id!==p.id).map(x=>photo(x))].filter(Boolean).slice(0,5);
+ state.photos=p.set?setGallery(p.set):[photo(p),...(Array.isArray(p.gallery)?p.gallery:[])].filter(Boolean).slice(0,5);
  state.photos=Array.from(new Set(state.photos)).slice(0,5);state.photoIndex=0;
  $('#detailHero').src=state.photos[0]||photo(p);$('#detailHero').alt=p.name;
  $('#detailName').textContent=p.name;$('#detailDescription').textContent=p.desc||'Свежеприготовленное блюдо.';
@@ -241,13 +249,15 @@ function activateWorkflow(screen){
 }
 function returnToCatalogue(){
  state.activeScreen='catalogue';
+ $('#detailDevice').classList.remove('mobile-active');
+ document.body.classList.remove('detail-open');
  $('.reference-board').classList.remove('workflow-mode');
  $('.catalogue-device').classList.remove('workflow-mode');
  $$('.workflow-screen').forEach(x=>x.classList.remove('active'));
  $$('.bottom-nav button').forEach(x=>x.classList.toggle('active',x.dataset.nav==='catalogue'));
  document.body.style.overflow='';
 }
-function showHomeScreen(){activateWorkflow('homeScreen');}
+function showHomeScreen(){syncHomeShortcutState();updateStoreHours();activateWorkflow('homeScreen');}
 function showFavoritesScreen(){renderFavorites();activateWorkflow('favoritesScreen');}
 function showBuilderScreen(){renderBuilder();activateWorkflow('builderScreen');}
 function showCartScreen(){renderCart();activateWorkflow('basketScreen');}
@@ -302,8 +312,56 @@ async function checkAdminEntry(initData){
   if(result.is_admin===true){link.hidden=false;link.setAttribute('aria-hidden','false');}
  }catch(error){console.warn('Admin entry check failed',error);}
 }
-async function load(){let fallback={products:[]};try{fallback=await (await fetch('./assets/local-catalog-fallback.json',{cache:'force-cache'})).json();}catch(e){}const results=await Promise.allSettled([apiGet('/api/menu'),apiGet('/api/site-content'),apiGet('/api/store-settings')]);const local=new Map((fallback.products||[]).map(p=>[p.id,p]));state.products=results[0].status==='fulfilled'?results[0].value.filter(p=>p.active!==false).map(p=>({...local.get(p.id),...p,photo:p.photo||local.get(p.id)?.photo||''})):fallback.products||[];state.sets=results[1].status==='fulfilled'?(results[1].value.sets||[]).filter(s=>s.active!==false):[];state.settings=results[2].status==='fulfilled'?results[2].value:{};const pickupHome=$('#homePickupAddress');if(pickupHome)pickupHome.textContent=state.settings.pickup_address||'Социалистическая, 26, Чарышское';loadSaved();for(const id of Object.keys(state.cart)){const p=find(id);if(!p){delete state.cart[id];continue;}if(stock(p)!==null)state.cart[id]=Math.min(stock(p),qty(id));}renderAll();const first=find('philadelphia')||state.products[0];if(first)detail(first,false);const app=tg();if(app){app.ready();app.expand();if(app.initData)checkAdminEntry(app.initData);}const settings=state.settings,phone=settings.phone||'+7 923 000-58-57',digits=phone.replace(/\D/g,'');$('#headerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));$('#footerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));}
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.filter){state.filter=b.dataset.filter;$$('.category-tile').forEach(x=>x.classList.toggle('active',x===b));renderCatalog();return;}if(b.dataset.cardQty){const id=b.dataset.id,delta=Number(b.dataset.cardQty)||0;if(id.startsWith('set:'))changeSetCart(id.slice(4),delta);else changeCart(id,delta);return;}if(b.dataset.add){const id=b.dataset.add;if(id.startsWith('set:'))addSet(state.sets.find(s=>s.id===id.slice(4)));else addProduct(find(id),1);return;}if(b.dataset.fav){const id=b.dataset.fav;state.favorites.has(id)?state.favorites.delete(id):state.favorites.add(id);save();renderAll();return;}if(b.dataset.cartQty){changeCart(b.dataset.id,Number(b.dataset.cartQty));return;}if(b.dataset.cartRemove){changeCart(b.dataset.cartRemove,-qty(b.dataset.cartRemove));return;}if(b.dataset.builderFilter!==undefined){state.builderFilter=b.dataset.builderFilter;renderBuilder();return;}if(b.dataset.builderProduct){changeBuilderProduct(b.dataset.builderProduct,Number(b.dataset.delta)||0);return;}if(b.dataset.builderSet){changeBuilderSet(b.dataset.builderSet,Number(b.dataset.delta)||0);return;}if(b.hasAttribute('data-workflow-back')){returnToCatalogue();return;}if(b.id==='builderAddToCart'){addBuilderToCart();return;}if(b.id==='cartCheckout'){openModal('cartModal');return;}if(b.id==='cartKeepShopping'){returnToCatalogue();return;}if(b.id==='confirmationHome'){showHomeScreen();return;}if(b.hasAttribute('data-open-cart')){showCartScreen();return;}if(b.hasAttribute('data-open-favorites')){openModal('favoritesModal');return;}if(b.dataset.close){closeModal(b.dataset.close);return;}if(b.dataset.photoIndex!==undefined){state.photoIndex=Number(b.dataset.photoIndex);$('#detailHero').src=state.photos[state.photoIndex];$$('.thumb').forEach((x,i)=>x.classList.toggle('active',i===state.photoIndex));const counter=$('#detailPhotoCount');if(counter)counter.textContent=(state.photoIndex+1)+' / '+state.photos.length;return;}if(b.hasAttribute('data-gallery-next')){state.photoIndex=(state.photoIndex+1)%state.photos.length;$('#detailHero').src=state.photos[state.photoIndex];$$('.thumb').forEach((x,i)=>x.classList.toggle('active',i===state.photoIndex));const counter=$('#detailPhotoCount');if(counter)counter.textContent=(state.photoIndex+1)+' / '+state.photos.length;return;}if(b.id==='detailBack'){document.body.classList.remove('detail-open');$('#detailDevice').classList.remove('mobile-active');return;}if(b.id==='detailMinus'){changeDetail(-1);return;}if(b.id==='detailPlus'){changeDetail(1);return;}if(b.id==='detailAdd'){addSelected();return;}if(b.id==='detailFavorite'&&state.selected){const id=state.selected.id;state.favorites.has(id)?state.favorites.delete(id):state.favorites.add(id);save();renderBadges();b.textContent=state.favorites.has(id)?'♥':'♡';return;}if(b.id==='detailShare'){if(navigator.share)navigator.share({title:state.selected?.name||'Тихий ролл',url:location.href}).catch(()=>{});else toast('Поделись ссылкой на магазин.');return;}if(b.id==='filterOpen'||b.classList.contains('menu-trigger')){openModal('filtersModal');return;}if(b.dataset.filterOption){state.filter=b.dataset.filterOption;renderFilterOptions();return;}if(b.id==='applyFilters'){renderCatalog();closeModal('filtersModal');return;}if(b.dataset.removeFav){state.favorites.delete(b.dataset.removeFav);save();renderFavorites();renderBadges();return;}if(b.dataset.fulfillment){updateCheckoutFulfillment(b.dataset.fulfillment);return;}if(b.hasAttribute('data-home-catalog')){returnToCatalogue();return;}if(b.hasAttribute('data-home-builder')){showBuilderScreen();return;}if(b.dataset.homeFilter){state.filter=b.dataset.homeFilter;returnToCatalogue();$('.category-tile').forEach(x=>x.classList.toggle('active',x.dataset.filter===state.filter));renderCatalog();return;}if(b.dataset.nav==='home'){showHomeScreen();return;}if(b.dataset.nav==='favorites'){showFavoritesScreen();return;}if(b.dataset.nav==='catalogue'){returnToCatalogue();return;}if(b.dataset.nav==='builder'){showBuilderScreen();return;}if(b.dataset.nav==='cart'){showCartScreen();return;}});
+function updateStoreHours(){
+ const dayNames={Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6,Sun:7};
+ let parts;
+ try{
+  parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Barnaul',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+ }catch(_){
+  parts=new Intl.DateTimeFormat('en-US',{weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+ }
+ const value=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+ const day=dayNames[value.weekday]||0;
+ const hour=Number(value.hour)||0,minute=Number(value.minute)||0;
+ const total=hour*60+minute;
+ const workingDay=[1,2,4,5,6].includes(day);
+ const isOpen=workingDay&&total>=12*60&&total<20*60;
+ const dot=$('#homeHoursDot'),label=$('#homeHoursStatus');
+ if(dot){dot.classList.toggle('is-open',isOpen);dot.classList.toggle('is-closed',!isOpen);}
+ if(label){label.textContent=isOpen?'Мы работаем':'Не работаем';label.classList.toggle('is-open',isOpen);label.classList.toggle('is-closed',!isOpen);}
+}
+function syncHomeShortcutState(){
+ $('[data-home-filter]').forEach(button=>{
+  const selected=button.dataset.homeFilter===state.filter;
+  button.classList.toggle('active',selected);
+  button.setAttribute('aria-pressed',selected?'true':'false');
+ });
+}
+function updateHomePhone(settings){
+ const phone=String(settings?.phone||'+7 923 000-58-57').trim();
+ const dial=phone.replace(/[^+\\d]/g,'');
+ const link=$('#homePhoneOrder'),text=$('#homePhoneText');
+ if(link)link.href='tel:'+dial;
+ if(text)text.textContent=phone;
+}
+async function load(){let fallback={products:[]};try{fallback=await (await fetch('./assets/local-catalog-fallback.json',{cache:'force-cache'})).json();}catch(e){}const results=await Promise.allSettled([apiGet('/api/menu'),apiGet('/api/site-content'),apiGet('/api/store-settings')]);const local=new Map((fallback.products||[]).map(p=>[p.id,p]));state.products=results[0].status==='fulfilled'?results[0].value.filter(p=>p.active!==false).map(p=>({...local.get(p.id),...p,photo:p.photo||local.get(p.id)?.photo||''})):fallback.products||[];state.sets=results[1].status==='fulfilled'?(results[1].value.sets||[]).filter(s=>s.active!==false):[];state.settings=results[2].status==='fulfilled'?results[2].value:{};updateHomePhone(state.settings);updateStoreHours();syncHomeShortcutState();if(!window.__tihiyHoursTimer)window.__tihiyHoursTimer=setInterval(updateStoreHours,30000);const pickupHome=$('#homePickupAddress');if(pickupHome)pickupHome.textContent=state.settings.pickup_address||'Социалистическая, 26, Чарышское';loadSaved();for(const id of Object.keys(state.cart)){const p=find(id);if(!p){delete state.cart[id];continue;}if(stock(p)!==null)state.cart[id]=Math.min(stock(p),qty(id));}renderAll();const first=find('philadelphia')||state.products[0];if(first)detail(first,false);const app=tg();if(app){app.ready();app.expand();if(app.initData)checkAdminEntry(app.initData);}const settings=state.settings,phone=settings.phone||'+7 923 000-58-57',digits=phone.replace(/\D/g,'');$('#headerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));$('#footerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.filter){state.filter=b.dataset.filter;$$('.category-tile').forEach(x=>x.classList.toggle('active',x===b));renderCatalog();return;}if(b.dataset.cardQty){const id=b.dataset.id,delta=Number(b.dataset.cardQty)||0;if(id.startsWith('set:'))changeSetCart(id.slice(4),delta);else changeCart(id,delta);return;}if(b.dataset.add){const id=b.dataset.add;if(id.startsWith('set:'))addSet(state.sets.find(s=>s.id===id.slice(4)));else addProduct(find(id),1);return;}if(b.dataset.fav){const id=b.dataset.fav;state.favorites.has(id)?state.favorites.delete(id):state.favorites.add(id);save();renderAll();return;}if(b.dataset.cartQty){changeCart(b.dataset.id,Number(b.dataset.cartQty));return;}if(b.dataset.cartRemove){changeCart(b.dataset.cartRemove,-qty(b.dataset.cartRemove));return;}if(b.dataset.builderFilter!==undefined){state.builderFilter=b.dataset.builderFilter;renderBuilder();return;}if(b.dataset.builderProduct){changeBuilderProduct(b.dataset.builderProduct,Number(b.dataset.delta)||0);return;}if(b.dataset.builderSet){changeBuilderSet(b.dataset.builderSet,Number(b.dataset.delta)||0);return;}if(b.hasAttribute('data-workflow-back')){returnToCatalogue();return;}if(b.id==='builderAddToCart'){addBuilderToCart();return;}if(b.id==='cartCheckout'){openModal('cartModal');return;}if(b.id==='cartKeepShopping'){returnToCatalogue();return;}if(b.id==='confirmationHome'){showHomeScreen();return;}if(b.hasAttribute('data-open-cart')){showCartScreen();return;}if(b.hasAttribute('data-open-favorites')){openModal('favoritesModal');return;}if(b.dataset.close){closeModal(b.dataset.close);return;}if(b.dataset.photoIndex!==undefined){showGalleryPhoto(Number(b.dataset.photoIndex));return;}if(b.hasAttribute('data-gallery-next')){showGalleryPhoto(state.photoIndex+1);return;}if(b.id==='detailBack'){document.body.classList.remove('detail-open');$('#detailDevice').classList.remove('mobile-active');return;}if(b.id==='detailMinus'){changeDetail(-1);return;}if(b.id==='detailPlus'){changeDetail(1);return;}if(b.id==='detailAdd'){addSelected();return;}if(b.id==='detailFavorite'&&state.selected){const id=state.selected.id;state.favorites.has(id)?state.favorites.delete(id):state.favorites.add(id);save();renderBadges();b.textContent=state.favorites.has(id)?'♥':'♡';return;}if(b.id==='detailShare'){if(navigator.share)navigator.share({title:state.selected?.name||'Тихий ролл',url:location.href}).catch(()=>{});else toast('Поделись ссылкой на магазин.');return;}if(b.id==='filterOpen'||b.classList.contains('menu-trigger')){openModal('filtersModal');return;}if(b.dataset.filterOption){state.filter=b.dataset.filterOption;renderFilterOptions();return;}if(b.id==='applyFilters'){renderCatalog();closeModal('filtersModal');return;}if(b.dataset.removeFav){state.favorites.delete(b.dataset.removeFav);save();renderFavorites();renderBadges();return;}if(b.dataset.fulfillment){updateCheckoutFulfillment(b.dataset.fulfillment);return;}if(b.hasAttribute('data-home-catalog')){returnToCatalogue();return;}if(b.hasAttribute('data-home-builder')){showBuilderScreen();return;}if(b.dataset.homeFilter){state.filter=b.dataset.homeFilter;syncHomeShortcutState();returnToCatalogue();$('.category-tile').forEach(x=>x.classList.toggle('active',x.dataset.filter===state.filter));renderCatalog();return;}if(b.dataset.nav==='home'){showHomeScreen();return;}if(b.dataset.nav==='favorites'){showFavoritesScreen();return;}if(b.dataset.nav==='catalogue'){returnToCatalogue();return;}if(b.dataset.nav==='builder'){showBuilderScreen();return;}if(b.dataset.nav==='cart'){showCartScreen();return;}});
+const galleryStage=$('.detail-image-stage');
+let galleryTouchStart=null;
+if(galleryStage){
+ galleryStage.addEventListener('touchstart',event=>{
+  if(event.target.closest('button,a')){galleryTouchStart=null;return;}
+  const touch=event.changedTouches[0];galleryTouchStart={x:touch.clientX,y:touch.clientY};
+ },{passive:true});
+ galleryStage.addEventListener('touchend',event=>{
+  if(!galleryTouchStart)return;
+  const touch=event.changedTouches[0],dx=touch.clientX-galleryTouchStart.x,dy=touch.clientY-galleryTouchStart.y;
+  galleryTouchStart=null;
+  if(Math.abs(dx)>46&&Math.abs(dx)>Math.abs(dy)*1.2){
+   showGalleryPhoto(state.photoIndex+(dx<0?1:-1));
+  }
+ },{passive:true});
+}
 $('#catalogueGrid').addEventListener('click',e=>{if(e.target.closest('button'))return;const el=e.target.closest('[data-card]');if(!el)return;const id=el.dataset.card;if(id.startsWith('set:')){const s=state.sets.find(x=>x.id===id.slice(4));if(s)setDetail(s);}else detail(find(id));});
 $('#sortSelect').addEventListener('change',e=>{state.sort=e.target.value;renderCatalog();});
 $('#catalogSearch').addEventListener('input',e=>{state.search=e.target.value.trim().toLowerCase();renderCatalog();});
