@@ -219,8 +219,8 @@ def calculate_order(items: list[OrderItem]) -> tuple[list[dict[str, Any]], int]:
             raise ValueError("В заказе повторяется одна и та же позиция")
         seen.add(row.id)
         product = live_menu[row.id]
-        available_stock = int(product.get("stock", 0) or 0)
-        if available_stock > 0 and row.qty > available_stock:
+        available_stock = product.get("stock")
+        if available_stock is not None and row.qty > int(available_stock):
             raise ValueError(f"Недостаточно товара «{product['name']}» в наличии. Осталось: {available_stock}.")
         subtotal = product["price"] * row.qty
         total += subtotal
@@ -326,7 +326,7 @@ def current_menu() -> dict[str, dict[str, Any]]:
             except (TypeError, ValueError):
                 continue
             if price > 0:
-                result[str(p["id"])] = {"name": str(p["name"]), "price": price, "cost": max(0, int(p.get("cost", 0) or 0)), "stock": max(0, int(p.get("stock", 0) or 0))}
+                result[str(p["id"])] = {"name": str(p["name"]), "price": price, "cost": max(0, int(p.get("cost", 0) or 0)), "stock": (None if p.get("stock") is None else max(0, int(p.get("stock", 0) or 0)))}
     return result
 
 CATEGORIES_FILE = os.getenv("CATEGORIES_FILE", os.path.join(os.path.dirname(__file__), "categories.json"))
@@ -379,7 +379,7 @@ class ProductPayload(BaseModel):
     desc: str = Field(default="", max_length=1000)
     photo: str = Field(default="", max_length=1200000)
     pieces: int = Field(default=8, ge=1, le=100)
-    stock: int = Field(default=0, ge=0, le=10000)
+    stock: int | None = Field(default=None, ge=0, le=10000)
     details: str = Field(default="", max_length=1000)
     gallery: list[str] = Field(default_factory=list, max_length=5)
     active: bool = True
@@ -1068,9 +1068,9 @@ async def create_order(payload: OrderPayload, origin: str | None = Header(defaul
             for product in products_on_disk:
                 product_id = str(product.get("id", ""))
                 if product_id in stock_by_id:
-                    available_stock = max(0, int(product.get("stock", 0) or 0))
-                    if available_stock > 0:
-                        product["stock"] = max(0, available_stock - stock_by_id[product_id])
+                    available_stock = product.get("stock")
+                    if available_stock is not None:
+                        product["stock"] = max(0, int(available_stock) - stock_by_id[product_id])
                         changed_stock = True
             if changed_stock:
                 write_products(products_on_disk)
