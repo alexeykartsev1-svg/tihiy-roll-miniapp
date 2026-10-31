@@ -47,6 +47,41 @@
       });
       root.append(button);
     });
+    fetch(API+'/api/categories',{cache:'no-store'}).then(response=>response.ok?response.json():[]).then(rows=>{
+      if(!Array.isArray(rows))return;
+      const byId=new Map(rows.map(row=>[row.id,row]));
+      const mappings=[
+        {cardId:'rolls',ids:['classic','warm']},
+        {cardId:'sets',ids:['sets']},
+        {cardId:'dogs',ids:['dogs']},
+        {cardId:'snacks',ids:['snacks']}
+      ];
+      mappings.forEach(mapping=>{
+        const button=root.querySelector('.home-category-card:nth-child('+(
+          categories.findIndex(row=>row.id===mapping.cardId)+1
+        )+')');
+        if(!button)return;
+        const source=mapping.ids.map(id=>byId.get(id)).find(Boolean);
+        if(!source)return;
+        const icon=button.querySelector('.home-category-icon');
+        if(icon&&source.icon)icon.textContent=source.icon;
+        if(source.image){const img=button.querySelector('img');if(img)img.src=source.image}
+        if(mapping.cardId!=='rolls'&&source.name){const title=button.querySelector('.home-category-copy b');if(title)title.textContent=source.name}
+      });
+      const known=new Set(['classic','warm','all','sets','dogs','snacks']);
+      rows.filter(row=>row&&row.id&&!known.has(row.id)).forEach(row=>{
+        const button=document.createElement('button');button.type='button';button.className='home-category-card';
+        const product=store.products.find(item=>item.cat===row.id);
+        const img=document.createElement('img');img.src=row.image||product?.photo||store.products[0]?.photo||'';img.alt='';img.loading='lazy';
+        const icon=document.createElement('span');icon.className='home-category-icon';icon.textContent=row.icon||'🍣';
+        const copy=document.createElement('span');copy.className='home-category-copy';
+        const title=document.createElement('b');title.textContent=row.name;
+        const hint=document.createElement('small');hint.textContent=store.products.filter(item=>item.cat===row.id).length+' товаров';
+        copy.append(title,hint);button.append(img,icon,copy);
+        button.addEventListener('click',()=>{store.renderMenu(row.id);$('#menu-section')?.scrollIntoView({behavior:'smooth',block:'start'})});
+        root.append(button);
+      });
+    }).catch(()=>{});
   }
 
   function buildCatalogTools(){
