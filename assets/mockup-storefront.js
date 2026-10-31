@@ -38,8 +38,37 @@ function productKind(p){
  if(category==='snacks')return 'Закуска';
  return 'Ролл';
 }
+function compositionValue(value){
+ if(Array.isArray(value))return value.map(item=>{
+  if(typeof item==='string')return item;
+  if(item&&typeof item==='object')return item.name||item.title||item.ingredient||item.label||'';
+  return '';
+ }).filter(Boolean).join(', ');
+ if(value&&typeof value==='object')return value.name||value.title||value.ingredient||value.label||'';
+ return String(value||'').trim();
+}
+function productDescription(p){
+ const details=compositionValue(p?.details)||compositionValue(p?.composition)||compositionValue(p?.ingredients);
+ const desc=compositionValue(p?.desc)||compositionValue(p?.description);
+ if(desc&&/временная карточка-образец/i.test(desc)&&details)return details;
+ if(desc)return desc;
+ if(details)return details;
+ const defaults={
+  philadelphia:'Нежный лосось, сливочный сыр, свежий огурец и рис.',
+  lava:'Нежный соус лава, сливочный сыр и свежие ингредиенты.',
+  warm_crab:'Тёплый ролл с крабом и аппетитной золотистой корочкой.',
+  warm_salmon:'Тёплый ролл с лососем, приготовленный до золотистой корочки.',
+  california:'Классический ролл с нежной начинкой и рисом.',
+  unagi:'Ролл с угрём и насыщенным соусом унаги.',
+  asian_hotdog_shrimp:'Креветка, рис, соус и хрустящая булочка.',
+  asian_hotdog_chicken:'Курица, сливочный соус, рис и хрустящая булочка.',
+  snack_tempura_shrimp:'Креветки в хрустящей темпуре с соусом.',
+  snack_crispy_rolls:'Хрустящая закуска с крабом, сливочным сыром и рисом.'
+ };
+ return defaults[p?.id]||'Свежеприготовленное блюдо из меню «Тихий ролл».';
+}
 function ingredientRows(p){
- const source=[p?.details,p?.composition,p?.ingredients,p?.desc].flatMap(value=>Array.isArray(value)?value:[value||'']).join(', ');
+ const source=[p?.details,p?.composition,p?.ingredients,p?.desc,p?.description].map(compositionValue).filter(Boolean).join(', ')+' '+productDescription(p);
  const patterns=[
   [/лосос|salmon/i,'🐟','Лосось'],[/кревет|shrimp/i,'🦐','Креветка'],[/краб|crab/i,'🦀','Краб'],
   [/икр|caviar/i,'🟠','Икра'],[/сыр|cheese/i,'🧀','Сливочный сыр'],[/огурц|cucumber/i,'🥒','Огурец'],
@@ -64,7 +93,7 @@ function showBuilderInfo(id){
  }else item=find(key);
  if(!item)return;
  $('#builderInfoName').textContent=item.name;
- $('#builderInfoDescription').textContent=item.desc||item.details||'Состав блюда';
+ $('#builderInfoDescription').textContent=productDescription(item);
  $('#builderInfoPieces').textContent=(Number(item.pieces)||8)+' шт.';
  $('#builderInfoWeight').textContent=item.weight||'280 г';
  $('#builderInfoPrice').textContent=money(item.price);
@@ -92,7 +121,8 @@ function card(p){
  const controls=selected>0
   ?'<div class="card-quantity" aria-label="Количество в корзине"><button type="button" data-card-qty="-1" data-id="'+id+'" aria-label="Уменьшить количество">−</button><span>'+selected+'</span><button type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Увеличить количество">+</button></div>'
   :'<button class="card-add" type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Добавить в корзину">+</button>';
- return '<article class="product-card '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'"><div class="card-photo"><img src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy">'+(p.badge?'<span class="card-ribbon">'+esc(p.badge)+'</span>':'')+'<button class="card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-label="Избранное">'+(fav?'♥':'♡')+'</button></div><div class="card-info"><h3 class="card-title">'+esc(p.name)+'</h3><div class="card-meta"><span>'+Number(p.pieces||8)+' шт.</span><span>'+esc(p.weight||'280 г')+'</span></div><button class="card-composition" type="button" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав</button><div class="card-bottom card-purchase"><strong class="card-price">'+money(p.price)+'</strong>'+controls+'</div></div></article>';
+ const desc=productDescription(p);
+ return '<article class="product-card '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'"><div class="card-photo"><img src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy">'+(p.badge?'<span class="card-ribbon">'+esc(p.badge)+'</span>':'')+'<button class="card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-label="Избранное">'+(fav?'♥':'♡')+'</button></div><div class="card-info"><h3 class="card-title">'+esc(p.name)+'</h3><p class="card-description">'+esc(desc)+'</p><div class="card-meta"><span>'+Number(p.pieces||8)+' шт.</span><span>'+esc(p.weight||'280 г')+'</span></div><button class="card-composition" type="button" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав</button><div class="card-bottom card-purchase"><strong class="card-price">'+money(p.price)+'</strong>'+controls+'</div></div></article>';
 }
 function renderHomeContent(){
  const hero=$('#homeHeroPhoto');
@@ -281,14 +311,14 @@ function builderProductCard(p){
  const controls=n
   ?'<div class="card-quantity builder-card-stepper"><button type="button" data-builder-product="'+id+'" data-delta="-1" aria-label="Уменьшить">−</button><span>'+n+'</span><button type="button" data-builder-product="'+id+'" data-delta="1" aria-label="Увеличить">+</button></div>'
   :'<button type="button" class="card-add builder-add-one" data-builder-product="'+id+'" data-delta="1" aria-label="Добавить">+</button>';
- return '<article class="builder-card '+(n?'selected':'')+'" data-builder-info="'+id+'" tabindex="0" aria-label="Состав: '+esc(p.name)+'"><div class="builder-card-photo"><img src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy"></div><div class="builder-card-copy"><b>'+esc(p.name)+'</b><small>'+(Number(p.pieces)||8)+' шт. · '+esc(p.weight||'280 г')+'</small><button type="button" class="card-composition builder-card-composition" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав</button><div class="builder-card-footer"><strong>'+money(p.price)+'</strong>'+controls+'</div></div></article>';
+ return '<article class="builder-card '+(n?'selected':'')+'" data-builder-info="'+id+'" tabindex="0" aria-label="Состав: '+esc(p.name)+'"><div class="builder-card-photo"><img src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy"></div><div class="builder-card-copy"><b>'+esc(p.name)+'</b><p class="builder-card-description">'+esc(productDescription(p))+'</p><small>'+(Number(p.pieces)||8)+' шт. · '+esc(p.weight||'280 г')+'</small><button type="button" class="card-composition builder-card-composition" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав</button><div class="builder-card-footer"><strong>'+money(p.price)+'</strong>'+controls+'</div></div></article>';
 }
 function builderSetCard(s){
  const n=Number(state.builderSets[s.id]||0),id=esc(s.id),key='set:'+id,title=SET_NAMES[s.id]||s.name||'Готовый сет';
  const controls=n
   ?'<div class="card-quantity builder-card-stepper"><button type="button" data-builder-set="'+id+'" data-delta="-1" aria-label="Уменьшить">−</button><span>'+n+'</span><button type="button" data-builder-set="'+id+'" data-delta="1" aria-label="Увеличить">+</button></div>'
   :'<button type="button" class="card-add builder-add-one" data-builder-set="'+id+'" data-delta="1" aria-label="Добавить сет">+</button>';
- return '<article class="builder-card '+(n?'selected':'')+'" data-builder-info="'+key+'" tabindex="0" aria-label="Состав: '+esc(title)+'"><div class="builder-card-photo"><img src="'+setImage(s)+'" alt="'+esc(title)+'" loading="lazy"></div><div class="builder-card-copy"><b>'+esc(title)+'</b><small>'+setPieces(s)+' шт. · '+setWeight(s)+' г</small><button type="button" class="card-composition builder-card-composition" data-composition="'+key+'"><span aria-hidden="true">✦</span> Состав</button><div class="builder-card-footer"><strong>'+money(setPrice(s))+'</strong>'+controls+'</div></div></article>';
+ return '<article class="builder-card '+(n?'selected':'')+'" data-builder-info="'+key+'" tabindex="0" aria-label="Состав: '+esc(title)+'"><div class="builder-card-photo"><img src="'+setImage(s)+'" alt="'+esc(title)+'" loading="lazy"></div><div class="builder-card-copy"><b>'+esc(title)+'</b><p class="builder-card-description">'+esc(s.description||'Готовый набор роллов для компании или уютного вечера.')+'</p><small>'+setPieces(s)+' шт. · '+setWeight(s)+' г</small><button type="button" class="card-composition builder-card-composition" data-composition="'+key+'"><span aria-hidden="true">✦</span> Состав</button><div class="builder-card-footer"><strong>'+money(setPrice(s))+'</strong>'+controls+'</div></div></article>';
 }
 function renderBuilder(){
  const filter=state.builderFilter;
