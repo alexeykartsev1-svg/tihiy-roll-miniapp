@@ -317,3 +317,26 @@
  .basket-remove{grid-column:3;grid-row:1}
  .basket-item-controls{width:96px}
 }
+
+/* Dedicated home screen */
+.home-scroll{padding-bottom:24px}
+.home-top-spacer{width:38px;height:38px}
+.home-hero{position:relative;overflow:hidden;margin:14px 0 22px;padding:26px 20px 22px;border:1px solid rgba(255,116,99,.35);border-radius:22px;background:radial-gradient(ellipse at 88% 0,rgba(255,75,61,.22),transparent 52%),linear-gradient(145deg,rgba(22,30,36,.98),rgba(5,11,16,.98));box-shadow:0 16px 42px rgba(0,0,0,.28)}
+.home-hero:after{content:"";position:absolute;right:-45px;bottom:-85px;width:210px;height:210px;border:1px solid rgba(255,111,94,.16);border-radius:50%;box-shadow:0 0 0 22px rgba(255,111,94,.035),0 0 0 48px rgba(255,111,94,.025);pointer-events:none}
+.home-eyebrow{display:block;color:#ff8577;font-size:10px;font-weight:850;letter-spacing:1.7px}
+.home-hero h2{position:relative;z-index:1;margin:12px 0 9px;font-family:Georgia,serif;font-size:clamp(38px,10vw,52px);font-weight:700;letter-spacing:-1.5px}
+.home-hero p{position:relative;z-index:1;max-width:340px;margin:0;color:#c0cbd1;font-size:14px;line-height:1.55}
+.home-actions{position:relative;z-index:1;display:grid;gap:9px;margin-top:22px}
+.home-actions .add-cart-button{min-height:54px;font-size:15px}
+.home-secondary{min-height:48px;border:1px solid rgba(204,220,229,.3);border-radius:13px;background:rgba(7,15,21,.74);color:#f5f7f8;font-size:14px;font-weight:750}
+.home-section{margin:0 0 20px}
+.home-section-heading>span{color:#ff8275;font-size:10px;font-weight:850;letter-spacing:1.4px}
+.home-section-heading h3{margin:5px 0 12px;font-size:21px;letter-spacing:-.4px}
+.home-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.home-shortcuts button{display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;align-items:center;column-gap:10px;min-height:75px;padding:11px;border:1px solid rgba(159,181,194,.22);border-radius:15px;background:linear-gradient(145deg,rgba(19,29,36,.88),rgba(6,13,18,.96));text-align:left}
+.home-shortcuts button>span{grid-row:span 2;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.055);font-size:25px}
+.home-shortcuts b{font-size:14px}.home-shortcuts small{color:#9eacb4;font-size:10px}
+.home-pickup-card{padding:16px;border:1px solid rgba(159,181,194,.23);border-radius:16px;background:linear-gradient(145deg,#101a20,#070d12)}
+.home-pickup-card>b{display:block;margin:6px 0;font-size:18px}
+.home-pickup-card p{margin:0 0 12px;color:#c0cbd1;font-size:13px;line-height:1.4}
+.home-pickup-card button{padding:9px 12px;border:1px solid rgba(255,112,96,.4);border-radius:10px;background:rgba(255,66,54,.1);color:#ff9a8f;font-size:12px;font-weight:750}
