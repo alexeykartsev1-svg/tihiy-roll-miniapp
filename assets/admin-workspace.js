@@ -42,17 +42,88 @@
     const pageOrders=makePage('orders','Заказы','Новые заказы, приготовление и выдача');
     const pageProducts=makePage('products','Товары','Ассортимент, фотографии, состав и цены');
     const pageStore=makePage('store','Категории и оформление','Категории меню, готовые сеты и рекламные блоки');
+    const pageAnalytics=makePage('analytics','Аналитика продаж','Реальные показатели заказов из базы магазина');
+    const analyticsRoot=document.createElement('div');analyticsRoot.className='admin-analytics-root';pageAnalytics.append(analyticsRoot);
     if(productsPanel)pageProducts.append(productsPanel);
     if(editor)pageProducts.append(editor);
     if(ordersPanel)pageOrders.append(ordersPanel);
     if(categoriesPanel)pageStore.append(categoriesPanel);
     if(sitePanel){sitePanel.id='siteContentPanel';pageStore.append(sitePanel)}
-    app.replaceChildren(home,pageOrders,pageProducts,pageStore);
+    app.replaceChildren(home,pageOrders,pageProducts,pageStore,pageAnalytics);
+    function renderAnalytics(){
+      const report=window.__TIHIY_ADMIN_REPORT__;
+      analyticsRoot.replaceChildren();
+      if(!report||!report.summary){
+        const empty=document.createElement('div');empty.className='panel';empty.textContent='Загрузка статистики…';analyticsRoot.append(empty);return;
+      }
+      const summary=report.summary;
+      const money=value=>new Intl.NumberFormat('ru-RU').format(Number(value)||0)+' ₽';
+      const cards=[
+        ['Выручка без отмен',money(summary.revenue),'Заказы без статуса «Отменён»'],
+        ['Всего заказов',String(summary.orders_count||0),'За всю сохранённую историю'],
+        ['Валовая прибыль',money(summary.gross_profit),'По позициям с заполненной себестоимостью'],
+        ['В работе',String(summary.active_orders||0),'Не завершены и не отменены']
+      ];
+      const grid=document.createElement('div');grid.className='admin-home-kpis admin-analytics-kpis';
+      cards.forEach(([label,value,note])=>{
+        const card=document.createElement('article');card.className='admin-home-kpi';
+        const l=document.createElement('span');l.textContent=label;
+        const v=document.createElement('strong');v.textContent=value;
+        const n=document.createElement('small');n.textContent=note;n.className='admin-analytics-note';
+        card.append(l,v,n);grid.append(card);
+      });
+      analyticsRoot.append(grid);
+      const chartPanel=document.createElement('section');chartPanel.className='panel admin-analytics-panel';
+      const chartTitle=document.createElement('h2');chartTitle.textContent='Выручка за последние 7 дней';chartPanel.append(chartTitle);
+      const trend=Array.isArray(report.trend)?report.trend:[];
+      const bars=document.createElement('div');bars.className='admin-analytics-bars';
+      const max=Math.max(1,...trend.map(row=>Number(row.revenue)||0));
+      trend.forEach(row=>{
+        const column=document.createElement('div');column.className='admin-analytics-column';
+        const amount=document.createElement('span');amount.className='admin-analytics-amount';amount.textContent=money(row.revenue||0);
+        const track=document.createElement('div');track.className='admin-analytics-track';
+        const bar=document.createElement('span');bar.className='admin-analytics-bar';bar.style.height=Math.max(3,((Number(row.revenue)||0)/max)*100)+'%';track.append(bar);
+        const label=document.createElement('small');label.textContent=row.label||'';
+        const count=document.createElement('em');count.textContent=(row.orders||0)+' зак.';
+        column.append(amount,track,label,count);bars.append(column);
+      });
+      chartPanel.append(bars);
+      const chartNote=document.createElement('p');chartNote.className='muted';chartNote.textContent='Дневной график рассчитан по последним '+(report.recentOrdersCount||0)+' загруженным заказам. Сводные показатели выше учитывают всю историю.';chartPanel.append(chartNote);
+      analyticsRoot.append(chartPanel);
+      const lower=document.createElement('div');lower.className='admin-analytics-lower';
+      const statusPanel=document.createElement('section');statusPanel.className='panel';
+      const statusTitle=document.createElement('h2');statusTitle.textContent='Статусы заказов';statusPanel.append(statusTitle);
+      const statusNames={new:'Новые',accepted:'Приняты',preparing:'Готовятся',ready:'Готовы',completed:'Выданы',cancelled:'Отменены'};
+      const statusColors={new:'#3898ff',accepted:'#e9a13a',preparing:'#ff5148',ready:'#3cbf89',completed:'#697780',cancelled:'#a56b80'};
+      Object.entries(statusNames).forEach(([key,label])=>{
+        const row=document.createElement('div');row.className='admin-status-row';
+        const dot=document.createElement('i');dot.style.background=statusColors[key];
+        const name=document.createElement('span');name.textContent=label;
+        const value=document.createElement('b');value.textContent=String((report.statusCounts||{})[key]||0);
+        row.append(dot,name,value);statusPanel.append(row);
+      });
+      const statusNote=document.createElement('p');statusNote.className='muted';statusNote.textContent='Распределение статусов показано по последним загруженным заказам.';statusPanel.append(statusNote);
+      const popularPanel=document.createElement('section');popularPanel.className='panel';
+      const popularTitle=document.createElement('h2');popularTitle.textContent='Популярные позиции';popularPanel.append(popularTitle);
+      const popular=Array.isArray(summary.popular_items)?summary.popular_items:[];
+      if(!popular.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Пока недостаточно данных о продажах.';popularPanel.append(empty)}
+      popular.slice(0,8).forEach((item,index)=>{
+        const row=document.createElement('div');row.className='admin-popular-row';
+        const rank=document.createElement('span');rank.className='admin-popular-rank';rank.textContent=String(index+1);
+        const name=document.createElement('b');name.textContent=item.name||'Позиция';
+        const qty=document.createElement('span');qty.textContent=(item.qty||0)+' шт.';
+        row.append(rank,name,qty);popularPanel.append(row);
+      });
+      lower.append(statusPanel,popularPanel);analyticsRoot.append(lower);
+    }
+    window.addEventListener('tihiy:analytics-updated',renderAnalytics);
+    renderAnalytics();
     const navItems=[
       ['home','⌂','Главная'],
       ['orders','▤','Заказы'],
       ['products','▦','Товары'],
-      ['store','✦','Категории и баннеры']
+      ['store','✦','Категории и баннеры'],
+      ['analytics','▥','Аналитика']
     ];
     function activate(id){
       app.querySelectorAll('.admin-page').forEach(p=>p.classList.toggle('active',p.dataset.page===id));
