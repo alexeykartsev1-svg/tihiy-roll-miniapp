@@ -286,3 +286,50 @@ body{background:radial-gradient(ellipse at 55% -20%,#2a1517 0,#10181d 35%,#070b0
 .qty button:disabled,.set-qty button:disabled{opacity:.36;cursor:not-allowed;filter:grayscale(.4)}
 .card .qty button:disabled{opacity:.35}
 .product-dialog #detailAdd:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.3)}
+
+
+.my-orders-open{flex:0 0 auto;min-height:38px;padding:8px 12px;border:1px solid rgba(255,84,74,.34);border-radius:10px;background:rgba(255,64,55,.1);color:#ff978c;font-size:10px;font-weight:800;cursor:pointer}
+.my-orders-open:hover{background:rgba(255,64,55,.18);border-color:#ff655b}
+.orders-modal{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,6,9,.8);backdrop-filter:blur(12px)}
+.orders-modal.show{display:flex}
+.orders-dialog{width:min(680px,100%);max-height:min(88vh,900px);overflow:auto;padding:20px;border:1px solid rgba(255,84,74,.32);border-radius:22px;background:linear-gradient(160deg,#182329,#0b1216 76%);box-shadow:0 30px 90px rgba(0,0,0,.58);color:#f4f7f8}
+.orders-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:13px;border-bottom:1px solid rgba(255,255,255,.1)}
+.orders-dialog-head span{color:#ff877a;font-size:9px;letter-spacing:1.6px}
+.orders-dialog-head h2{margin:5px 0 0;font-size:24px}
+.orders-dialog-head button{width:36px;height:36px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:#1a272d;color:white;font-size:22px;cursor:pointer}
+.orders-dialog-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0;color:#9eacb2;font-size:10px}
+.orders-dialog-toolbar p{margin:0}
+.orders-dialog-toolbar button{border:1px solid rgba(255,255,255,.14);border-radius:8px;background:#152127;color:#dce5e8;padding:8px 10px;font-size:10px;font-weight:750;cursor:pointer}
+.orders-empty{padding:28px 15px;border:1px dashed rgba(255,255,255,.14);border-radius:13px;color:#9eabb2;text-align:center;font-size:12px}
+.customer-order-card{margin:0 0 11px;padding:13px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:#101a1f}
+.customer-order-top{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.customer-order-top>strong{font-size:14px}
+.customer-order-status{display:inline-flex;border-radius:20px;padding:6px 9px;font-size:9px;font-weight:850}
+.customer-order-date{margin:7px 0 12px;color:#93a2a9;font-size:10px}
+.customer-order-progress{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:8px 0 13px}
+.customer-order-progress>span{display:grid;justify-items:center;gap:5px;text-align:center;color:#83939a;font-size:9px}
+.customer-order-progress i{display:grid;place-items:center;width:26px;height:26px;border:1px solid rgba(255,255,255,.16);border-radius:50%;background:#172329;color:#aab7bd;font-size:10px;font-style:normal}
+.customer-order-progress>span.done i{border-color:rgba(84,197,137,.45);background:rgba(46,154,98,.2);color:#91e0b0}
+.customer-order-progress>span.current i{border-color:#ff695d;background:rgba(255,63,55,.17);color:#fff}
+.customer-order-progress>span.current{color:#ff9589}
+.customer-order-progress.cancelled{opacity:.45}
+.customer-order-items{display:grid;gap:6px;margin:10px 0}
+.customer-order-item{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.customer-order-item img{width:34px;height:34px;border-radius:7px;object-fit:cover;background:#202b31}
+.customer-order-item span{font-size:10px;color:#dce5e8}
+.customer-order-item b{font-size:10px;color:white;white-space:nowrap}
+.customer-order-footer{display:flex;align-items:center;justify-content:space-between;margin-top:11px;padding-top:11px;border-top:1px solid rgba(255,255,255,.1);font-size:11px}
+.customer-order-footer strong{font-size:17px}
+.delivery-zone-list{display:grid;gap:5px;margin-top:9px}
+.delivery-zone-row{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid rgba(255,255,255,.09);border-radius:8px;background:rgba(255,255,255,.035);font-size:10px;color:#bdc9cd}
+.delivery-zone-row strong{color:#fff;white-space:nowrap}
+@media(max-width:760px){
+ .my-orders-open{min-height:31px;padding:6px 7px;font-size:8px}
+ .orders-modal{padding:8px}
+ .orders-dialog{max-height:94dvh;padding:13px;border-radius:16px}
+ .orders-dialog-head h2{font-size:20px}
+ .orders-dialog-toolbar{align-items:flex-start;font-size:9px}
+ .customer-order-card{padding:10px}
+ .customer-order-progress>span{font-size:8px}
+ .customer-order-progress i{width:23px;height:23px}
+}
