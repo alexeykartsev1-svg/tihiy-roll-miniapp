@@ -306,15 +306,64 @@ DEFAULT_PRODUCTS = [
     {"id":"unagi","name":"Унаги","price":460,"cost":0,"weight":"280 г","cat":"classic","badge":"","desc":"Ролл с угрём и насыщенным соусом унаги.","photo":"","active":True,"sort_order":5},
 ]
 
+STARTER_CATEGORY_PRODUCTS = [
+    {
+        "id": "asian_hotdog_shrimp", "name": "Азиатский хот-дог с креветкой",
+        "price": 390, "cost": 0, "weight": "240 г", "cat": "dogs",
+        "badge": "", "desc": "Временная карточка-образец. Название, состав и фото можно изменить в админ-панели.",
+        "details": "Креветка, рис, соус, хрустящая булочка", "pieces": 1,
+        "stock": None, "photo": "", "gallery": [], "active": True, "sort_order": 20,
+    },
+    {
+        "id": "asian_hotdog_chicken", "name": "Азиатский хот-дог с курицей",
+        "price": 350, "cost": 0, "weight": "240 г", "cat": "dogs",
+        "badge": "", "desc": "Временная карточка-образец. Название, состав и фото можно изменить в админ-панели.",
+        "details": "Курица, сливочный соус, рис, хрустящая булочка", "pieces": 1,
+        "stock": None, "photo": "", "gallery": [], "active": True, "sort_order": 21,
+    },
+    {
+        "id": "snack_tempura_shrimp", "name": "Креветки темпура",
+        "price": 390, "cost": 0, "weight": "220 г", "cat": "snacks",
+        "badge": "", "desc": "Временная карточка-образец. Название, состав и фото можно изменить в админ-панели.",
+        "details": "Креветка, темпура, соус", "pieces": 6,
+        "stock": None, "photo": "", "gallery": [], "active": True, "sort_order": 22,
+    },
+    {
+        "id": "snack_crispy_rolls", "name": "Хрустящая закуска",
+        "price": 350, "cost": 0, "weight": "220 г", "cat": "snacks",
+        "badge": "", "desc": "Временная карточка-образец. Название, состав и фото можно изменить в админ-панели.",
+        "details": "Краб, сливочный сыр, рис, темпура", "pieces": 6,
+        "stock": None, "photo": "", "gallery": [], "active": True, "sort_order": 23,
+    },
+]
+
 def read_products() -> list[dict[str, Any]]:
     try:
         with open(PRODUCTS_FILE, "r", encoding="utf-8") as handle:
             data = json.load(handle)
-        if isinstance(data, list) and all(isinstance(item, dict) for item in data):
-            return data
+        if not isinstance(data, list) or not all(isinstance(item, dict) for item in data):
+            data = [dict(item) for item in DEFAULT_PRODUCTS]
     except (OSError, json.JSONDecodeError):
-        pass
-    return [dict(item) for item in DEFAULT_PRODUCTS]
+        data = [dict(item) for item in DEFAULT_PRODUCTS]
+
+    # Seed starter cards exactly once so they are real menu items accepted by
+    # calculate_order/current_menu, while keeping later admin edits/deletions.
+    seed_marker = PRODUCTS_FILE + ".starter-category-cards-v1"
+    if not os.path.exists(seed_marker):
+        existing_ids = {str(item.get("id", "")) for item in data}
+        missing = [dict(item) for item in STARTER_CATEGORY_PRODUCTS if item["id"] not in existing_ids]
+        if missing:
+            data.extend(missing)
+            write_products(data)
+        try:
+            marker_dir = os.path.dirname(seed_marker)
+            if marker_dir:
+                os.makedirs(marker_dir, exist_ok=True)
+            with open(seed_marker, "w", encoding="utf-8") as handle:
+                handle.write("seeded\n")
+        except OSError:
+            logger.warning("Could not create starter category seed marker at %s", seed_marker)
+    return data
 
 def write_products(products: list[dict[str, Any]]) -> None:
     folder = os.path.dirname(PRODUCTS_FILE)
