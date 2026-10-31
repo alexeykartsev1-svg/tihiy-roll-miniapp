@@ -76,6 +76,7 @@ textarea { min-height:100px; }
 <div class="field"><label for="promoButton">Текст кнопки рекламы</label><input id="promoButton" maxlength="50"></div>
 <div class="field full"><label for="promoText">Текст рекламного блока</label><textarea id="promoText" maxlength="500"></textarea></div>
 <div class="field full"><label for="promoLink">Ссылка кнопки рекламы</label><input id="promoLink" maxlength="300" placeholder="#menu"></div>
+<div class="field full"><label>Фотография рекламного блока главного экрана</label><img id="promoImagePreview" class="slide-photo-preview" alt="Предпросмотр рекламного фото"><input id="promoImageFile" type="file" accept="image/jpeg,image/png,image/webp"><button class="btn" type="button" id="clearPromoImage">Убрать фото</button><div class="help">Выбери файл с компьютера — вставлять HTTPS-ссылку не нужно.</div></div>
 </div><h3 style="margin:22px 0 8px">Готовые сеты</h3>
 <p class="muted">Описание меняется прямо на карточке. Для фото вставь HTTPS-ссылку или загрузи JPG, PNG, WebP.</p>
 <div id="setEditor" class="formgrid"></div>
@@ -145,7 +146,7 @@ function renderProductGalleryEditor(){
   item.append(img,input,clear);root.append(item);
  }
 }
-function closeEditor(){$('editor').classList.remove('open');editingId=null}function compressImage(file){return new Promise((resolve,reject)=>{if(!file.type.match(/^image\/(jpeg|png|webp)$/))return reject(new Error('Выбери JPG, PNG или WebP.'));const reader=new FileReader();reader.onerror=()=>reject(new Error('Не удалось прочитать файл'));reader.onload=()=>{const img=new Image();img.onerror=()=>reject(new Error('Не удалось открыть изображение'));img.onload=()=>{const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);let mime=file.type==='image/png'?'image/png':'image/jpeg';const out=canvas.toDataURL('image/jpeg',0.78);if(out.length>900000)return reject(new Error('Фото слишком большое после сжатия. Выбери другое изображение.')); resolve(out)};img.src=reader.result};reader.readAsDataURL(file)})}$('photoFile').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;try{photoData=await compressImage(file);$('photoPreview').src=photoData;status('Фото готово к сохранению.')}catch(err){status(err.message,'error');e.target.value=''}});$('clearPhoto').onclick=()=>{photoData='';$('photoPreview').src=safeImage('');$('photoFile').value=''};$('add').onclick=()=>openEditor();$('cancel').onclick=closeEditor;$('retry').onclick=boot;$('productForm').addEventListener('submit',async e=>{e.preventDefault();const payload={id:$('pid').value.trim(),name:$('name').value.trim(),price:Number($('price').value),cost:Number($('cost').value||0),weight:$('weight').value.trim()||'280 г',pieces:Number($('pieces').value||8),details:$('details').value.trim(),gallery:productGalleryPhotos.filter(Boolean).slice(0,5),cat:$('cat').value,badge:$('badge').value,desc:$('desc').value.trim(),photo:photoData,active:$('active').checked,sort_order:Math.max(0,products.findIndex(p=>p.id===editingId))};if(!payload.photo&&editingId){const old=products.find(p=>p.id===editingId);payload.photo=old?old.photo||'':''}try{$('save').disabled=true;$('save').textContent='Сохраняем…';if(editingId)await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'PUT',body:JSON.stringify(payload)});else await api('/api/admin/products',{method:'POST',body:JSON.stringify(payload)});closeEditor();await loadProducts();status('Изменения сохранены на сервере. Открой магазин заново, чтобы увидеть обновления.','ok')}catch(err){status(err.message,'error')}finally{$('save').disabled=false;$('save').textContent='Сохранить'}});$('delete').onclick=async()=>{if(!editingId||!confirm('Удалить товар «'+($('name').value)+'»?'))return;try{await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'DELETE'});closeEditor();await loadProducts();status('Товар удалён.','ok')}catch(e){status(e.message,'error')}};let siteContent=null;let siteSetPhotos={};
+function closeEditor(){$('editor').classList.remove('open');editingId=null}function compressImage(file){return new Promise((resolve,reject)=>{if(!file.type.match(/^image\/(jpeg|png|webp)$/))return reject(new Error('Выбери JPG, PNG или WebP.'));const reader=new FileReader();reader.onerror=()=>reject(new Error('Не удалось прочитать файл'));reader.onload=()=>{const img=new Image();img.onerror=()=>reject(new Error('Не удалось открыть изображение'));img.onload=()=>{const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);let mime=file.type==='image/png'?'image/png':'image/jpeg';const out=canvas.toDataURL('image/jpeg',0.78);if(out.length>900000)return reject(new Error('Фото слишком большое после сжатия. Выбери другое изображение.')); resolve(out)};img.src=reader.result};reader.readAsDataURL(file)})}$('photoFile').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;try{photoData=await compressImage(file);$('photoPreview').src=photoData;status('Фото готово к сохранению.')}catch(err){status(err.message,'error');e.target.value=''}});$('clearPhoto').onclick=()=>{photoData='';$('photoPreview').src=safeImage('');$('photoFile').value=''};$('add').onclick=()=>openEditor();$('cancel').onclick=closeEditor;$('retry').onclick=boot;$('productForm').addEventListener('submit',async e=>{e.preventDefault();const payload={id:$('pid').value.trim(),name:$('name').value.trim(),price:Number($('price').value),cost:Number($('cost').value||0),weight:$('weight').value.trim()||'280 г',pieces:Number($('pieces').value||8),details:$('details').value.trim(),gallery:productGalleryPhotos.filter(Boolean).slice(0,5),cat:$('cat').value,badge:$('badge').value,desc:$('desc').value.trim(),photo:photoData,active:$('active').checked,sort_order:Math.max(0,products.findIndex(p=>p.id===editingId))};if(!payload.photo&&editingId){const old=products.find(p=>p.id===editingId);payload.photo=old?old.photo||'':''}try{$('save').disabled=true;$('save').textContent='Сохраняем…';if(editingId)await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'PUT',body:JSON.stringify(payload)});else await api('/api/admin/products',{method:'POST',body:JSON.stringify(payload)});closeEditor();await loadProducts();status('Изменения сохранены на сервере. Открой магазин заново, чтобы увидеть обновления.','ok')}catch(err){status(err.message,'error')}finally{$('save').disabled=false;$('save').textContent='Сохранить'}});$('delete').onclick=async()=>{if(!editingId||!confirm('Удалить товар «'+($('name').value)+'»?'))return;try{await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'DELETE'});closeEditor();await loadProducts();status('Товар удалён.','ok')}catch(e){status(e.message,'error')}};let siteContent=null;let siteSetPhotos={};let siteSetGalleryPhotos={};let siteSlidePhotos=[];let sitePromoImage='';
 async function loadSiteContent(){
  try{
   siteContent=await api('/api/admin/site-content');
@@ -156,14 +157,26 @@ async function loadSiteContent(){
   $('promoText').value=siteContent.promo_text||'';
   $('promoButton').value=siteContent.promo_button||'';
   $('promoLink').value=siteContent.promo_link||'#menu';
+  sitePromoImage=siteContent.promo_image||'';
+  $('promoImagePreview').src=safeImage(sitePromoImage);
+  $('promoImageFile').value='';
   const slides=Array.isArray(siteContent.slides)?siteContent.slides:[];
-  const editor=$('slideEditor');editor.replaceChildren();
+  const editor=$('slideEditor');editor.replaceChildren();siteSlidePhotos=[];
   for(let i=0;i<3;i++){
-   const s=slides[i]||{title:'',accent:'',desc:'',image:'',button:'',active:true};
+   const slide=slides[i]||{title:'',accent:'',desc:'',image:'',button:'',active:true};
+   siteSlidePhotos[i]=typeof slide.image==='string'&&slide.image.startsWith('data:image/')?slide.image:'';
    const box=document.createElement('div');box.className='field full';box.style.cssText='border:1px solid var(--line);padding:12px;border-radius:12px';
-   box.innerHTML='<strong>Слайд '+(i+1)+'</strong><div class="formgrid" style="margin-top:10px"><div class="field"><label>Заголовок</label><input maxlength="120" data-slide="'+i+'" data-key="title"></div><div class="field"><label>Акцентная строка</label><input maxlength="120" data-slide="'+i+'" data-key="accent"></div><div class="field full"><label>Описание</label><textarea maxlength="300" data-slide="'+i+'" data-key="desc"></textarea></div><div class="field full"><label>URL изображения (HTTPS)</label><input maxlength="1500" data-slide="'+i+'" data-key="image" placeholder="https://..."></div><div class="field"><label>Текст кнопки</label><input maxlength="50" data-slide="'+i+'" data-key="button"></div><div class="field checks"><label><input type="checkbox" data-slide="'+i+'" data-key="active"> Показывать слайд</label></div></div>';
+   box.innerHTML='<strong>Слайд '+(i+1)+'</strong><div class="formgrid" style="margin-top:10px"><div class="field"><label>Заголовок</label><input maxlength="120" data-slide="'+i+'" data-key="title"></div><div class="field"><label>Акцентная строка</label><input maxlength="120" data-slide="'+i+'" data-key="accent"></div><div class="field full"><label>Описание</label><textarea maxlength="300" data-slide="'+i+'" data-key="desc"></textarea></div><div class="field full"><label>Ссылка на фото (необязательно)</label><input maxlength="2000" data-slide="'+i+'" data-key="image" placeholder="Можно загрузить файл ниже"></div><div class="field full"><img class="slide-photo-preview" data-slide-preview="'+i+'" alt="Предпросмотр слайда"><label>Или загрузить фото с компьютера</label><input type="file" accept="image/jpeg,image/png,image/webp" data-slide-file="'+i+'"></div><div class="field"><label>Текст кнопки</label><input maxlength="50" data-slide="'+i+'" data-key="button"></div><div class="field checks"><label><input type="checkbox" data-slide="'+i+'" data-key="active"> Показывать слайд</label></div></div>';
    editor.append(box);
-   box.querySelectorAll('[data-slide]').forEach(el=>{const key=el.dataset.key;if(key==='active')el.checked=s.active!==false;else el.value=s[key]||''});
+   box.querySelectorAll('[data-slide]').forEach(el=>{const key=el.dataset.key;if(key==='active')el.checked=slide.active!==false;else el.value=(key==='image'&&siteSlidePhotos[i])?'':(slide[key]||'')});
+   box.querySelector('[data-slide-preview="'+i+'"]').src=safeImage(slide.image||'');
+   const imageInput=box.querySelector('[data-key="image"]');
+   imageInput.addEventListener('input',()=>{siteSlidePhotos[i]='';box.querySelector('[data-slide-preview="'+i+'"]').src=safeImage(imageInput.value.trim())});
+   box.querySelector('[data-slide-file="'+i+'"]').addEventListener('change',async event=>{
+    const file=event.target.files&&event.target.files[0];if(!file)return;
+    try{siteSlidePhotos[i]=await compressImage(file);imageInput.value='';box.querySelector('[data-slide-preview="'+i+'"]').src=siteSlidePhotos[i];status('Фото слайда '+(i+1)+' загружено.','ok')}
+    catch(error){status(error.message,'error');event.target.value=''}
+   });
   }
  }catch(e){status('Не удалось загрузить оформление: '+e.message,'error')}
 }
@@ -174,15 +187,17 @@ function renderSetContentEditor(){
   {id:'solo',title:'Сет «На одного»',description:'Филадельфия и Лава — для уютного ужина.',image:'./assets/set-solo.webp'},
   {id:'duo',title:'Сет «Вечер вдвоём»',description:'Филадельфия, Тёплый краб и Лава — поделиться вкусом.',image:'./assets/set-duo.webp'},
   {id:'party',title:'Сет «Компания»',description:'Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.',image:'./assets/set-party.webp'},
+  {id:'newyear',title:'Новогодний сет',description:'Праздничное сочетание любимых роллов.',image:''}
  ];
  const savedSets=Array.isArray(siteContent.sets)?siteContent.sets:[];
- root.replaceChildren();siteSetPhotos={};
+ root.replaceChildren();siteSetPhotos={};siteSetGalleryPhotos={};
  definitions.forEach(def=>{
   const saved=savedSets.find(row=>row&&row.id===def.id)||{};
   const image=typeof saved.image==='string'?saved.image:'';
   siteSetPhotos[def.id]=image.startsWith('data:image/')?image:'';
+  siteSetGalleryPhotos[def.id]=Array.isArray(saved.photos)?saved.photos.slice(0,5):[];
   const box=document.createElement('div');box.className='set-admin-card';
-  box.innerHTML='<div class="set-admin-fields"><strong></strong><div class="field"><label>Описание на карточке</label><textarea maxlength="300" data-set-field="'+def.id+'"></textarea></div><div class="field"><label>Ссылка на фото (HTTPS)</label><input type="url" maxlength="2000" data-set-url="'+def.id+'" placeholder="https://..."></div></div><div class="set-admin-image"><img class="set-admin-preview" data-set-preview="'+def.id+'" alt=""><input class="set-admin-file" type="file" accept="image/jpeg,image/png,image/webp" data-set-file="'+def.id+'"><button class="btn" type="button" data-set-clear="'+def.id+'">Сбросить фото</button><div class="help">Загруженное фото сожмётся автоматически.</div></div>';
+  box.innerHTML='<div class="set-admin-fields"><strong></strong><div class="field"><label>Описание на карточке</label><textarea maxlength="300" data-set-field="'+def.id+'"></textarea></div><div class="field"><label>Ссылка на главное фото (можно оставить пустой)</label><input type="url" maxlength="2000" data-set-url="'+def.id+'" placeholder="HTTPS или загрузить файл ниже"></div><div class="field"><label>Главное фото</label><input class="set-admin-file" type="file" accept="image/jpeg,image/png,image/webp" data-set-file="'+def.id+'"></div><div class="field"><label>Дополнительные фото — до 5</label><div class="admin-gallery-grid" data-set-gallery="'+def.id+'"></div></div></div><div class="set-admin-image"><img class="set-admin-preview" data-set-preview="'+def.id+'" alt=""><button class="btn" type="button" data-set-clear="'+def.id+'">Сбросить главное фото</button><div class="help">Фото загружаются с компьютера и сжимаются автоматически.</div></div>';
   root.append(box);
   box.querySelector('strong').textContent=def.title;
   box.querySelector('[data-set-field="'+def.id+'"]').value=typeof saved.description==='string'?saved.description:def.description;
@@ -190,28 +205,42 @@ function renderSetContentEditor(){
   const preview=box.querySelector('[data-set-preview="'+def.id+'"]');
   const isData=image.startsWith('data:image/');
   url.value=isData?'':image;
-  preview.src=image||def.image;
-  url.addEventListener('input',()=>{siteSetPhotos[def.id]='';preview.src=url.value.trim()||def.image});
+  preview.src=safeImage(image||def.image);
+  url.addEventListener('input',()=>{siteSetPhotos[def.id]='';preview.src=safeImage(url.value.trim()||def.image)});
   box.querySelector('[data-set-file="'+def.id+'"]').addEventListener('change',async event=>{
    const file=event.target.files&&event.target.files[0];if(!file)return;
-   try{siteSetPhotos[def.id]=await compressImage(file);url.value='';preview.src=siteSetPhotos[def.id];status('Фото '+def.title+' готово к сохранению.','ok')}
+   try{siteSetPhotos[def.id]=await compressImage(file);url.value='';preview.src=siteSetPhotos[def.id];status('Главное фото '+def.title+' готово к сохранению.','ok')}
    catch(error){status(error.message,'error');event.target.value=''}
   });
-  box.querySelector('[data-set-clear="'+def.id+'"]').addEventListener('click',()=>{siteSetPhotos[def.id]='';url.value='';box.querySelector('[data-set-file="'+def.id+'"]').value='';preview.src=def.image;status('Будет использовано фото по умолчанию после сохранения.')});
+  box.querySelector('[data-set-clear="'+def.id+'"]').addEventListener('click',()=>{siteSetPhotos[def.id]='';url.value='';box.querySelector('[data-set-file="'+def.id+'"]').value='';preview.src=safeImage(def.image);status('Главное фото будет сброшено после сохранения.')});
+  const gallery=box.querySelector('[data-set-gallery="'+def.id+'"]');
+  for(let i=0;i<5;i++){
+   const item=document.createElement('div');item.className='admin-gallery-item';
+   const img=document.createElement('img');img.alt='Фото '+(i+1);img.src=safeImage(siteSetGalleryPhotos[def.id][i]||'');
+   const input=document.createElement('input');input.type='file';input.accept='image/jpeg,image/png,image/webp';input.setAttribute('aria-label','Дополнительное фото '+(i+1)+' для '+def.title);
+   const clear=document.createElement('button');clear.type='button';clear.className='btn';clear.textContent='Убрать';
+   input.addEventListener('change',async event=>{const file=event.target.files&&event.target.files[0];if(!file)return;try{siteSetGalleryPhotos[def.id][i]=await compressImage(file);img.src=siteSetGalleryPhotos[def.id][i];status('Фото '+(i+1)+' сета «'+def.title+'» загружено.','ok')}catch(error){status(error.message,'error');input.value=''}});
+   clear.addEventListener('click',()=>{siteSetGalleryPhotos[def.id][i]='';input.value='';img.src=safeImage('')});
+   item.append(img,input,clear);gallery.append(item);
+  }
  });
 }
+
 const loadSiteContentOriginal=loadSiteContent;
 loadSiteContent=async function(){await loadSiteContentOriginal();renderSetContentEditor()};
 
 $('reloadContent').addEventListener('click',loadSiteContent);
+$('promoImageFile').addEventListener('change',async event=>{const file=event.target.files&&event.target.files[0];if(!file)return;try{sitePromoImage=await compressImage(file);$('promoImagePreview').src=sitePromoImage;status('Фото рекламного блока загружено.','ok')}catch(error){status(error.message,'error');event.target.value=''}});
+$('clearPromoImage').addEventListener('click',()=>{sitePromoImage='';$('promoImagePreview').src=safeImage('');$('promoImageFile').value=''});
 $('saveContent').addEventListener('click',async()=>{
  try{
-  const payload={hero_title:$('heroTitle').value.trim(),hero_subtitle:$('heroSubtitle').value.trim(),hero_button:$('heroButton').value.trim(),promo_title:$('promoTitle').value.trim(),promo_text:$('promoText').value.trim(),promo_button:$('promoButton').value.trim(),promo_link:$('promoLink').value.trim(),slides:[],sets:[]};
+  const payload={hero_title:$('heroTitle').value.trim(),hero_subtitle:$('heroSubtitle').value.trim(),hero_button:$('heroButton').value.trim(),promo_title:$('promoTitle').value.trim(),promo_text:$('promoText').value.trim(),promo_button:$('promoButton').value.trim(),promo_link:$('promoLink').value.trim(),promo_image:sitePromoImage,slides:[],sets:[]};
   document.querySelectorAll('#slideEditor [data-slide]').forEach(el=>{const i=Number(el.dataset.slide);payload.slides[i]=payload.slides[i]||{title:'',accent:'',desc:'',image:'',button:'',active:true};payload.slides[i][el.dataset.key]=el.dataset.key==='active'?el.checked:el.value.trim()});
-  payload.sets=['solo','duo','party'].map(id=>{
+  payload.slides.forEach((slide,i)=>{const imageInput=document.querySelector('[data-slide="'+i+'"][data-key="image"]');slide.image=siteSlidePhotos[i]||(imageInput?imageInput.value.trim():'')});
+  payload.sets=['solo','duo','party','newyear'].map(id=>{
    const description=document.querySelector('[data-set-field="'+id+'"]');
    const url=document.querySelector('[data-set-url="'+id+'"]');
-   return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():'')};
+   return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5)};
   });
   $('saveContent').disabled=true;await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify(payload)});status('Оформление, описания и фото готовых сетов сохранены. Открой магазин заново, чтобы увидеть обновления.','ok');
  }catch(e){status(e.message,'error')}finally{$('saveContent').disabled=false}
