@@ -1136,7 +1136,7 @@ function renderSetPrices(){
     if(card)card.hidden=!available||content.active===false;
     const total=resolved.reduce((sum,row)=>sum+(row.product?Number(row.product.price||0)*row.qty:0),0);
     const pieces=resolved.reduce((sum,row)=>sum+(row.product?Number(row.product.pieces||8)*row.qty:0),0);
-    const weight=resolved.reduce((sum,row)=>sum+(row.product?Number.parseInt(String(row.product.weight||'').replace(/[^0-9]/g,''),10)||0)*row.qty:0),0);
+    const weight=resolved.reduce((sum,row)=>sum+(row.product?((Number.parseInt(String(row.product.weight||'').replace(/[^0-9]/g,''),10)||0)*row.qty):0),0);
     el.textContent=available?money(total):'Временно недоступен';
     const meta=card?.querySelectorAll('.set-meta span');
     if(meta&&meta.length>=2){
