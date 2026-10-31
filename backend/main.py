@@ -400,6 +400,42 @@ def admin_from_header(x_telegram_init_data: str | None) -> None:
 async def get_categories() -> list[dict[str, Any]]:
     return sorted(read_categories(), key=lambda c: int(c.get("sort_order",0)))
 
+def validate_category_update(category_id: str, payload: dict[str, Any], existing: list[dict[str, Any]]) -> dict[str, Any]:
+    current = next((dict(row) for row in existing if row.get("id") == category_id), None)
+    if current is None:
+        raise ValueError("Категория не найдена.")
+    name = payload.get("name", current.get("name", ""))
+    sort_order = payload.get("sort_order", current.get("sort_order", 0))
+    icon = payload.get("icon", current.get("icon", ""))
+    image = payload.get("image", current.get("image", ""))
+    if not isinstance(name, str) or not name.strip() or len(name.strip()) > 60:
+        raise ValueError("Название категории должно содержать от 1 до 60 символов.")
+    if any(row.get("id") != category_id and str(row.get("name", "")).casefold() == name.strip().casefold() for row in existing):
+        raise ValueError("Категория с таким названием уже существует.")
+    if not isinstance(sort_order, int) or isinstance(sort_order, bool) or not 0 <= sort_order <= 1000:
+        raise ValueError("Порядок категории должен быть от 0 до 1000.")
+    if not isinstance(icon, str) or len(icon) > 16:
+        raise ValueError("Значок категории должен быть коротким текстом.")
+    if not isinstance(image, str) or len(image) > 1_000_000:
+        raise ValueError("Изображение категории слишком большое.")
+    if image and not (image.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", image)):
+        raise ValueError("Изображение категории должно быть HTTPS-ссылкой или JPG, PNG, WebP.")
+    current.update({"name": name.strip(), "sort_order": sort_order, "icon": icon.strip(), "image": image.strip()})
+    return current
+
+@app.put("/api/admin/categories/{category_id}")
+async def admin_update_category(category_id: str, payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    categories = read_categories()
+    try:
+        updated_item = validate_category_update(category_id, payload, categories)
+    except ValueError as exc:
+        if str(exc) == "Категория не найдена.":
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    write_categories([updated_item if row.get("id") == category_id else row for row in categories])
+    return {"ok": True, "category": updated_item}
+
 @app.get("/api/admin/categories")
 async def admin_get_categories(x_telegram_init_data: str | None = Header(default=None)) -> list[dict[str, Any]]:
     admin_from_header(x_telegram_init_data)
@@ -768,7 +804,20 @@ def read_site_content() -> dict[str, Any]:
             merged = dict(DEFAULT_SITE_CONTENT)
             merged.update(data)
             merged["slides"] = data.get("slides", DEFAULT_SITE_CONTENT["slides"])
-            merged["sets"] = data.get("sets", DEFAULT_SITE_CONTENT["sets"])
+            saved_sets = data.get("sets", DEFAULT_SITE_CONTENT["sets"])
+            default_by_id = {row["id"]: row for row in DEFAULT_SITE_CONTENT["sets"]}
+            merged_sets = []
+            for row in saved_sets if isinstance(saved_sets, list) else DEFAULT_SITE_CONTENT["sets"]:
+                if not isinstance(row, dict):
+                    continue
+                defaults = default_by_id.get(row.get("id"), {})
+                merged_row = dict(defaults)
+                merged_row.update(row)
+                merged_row.setdefault("items", DEFAULT_SET_ITEMS.get(merged_row.get("id"), []))
+                merged_row.setdefault("active", True)
+                merged_row.setdefault("stock", 0)
+                merged_sets.append(merged_row)
+            merged["sets"] = merged_sets
             return merged
     except (OSError, json.JSONDecodeError):
         pass
