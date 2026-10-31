@@ -1031,13 +1031,22 @@ const favorites = new Set();
 const CART_STORAGE_KEY = 'tihiyRollCartV1';
 const FAVORITES_STORAGE_KEY = 'tihiyRollFavoritesV1';
 const LAST_ORDER_STORAGE_KEY = 'tihiyRollLastOrderV1';
+const SET_CART_STORAGE_KEY = 'tihiyRollSetCartV1';
+let savedSetCounts = {};
 try {
   const savedCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '{}');
   products.forEach(p => { const q = Number(savedCart[p.id] || 0); if (Number.isInteger(q) && q > 0 && q <= 99) cart[p.id] = q; });
   const savedFavorites = JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY) || '[]');
   if (Array.isArray(savedFavorites)) savedFavorites.filter(id => products.some(p => p.id === id)).forEach(id => favorites.add(id));
+  const rawSetCounts = JSON.parse(localStorage.getItem(SET_CART_STORAGE_KEY) || '{}');
+  if (rawSetCounts && typeof rawSetCounts === 'object') savedSetCounts = rawSetCounts;
 } catch (_) {}
-function saveCart() { try { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); } catch (_) {} }
+function saveCart() {
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    if (window.__TIHIY_SET_QUANTITIES) localStorage.setItem(SET_CART_STORAGE_KEY, JSON.stringify(window.__TIHIY_SET_QUANTITIES));
+  } catch (_) {}
+}
 function saveFavorites() { try { localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([...favorites])); } catch (_) {} }
 const money = value => new Intl.NumberFormat('ru-RU').format(value) + ' ₽';
 const menu = document.getElementById('menu');
@@ -1142,7 +1151,7 @@ function renderSetPrices(){
     const el=document.getElementById(id);if(!el)return;
     const rows=SET_PRESETS[key]||[];
     const resolved=rows.map(([pid,qty])=>({product:products.find(p=>p.id===pid),qty}));
-    const available=resolved.length>0&&resolved.every(row=>row.product);
+    const available=resolved.length>0&&resolved.every(row=>row.product&&(row.product.stock==null||Number(row.product.stock)>=row.qty));
     const card=el.closest('.set-card');
     const content=editableSetsContent[key]||{};
     if(card)card.hidden=!available||content.active===false;
@@ -1162,16 +1171,39 @@ function renderSetPrices(){
   if(typeof setQuantities!=='undefined')Object.keys(setQuantities).forEach(syncSetCount);
 }
 
-const setQuantities={solo:0,duo:0,party:0,newyear:0};
+const setQuantities={solo:Number(savedSetCounts.solo)||0,duo:Number(savedSetCounts.duo)||0,party:Number(savedSetCounts.party)||0,newyear:Number(savedSetCounts.newyear)||0};
+window.__TIHIY_SET_QUANTITIES=setQuantities;
 function syncSetCount(key){
  const count=Number(setQuantities[key]||0),out=document.querySelector('[data-set-count="'+key+'"]');
  if(out)out.textContent=String(count);
  const add=document.querySelector('[data-set-card="'+key+'"] [data-set="'+key+'"]');
  if(add){add.textContent=count?'Добавлено ✓':'Добавить сет';add.classList.toggle('is-added',count>0);add.setAttribute('aria-pressed',String(count>0));}
  const plus=document.querySelector('[data-set-qty="plus"][data-set-key="'+key+'"]');
- const stock=Number(editableSetsContent[key]?.stock||0);
- if(plus){plus.disabled=stock>0&&count>=stock;plus.title=plus.disabled?'Больше наборов нет в наличии':''}
- if(add){const unavailable=editableSetsContent[key]?.active===false||(stock>0&&count>=stock);add.disabled=!!unavailable;add.title=add.disabled?'Набор временно недоступен':''}
+ const stock=editableSetsContent[key]?.stock;
+ const limited=stock!==null&&stock!==undefined;
+ if(plus){plus.disabled=limited&&count>=Number(stock);plus.title=plus.disabled?'Больше наборов нет в наличии':''}
+ if(add){const unavailable=editableSetsContent[key]?.active===false||(limited&&count>=Number(stock));add.disabled=!!unavailable;add.title=add.disabled?'Набор временно недоступен':''}
+ try{localStorage.setItem(SET_CART_STORAGE_KEY,JSON.stringify(setQuantities))}catch(_){}
+}
+function reconcileSetCounts(){
+ const remaining={...cart};
+ Object.keys(setQuantities).forEach(key=>{
+  const desired=Math.max(0,Number(setQuantities[key])||0);
+  const content=editableSetsContent[key]||{};
+  const stock=content.stock;
+  let accepted=0;
+  const rows=SET_PRESETS[key]||[];
+  if(content.active!==false){
+   while(accepted<desired){
+    if(stock!==null&&stock!==undefined&&accepted>=Number(stock))break;
+    if(!rows.length||!rows.every(([id,qty])=>(remaining[id]||0)>=qty))break;
+    rows.forEach(([id,qty])=>{remaining[id]=Math.max(0,(remaining[id]||0)-qty)});
+    accepted++;
+   }
+  }
+  setQuantities[key]=accepted;
+  syncSetCount(key);
+ });
 }
 const DEFAULT_SET_CONTENT={
  solo:{description:'Филадельфия и Лава — для уютного ужина.',image:'./assets/set-solo.webp',title:'На одного'},
@@ -1193,7 +1225,7 @@ function applyEditableSets(rows){
     image:typeof row.image==='string'?row.image:'',
     photos:Array.isArray(row.photos)?row.photos.filter(x=>typeof x==='string').slice(0,5):[],
     active:row.active!==false,
-    stock:Number(row.stock)||0
+    stock:row.stock==null?null:Math.max(0,Number(row.stock)||0)
   };
   const card=document.querySelector('[data-set-card="'+row.id+'"]');
   const description=card&&card.querySelector('[data-set-description]');
@@ -1202,9 +1234,9 @@ function applyEditableSets(rows){
     card.hidden=editableSetsContent[row.id].active===false;
     const badge=card.querySelector('.set-stock-badge');
     if(badge)badge.remove();
-    if(editableSetsContent[row.id].stock>0){
+    if(editableSetsContent[row.id].stock!==null){
       const stock=document.createElement('span');stock.className='set-stock-badge';
-      stock.textContent='Осталось: '+editableSetsContent[row.id].stock;
+      stock.textContent=editableSetsContent[row.id].stock===0?'Нет в наличии':'Осталось: '+editableSetsContent[row.id].stock;
       card.querySelector('.set-card-copy')?.append(stock);
     }
   }
@@ -1315,7 +1347,7 @@ document.addEventListener('click',event=>{
  }
  const qtyButton=event.target.closest('[data-set-qty]');
  if(qtyButton){const key=qtyButton.dataset.setKey;const rows=SET_PRESETS[key]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;
-  if(qtyButton.dataset.setQty==='plus'){const stock=Number(editableSetsContent[key]?.stock||0);if(stock>0&&(setQuantities[key]||0)>=stock)return;rows.forEach(([id,qty])=>cart[id]=Math.min(99,(cart[id]||0)+qty));setQuantities[key]=(setQuantities[key]||0)+1}
+  if(qtyButton.dataset.setQty==='plus'){const stock=editableSetsContent[key]?.stock;if(stock!==null&&stock!==undefined&&(setQuantities[key]||0)>=Number(stock))return;rows.forEach(([id,qty])=>cart[id]=Math.min(99,(cart[id]||0)+qty));setQuantities[key]=(setQuantities[key]||0)+1}
   else {if((setQuantities[key]||0)<=0)return;rows.forEach(([id,qty])=>{const next=Math.max(0,(cart[id]||0)-qty);if(next)cart[id]=next;else delete cart[id]});setQuantities[key]--; }
   saveCart();renderMenu(activeFilter);updateCartBar();renderCart();syncSetCount(key);return
  }
@@ -1326,8 +1358,8 @@ document.addEventListener('click',event=>{
  const key=button.dataset.set,rows=SET_PRESETS[key]||[];
  if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;
  const current=Number(setQuantities[key]||0),direction=current>0?-1:1;
- const stock=Number(editableSetsContent[key]?.stock||0);
- if(direction>0&&(editableSetsContent[key]?.active===false||(stock>0&&current>=stock)))return;
+ const stock=editableSetsContent[key]?.stock;
+ if(direction>0&&(editableSetsContent[key]?.active===false||(stock!==null&&stock!==undefined&&current>=Number(stock))))return;
  rows.forEach(([id,qty])=>{const next=Math.max(0,Math.min(99,(cart[id]||0)+(qty*direction)));if(next)cart[id]=next;else delete cart[id]});
  setQuantities[key]=Math.max(0,current+direction);syncSetCount(key);
  saveCart();renderMenu(activeFilter);updateCartBar();renderCart();
@@ -1388,6 +1420,7 @@ function changeQuantity(id, delta) {
   const stock = product && product.stock != null ? Math.max(0, Number(product.stock)||0) : 99;
   const next = Math.max(0, Math.min(99, stock, current + delta));
   if (next) cart[id] = next; else delete cart[id];
+  reconcileSetCounts();
   saveCart();
   renderMenu(activeFilter);
   updateCartBar();
@@ -1618,7 +1651,8 @@ document.getElementById('form').addEventListener('submit', async event => {
       (String(fields.get('fulfillment') || '') === 'Доставка' ? 'Адрес доставки: ' + String(fields.get('delivery_address') || '').trim() : '')
     ].filter(Boolean).join('\\n'),
     items: products.filter(product => (cart[product.id] || 0) > 0)
-      .map(product => ({id: product.id, qty: cart[product.id]}))
+      .map(product => ({id: product.id, qty: cart[product.id]})),
+    sets: Object.entries(setQuantities).filter(([,qty])=>Number(qty)>0).map(([id,qty])=>({id,qty:Number(qty)}))
   };
 
   const selectedPickupDate = dateForPickupChoice(String(fields.get('pickup_day') || ''));
@@ -1841,6 +1875,7 @@ async function loadServerCatalog() {
     products.splice(0, products.length, ...merged);
     renderCustomSetBuilder();
     renderSetPrices();
+    reconcileSetCounts();
     await loadCategoryFilters();
     Object.keys(cart).forEach(id => {
       const product=products.find(p=>p.id===id);
