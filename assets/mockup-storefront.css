@@ -1051,3 +1051,25 @@
  .builder-card .builder-add-one{width:33px!important;height:33px!important;min-width:33px!important;flex-basis:33px!important}
  .builder-card .builder-card-stepper{grid-template-columns:25px 20px 25px!important;width:70px!important;min-width:70px!important;flex-basis:70px!important;height:33px!important;min-height:33px!important}
 }
+
+/* Checkout identity validation: clear red field borders and readable hints */
+.checkout-field.identity-field{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:7px!important}
+.checkout-field.identity-field>input{
+ display:block!important;width:100%!important;box-sizing:border-box!important;
+ border:1px solid rgba(164,188,202,.34)!important;
+ transition:border-color .16s,box-shadow .16s,background .16s
+}
+.checkout-field.identity-field>input:focus{border-color:#5d9fce!important}
+.checkout-field.identity-field>input.is-invalid,
+.checkout-field.identity-field.has-error>input{
+ border:1.5px solid #ff4d55!important;
+ background:rgba(113,22,31,.12)!important;
+ box-shadow:0 0 0 2px rgba(255,65,75,.15),0 0 15px rgba(255,65,75,.08)!important
+}
+.checkout-field.identity-field>input.is-invalid:focus{border-color:#ff6870!important;box-shadow:0 0 0 3px rgba(255,65,75,.2)!important}
+.field-error{
+ display:block!important;margin:0!important;padding:0 2px!important;
+ color:#ff777d!important;font-size:11px!important;font-weight:650!important;line-height:1.35!important
+}
+.field-error[hidden]{display:none!important}
+#deliveryAddress{font-size:14px!important}
