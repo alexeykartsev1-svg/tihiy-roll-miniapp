@@ -1156,6 +1156,10 @@ function syncSetCount(key){
  if(out)out.textContent=String(count);
  const add=document.querySelector('[data-set-card="'+key+'"] [data-set="'+key+'"]');
  if(add){add.textContent=count?'Добавлено ✓':'Добавить сет';add.classList.toggle('is-added',count>0);add.setAttribute('aria-pressed',String(count>0));}
+ const plus=document.querySelector('[data-set-qty="plus"][data-set-key="'+key+'"]');
+ const stock=Number(editableSetsContent[key]?.stock||0);
+ if(plus){plus.disabled=stock>0&&count>=stock;plus.title=plus.disabled?'Больше наборов нет в наличии':''}
+ if(add){const unavailable=editableSetsContent[key]?.active===false||(stock>0&&count>=stock);add.disabled=!!unavailable;add.title=add.disabled?'Набор временно недоступен':''}
 }
 const DEFAULT_SET_CONTENT={
  solo:{description:'Филадельфия и Лава — для уютного ужина.',image:'./assets/set-solo.webp',title:'На одного'},
@@ -1299,7 +1303,7 @@ document.addEventListener('click',event=>{
  }
  const qtyButton=event.target.closest('[data-set-qty]');
  if(qtyButton){const key=qtyButton.dataset.setKey;const rows=SET_PRESETS[key]||[];if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;
-  if(qtyButton.dataset.setQty==='plus'){rows.forEach(([id,qty])=>cart[id]=Math.min(99,(cart[id]||0)+qty));setQuantities[key]=(setQuantities[key]||0)+1}
+  if(qtyButton.dataset.setQty==='plus'){const stock=Number(editableSetsContent[key]?.stock||0);if(stock>0&&(setQuantities[key]||0)>=stock)return;rows.forEach(([id,qty])=>cart[id]=Math.min(99,(cart[id]||0)+qty));setQuantities[key]=(setQuantities[key]||0)+1}
   else {if((setQuantities[key]||0)<=0)return;rows.forEach(([id,qty])=>{const next=Math.max(0,(cart[id]||0)-qty);if(next)cart[id]=next;else delete cart[id]});setQuantities[key]--; }
   saveCart();renderMenu(activeFilter);updateCartBar();renderCart();syncSetCount(key);return
  }
@@ -1310,6 +1314,8 @@ document.addEventListener('click',event=>{
  const key=button.dataset.set,rows=SET_PRESETS[key]||[];
  if(!rows.length||!rows.every(([id])=>products.some(p=>p.id===id)))return;
  const current=Number(setQuantities[key]||0),direction=current>0?-1:1;
+ const stock=Number(editableSetsContent[key]?.stock||0);
+ if(direction>0&&(editableSetsContent[key]?.active===false||(stock>0&&current>=stock)))return;
  rows.forEach(([id,qty])=>{const next=Math.max(0,Math.min(99,(cart[id]||0)+(qty*direction)));if(next)cart[id]=next;else delete cart[id]});
  setQuantities[key]=Math.max(0,current+direction);syncSetCount(key);
  saveCart();renderMenu(activeFilter);updateCartBar();renderCart();
