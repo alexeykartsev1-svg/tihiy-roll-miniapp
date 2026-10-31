@@ -15,15 +15,11 @@
   <main class="reference-board" id="referenceBoard">
     <!-- Catalogue screen -->
     <section class="device-frame catalogue-device" aria-label="Каталог магазина">
-      <div class="device-status"><span>9:41</span><span class="status-icons"><i class="signal"></i><i class="wifi"></i><i class="battery"></i></span></div>
+      
       <div class="catalogue-header">
         <div class="brand-row">
+          <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><linearGradient id="rollLogoRed" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff7560"/><stop offset="1" stop-color="#df282d"/></linearGradient></defs><circle cx="30" cy="36" r="23" fill="#0b151a" stroke="url(#rollLogoRed)" stroke-width="3.2"/><circle cx="30" cy="36" r="14.5" fill="none" stroke="#f1eee8" stroke-width="2.2"/><circle cx="30" cy="36" r="7" fill="none" stroke="#ff5b4c" stroke-width="2.6"/><path d="M19 29c5-5 17-6 23 1M17 43c7 7 19 8 27 1" fill="none" stroke="#f4eee7" stroke-width="1.8" stroke-linecap="round"/><path d="M39 5 27 22M48 9 34 25" fill="none" stroke="#ff5146" stroke-width="3.2" stroke-linecap="round"/><path d="M13 11c4 2 7 5 8 9-5-1-9-4-11-8 1-1 2-1 3-1Z" fill="#ff6a54"/><path d="M29 14c-1 3-3 5-6 6 0-4 2-7 5-9 1 1 1 2 1 3Z" fill="#d9272e"/></svg></a>
           <button class="round-icon menu-trigger" type="button" aria-label="Открыть меню">☰</button>
-          <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
-          <div class="header-actions">
-            <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b id="favCount">0</b></button>
-            <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="cartCount">0</b></button>
-          </div>
         </div>
         <div class="catalogue-title">
           <h1>Наше меню</h1>
@@ -50,21 +46,32 @@
       <section class="workflow-screen home-screen" id="homeScreen" aria-label="Главная">
         <div class="workflow-scroll home-scroll">
           <div class="workflow-topbar">
-            <span class="home-top-spacer"></span>
-            <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
-            <div class="header-actions">
-              <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b id="homeFavCount">0</b></button>
-              <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="homeCartCount">0</b></button>
-            </div>
+            <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><linearGradient id="rollLogoRed" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff7560"/><stop offset="1" stop-color="#df282d"/></linearGradient></defs><circle cx="30" cy="36" r="23" fill="#0b151a" stroke="url(#rollLogoRed)" stroke-width="3.2"/><circle cx="30" cy="36" r="14.5" fill="none" stroke="#f1eee8" stroke-width="2.2"/><circle cx="30" cy="36" r="7" fill="none" stroke="#ff5b4c" stroke-width="2.6"/><path d="M19 29c5-5 17-6 23 1M17 43c7 7 19 8 27 1" fill="none" stroke="#f4eee7" stroke-width="1.8" stroke-linecap="round"/><path d="M39 5 27 22M48 9 34 25" fill="none" stroke="#ff5146" stroke-width="3.2" stroke-linecap="round"/><path d="M13 11c4 2 7 5 8 9-5-1-9-4-11-8 1-1 2-1 3-1Z" fill="#ff6a54"/><path d="M29 14c-1 3-3 5-6 6 0-4 2-7 5-9 1 1 1 2 1 3Z" fill="#d9272e"/></svg></a>
+            <button class="round-icon menu-trigger" type="button" aria-label="Открыть меню">☰</button>
           </div>
           <section class="home-hero">
             <span class="home-eyebrow">СВЕЖЕЕ К ВАШЕМУ ВРЕМЕНИ</span>
-            <h2>Тихий ролл</h2>
+            <h2>Вкус в каждой детали</h2>
             <p>Любимые роллы, сеты и азиатские закуски. Готовим к выбранному времени — чтобы вы получили заказ свежим.</p>
             <div class="home-actions">
               <button class="add-cart-button" type="button" data-home-catalog>Открыть каталог <span>›</span></button>
               <button class="home-secondary" type="button" data-home-builder>Собрать свой сет</button>
             </div>
+          </section>
+          <section class="home-service-panel" aria-label="Режим работы и заказ по телефону">
+            <div class="home-hours-card">
+              <div class="home-hours-state"><i id="homeHoursDot" class="hours-dot is-closed"></i><b id="homeHoursStatus">Проверяем режим работы…</b></div>
+              <div class="home-hours-lines">
+                <div><span>Пн, Вт, Чт, Пт, Сб</span><strong>12:00–20:00</strong></div>
+                <div><span>Ср, Вс</span><strong>Выходной</strong></div>
+              </div>
+              <small class="home-hours-note">Время по Чарышскому · Алтайский край</small>
+            </div>
+            <a class="home-phone-button" id="homePhoneOrder" href="tel:+79230005857">
+              <span class="home-phone-icon" aria-hidden="true">☎</span>
+              <span class="home-phone-copy"><b>Заказать по телефону</b><small id="homePhoneText">+7 923 000-58-57</small></span>
+              <span class="home-phone-arrow" aria-hidden="true">↗</span>
+            </a>
           </section>
           <section class="home-section">
             <div class="home-section-heading"><span>ВЫБИРАЙТЕ СВОЁ</span><h3>Что сегодня хочется?</h3></div>
@@ -75,24 +82,14 @@
               <button type="button" data-home-filter="snacks"><span>🍤</span><b>Закуски</b><small>К заказу</small></button>
             </div>
           </section>
-          <section class="home-pickup-card">
-            <span class="home-eyebrow">САМОВЫВОЗ</span>
-            <b>Забрать заказ</b>
-            <p id="homePickupAddress">Адрес загрузится из настроек магазина</p>
-            <button type="button" data-home-catalog>Выбрать блюда <span>›</span></button>
-          </section>
         </div>
       </section>
 
       <section class="workflow-screen favorites-screen" id="favoritesScreen" aria-label="Избранное">
         <div class="workflow-scroll favorites-scroll">
           <div class="workflow-topbar">
+            <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><linearGradient id="rollLogoRed" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff7560"/><stop offset="1" stop-color="#df282d"/></linearGradient></defs><circle cx="30" cy="36" r="23" fill="#0b151a" stroke="url(#rollLogoRed)" stroke-width="3.2"/><circle cx="30" cy="36" r="14.5" fill="none" stroke="#f1eee8" stroke-width="2.2"/><circle cx="30" cy="36" r="7" fill="none" stroke="#ff5b4c" stroke-width="2.6"/><path d="M19 29c5-5 17-6 23 1M17 43c7 7 19 8 27 1" fill="none" stroke="#f4eee7" stroke-width="1.8" stroke-linecap="round"/><path d="M39 5 27 22M48 9 34 25" fill="none" stroke="#ff5146" stroke-width="3.2" stroke-linecap="round"/><path d="M13 11c4 2 7 5 8 9-5-1-9-4-11-8 1-1 2-1 3-1Z" fill="#ff6a54"/><path d="M29 14c-1 3-3 5-6 6 0-4 2-7 5-9 1 1 1 2 1 3Z" fill="#d9272e"/></svg></a>
             <button class="round-icon menu-trigger" type="button" aria-label="Открыть меню">☰</button>
-            <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
-            <div class="header-actions">
-              <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b id="favoritesScreenFavCount">0</b></button>
-              <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="favoritesScreenCartCount">0</b></button>
-            </div>
           </div>
           <header class="favorites-page-heading">
             <h2>Избранное</h2>
@@ -106,12 +103,8 @@
       <section class="workflow-screen" id="builderScreen" aria-label="Конструктор сета">
         <div class="workflow-scroll">
           <div class="workflow-topbar">
+            <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><linearGradient id="rollLogoRed" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff7560"/><stop offset="1" stop-color="#df282d"/></linearGradient></defs><circle cx="30" cy="36" r="23" fill="#0b151a" stroke="url(#rollLogoRed)" stroke-width="3.2"/><circle cx="30" cy="36" r="14.5" fill="none" stroke="#f1eee8" stroke-width="2.2"/><circle cx="30" cy="36" r="7" fill="none" stroke="#ff5b4c" stroke-width="2.6"/><path d="M19 29c5-5 17-6 23 1M17 43c7 7 19 8 27 1" fill="none" stroke="#f4eee7" stroke-width="1.8" stroke-linecap="round"/><path d="M39 5 27 22M48 9 34 25" fill="none" stroke="#ff5146" stroke-width="3.2" stroke-linecap="round"/><path d="M13 11c4 2 7 5 8 9-5-1-9-4-11-8 1-1 2-1 3-1Z" fill="#ff6a54"/><path d="M29 14c-1 3-3 5-6 6 0-4 2-7 5-9 1 1 1 2 1 3Z" fill="#d9272e"/></svg></a>
             <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
-            <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
-            <div class="header-actions">
-              <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b id="builderFavCount">0</b></button>
-              <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="builderCartCount">0</b></button>
-            </div>
           </div>
           <div class="workflow-steps">
             <div class="workflow-step current"><i>1</i><span>Выбор роллов</span></div>
@@ -146,12 +139,8 @@
       <section class="workflow-screen" id="basketScreen" aria-label="Корзина">
         <div class="workflow-scroll">
           <div class="workflow-topbar">
+            <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><linearGradient id="rollLogoRed" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff7560"/><stop offset="1" stop-color="#df282d"/></linearGradient></defs><circle cx="30" cy="36" r="23" fill="#0b151a" stroke="url(#rollLogoRed)" stroke-width="3.2"/><circle cx="30" cy="36" r="14.5" fill="none" stroke="#f1eee8" stroke-width="2.2"/><circle cx="30" cy="36" r="7" fill="none" stroke="#ff5b4c" stroke-width="2.6"/><path d="M19 29c5-5 17-6 23 1M17 43c7 7 19 8 27 1" fill="none" stroke="#f4eee7" stroke-width="1.8" stroke-linecap="round"/><path d="M39 5 27 22M48 9 34 25" fill="none" stroke="#ff5146" stroke-width="3.2" stroke-linecap="round"/><path d="M13 11c4 2 7 5 8 9-5-1-9-4-11-8 1-1 2-1 3-1Z" fill="#ff6a54"/><path d="M29 14c-1 3-3 5-6 6 0-4 2-7 5-9 1 1 1 2 1 3Z" fill="#d9272e"/></svg></a>
             <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
-            <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
-            <div class="header-actions">
-              <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b id="basketFavCount">0</b></button>
-              <button class="header-icon cart-head" type="button" aria-label="Корзина">🛒<b id="basketCartCount">0</b></button>
-            </div>
           </div>
           <div class="workflow-steps">
             <div class="workflow-step"><i>1</i><span>Выбор роллов</span></div>
@@ -184,11 +173,8 @@
       <section class="workflow-screen" id="confirmationScreen" aria-label="Подтверждение заказа">
         <div class="workflow-scroll">
           <div class="workflow-topbar">
+            <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><linearGradient id="rollLogoRed" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff7560"/><stop offset="1" stop-color="#df282d"/></linearGradient></defs><circle cx="30" cy="36" r="23" fill="#0b151a" stroke="url(#rollLogoRed)" stroke-width="3.2"/><circle cx="30" cy="36" r="14.5" fill="none" stroke="#f1eee8" stroke-width="2.2"/><circle cx="30" cy="36" r="7" fill="none" stroke="#ff5b4c" stroke-width="2.6"/><path d="M19 29c5-5 17-6 23 1M17 43c7 7 19 8 27 1" fill="none" stroke="#f4eee7" stroke-width="1.8" stroke-linecap="round"/><path d="M39 5 27 22M48 9 34 25" fill="none" stroke="#ff5146" stroke-width="3.2" stroke-linecap="round"/><path d="M13 11c4 2 7 5 8 9-5-1-9-4-11-8 1-1 2-1 3-1Z" fill="#ff6a54"/><path d="M29 14c-1 3-3 5-6 6 0-4 2-7 5-9 1 1 1 2 1 3Z" fill="#d9272e"/></svg></a>
             <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
-            <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
-            <div class="header-actions">
-              <button class="header-icon" type="button" data-nav="favorites" aria-label="Избранное">♡<b>♡</b></button>
-            </div>
           </div>
           <div class="workflow-steps">
             <div class="workflow-step current"><i>1</i><span>Заказ принят</span></div>
@@ -231,12 +217,14 @@
     <!-- Product detail screen: always visible alongside the catalogue on desktop; opens as a full-screen view on mobile. -->
     <section class="device-frame detail-device" id="detailDevice" aria-label="Карточка выбранного товара">
       <div class="detail-image-stage">
-        <div class="device-status detail-status"><span>9:41</span><span class="status-icons"><i class="signal"></i><i class="wifi"></i><i class="battery"></i></span></div>
+        
         <img id="detailHero" src="./assets/set-party.webp" alt="Филадельфия"><div class="detail-photo-count" id="detailPhotoCount">1 / 5</div>
         <div class="detail-topbar">
           <button class="round-icon detail-back" type="button" id="detailBack" aria-label="Назад">‹</button>
+          <a class="brand-logo detail-brand-logo" href="#catalogue" aria-label="Тихий ролл">
+            <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><linearGradient id="rollLogoRed" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff7560"/><stop offset="1" stop-color="#df282d"/></linearGradient></defs><circle cx="30" cy="36" r="23" fill="#0b151a" stroke="url(#rollLogoRed)" stroke-width="3.2"/><circle cx="30" cy="36" r="14.5" fill="none" stroke="#f1eee8" stroke-width="2.2"/><circle cx="30" cy="36" r="7" fill="none" stroke="#ff5b4c" stroke-width="2.6"/><path d="M19 29c5-5 17-6 23 1M17 43c7 7 19 8 27 1" fill="none" stroke="#f4eee7" stroke-width="1.8" stroke-linecap="round"/><path d="M39 5 27 22M48 9 34 25" fill="none" stroke="#ff5146" stroke-width="3.2" stroke-linecap="round"/><path d="M13 11c4 2 7 5 8 9-5-1-9-4-11-8 1-1 2-1 3-1Z" fill="#ff6a54"/><path d="M29 14c-1 3-3 5-6 6 0-4 2-7 5-9 1 1 1 2 1 3Z" fill="#d9272e"/></svg>
+          </a>
           <div class="detail-top-actions">
-            <button class="round-icon" type="button" id="detailFavorite" aria-label="Добавить в избранное">♡</button>
             <button class="round-icon" type="button" id="detailShare" aria-label="Поделиться">⇧</button>
           </div>
         </div>
@@ -251,7 +239,7 @@
           <button class="thumb thumb-next" type="button" aria-label="Следующие фото">›</button>
         </div>
         <div class="detail-copy">
-          <h2 id="detailName">Филадельфия</h2>
+          <div class="detail-title-row"><h2 id="detailName">Филадельфия</h2><button class="detail-favorite-inline" type="button" id="detailFavorite" aria-label="Добавить в избранное">♡</button></div>
           <p id="detailDescription">Классический ролл с нежным лососем и сливочным сыром.</p>
           <div class="product-facts">
             <div><strong id="detailPieces">8 шт.</strong><span>Количество</span></div>
