@@ -177,9 +177,10 @@ function activateWorkflow(screen){
  state.activeScreen=screen;
  $('.reference-board').classList.add('workflow-mode');
  $('.catalogue-device').classList.add('workflow-mode');
- $('.workflow-screen').forEach(x=>x.classList.toggle('active',x.id===screen));
+ $$('.workflow-screen').forEach(x=>x.classList.toggle('active',x.id===screen));
  const activeNav=screen==='confirmationScreen'?'cart':screen.replace('Screen','').replace('basket','cart');
- $('.bottom-nav button').forEach(x=>x.classList.toggle('active',x.dataset.nav===activeNav));
+ $$('.bottom-nav button').forEach(x=>x.classList.toggle('active',x.dataset.nav===activeNav));
+ $$('.workflow-steps').forEach(group=>$$('.workflow-step',group).forEach((step,index)=>step.classList.toggle('completed',screen==='basketScreen'&&index===0)));
  $('#detailDevice').classList.remove('mobile-active');
  document.body.classList.remove('detail-open');
  document.body.style.overflow='';
