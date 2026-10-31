@@ -279,3 +279,10 @@ body{background:radial-gradient(ellipse at 55% -20%,#2a1517 0,#10181d 35%,#070b0
  .card-actions{flex-wrap:wrap}
  .details-link{flex:1}
 }
+
+
+.stock-chip{display:inline-flex;align-items:center;border:1px solid rgba(100,210,145,.22);border-radius:7px;background:rgba(46,154,98,.1);color:#8bdcab;padding:4px 6px;font-size:9px;white-space:nowrap}
+.stock-chip.sold-out{border-color:rgba(255,88,80,.28);background:rgba(255,64,55,.12);color:#ff948a}
+.qty button:disabled,.set-qty button:disabled{opacity:.36;cursor:not-allowed;filter:grayscale(.4)}
+.card .qty button:disabled{opacity:.35}
+.product-dialog #detailAdd:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.3)}
