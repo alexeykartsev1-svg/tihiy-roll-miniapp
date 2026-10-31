@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - storefront-gallery-newyear-20261031
+      - premium-redesign-20261031
   pull_request:
     branches:
       - main
@@ -30,11 +31,18 @@ jobs:
         run: |
           node - <<'NODE'
           const fs = require('node:fs');
-          for (const file of ['index.html', 'admin.html']) {
+          for (const file of ['index.html', 'admin.html', 'assets/admin-workspace.js']) {
             const html = fs.readFileSync(file, 'utf8');
             const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)];
             if (!scripts.length) throw new Error(`No script in ${file}`);
             scripts.forEach((match) => new Function(match[1]));
             console.log(`OK: ${file} (${scripts.length} script block(s))`);
           }
+          const front = fs.readFileSync('index.html', 'utf8');
+          const admin = fs.readFileSync('admin.html', 'utf8');
+          for (const asset of ['assets/premium-storefront.css', 'assets/premium-admin.css', 'assets/admin-workspace.js']) {
+            if (!fs.existsSync(asset)) throw new Error('Missing redesign asset: ' + asset);
+          }
+          if (!front.includes('premium-storefront.css')) throw new Error('Storefront theme is not linked');
+          if (!admin.includes('premium-admin.css') || !admin.includes('admin-workspace.js')) throw new Error('Admin redesign assets are not linked');
           NODE
