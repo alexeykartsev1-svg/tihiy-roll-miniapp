@@ -440,3 +440,18 @@
  .card-add{width:40px;height:40px;flex-basis:40px}
  .card-quantity{grid-template-columns:30px 23px 30px;height:38px}
 }
+
+/* Owner-only admin entry in the storefront menu */
+.admin-panel-entry{
+ display:flex;align-items:center;gap:12px;width:100%;min-height:62px;margin:14px 0 12px;padding:10px 13px;
+ border:1px solid rgba(255,91,79,.42);border-radius:14px;
+ background:linear-gradient(110deg,rgba(237,55,48,.17),rgba(11,24,30,.96));
+ color:#f6f8f9;text-decoration:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 7px 20px rgba(0,0,0,.18)
+}
+.admin-panel-entry[hidden]{display:none!important}
+.admin-panel-entry-icon{display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;border-radius:11px;background:linear-gradient(145deg,#ff6252,#df282c);color:white;font-size:19px}
+.admin-panel-entry-copy{display:grid;gap:3px;min-width:0}
+.admin-panel-entry-copy b{font-size:14px;font-weight:850}
+.admin-panel-entry-copy small{color:#a9b8be;font-size:10px}
+.admin-panel-entry-arrow{margin-left:auto;color:#ff8d82;font-size:20px;font-weight:800}
+.admin-panel-entry:active{transform:scale(.985);filter:brightness(1.12)}
