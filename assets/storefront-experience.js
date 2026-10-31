@@ -21,8 +21,6 @@
     popular.id='homePopular';popular.className='section home-popular';
     popular.innerHTML='<div class="section-heading"><h2>Популярное</h2><a href="#menu-section" class="section-note">Смотреть всё →</a></div><div class="home-popular-grid" id="homePopularGrid"></div>';
     section.after(popular);
-    const guideTitle=$('#how-to-order');
-    if(guideTitle)guideTitle.after(popular);
     const categories=[
       {id:'rolls',label:'Роллы',hint:'Классические и авторские',filter:'all',emoji:'🍣',pick:p=>['classic','warm'].includes(p.cat)},
       {id:'sets',label:'Сеты',hint:'Готовые сочетания',target:'#sets-section',emoji:'🎁'},
@@ -122,7 +120,7 @@
     favorite.addEventListener('click',()=>{
       const id=dialog.dataset.productId;if(!id)return;
       if(store.favorites.has(id))store.favorites.delete(id);else store.favorites.add(id);
-      try{localStorage.setItem('tihiyRollFavoritesV1',JSON.stringify([...store.favorites]))}catch(_){}
+      store.saveFavorites?.();
       store.renderMenu(store.activeFilter);
       updateDetailFavorite();
     });
@@ -139,6 +137,13 @@
       favorite.classList.toggle('active',active);favorite.textContent=active?'♥':'♡';
       favorite.setAttribute('aria-label',active?'Убрать из избранного':'Добавить в избранное');
     }
+    const modalObserver=new MutationObserver(()=>{
+      if(!dialog.classList.contains('show'))return;
+      const title=$('#detailTitle',dialog)?.textContent||'';
+      const product=store.products.find(item=>item.name===title);
+      if(product)window.__TIHIY_UPDATE_DETAIL(product);
+    });
+    modalObserver.observe(dialog,{attributes:true,attributeFilter:['class']});
     window.__TIHIY_UPDATE_DETAIL=product=>{
       if(!product)return;
       dialog.dataset.productId=product.id;
