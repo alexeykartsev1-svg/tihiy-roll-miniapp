@@ -45,17 +45,43 @@
 
       <section class="workflow-screen home-screen" id="homeScreen" aria-label="Главная">
         <div class="workflow-scroll home-scroll">
-          <div class="workflow-topbar">
+          <div class="workflow-topbar home-topbar">
             <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="30" cy="36" r="23" fill="#0b151a" stroke="#ef443d" stroke-width="3.2"/><circle cx="30" cy="36" r="14.5" fill="none" stroke="#f1eee8" stroke-width="2.2"/><circle cx="30" cy="36" r="7" fill="none" stroke="#ff5b4c" stroke-width="2.6"/><path d="M19 29c5-5 17-6 23 1M17 43c7 7 19 8 27 1" fill="none" stroke="#f4eee7" stroke-width="1.8" stroke-linecap="round"/><path d="M39 5 27 22M48 9 34 25" fill="none" stroke="#ff5146" stroke-width="3.2" stroke-linecap="round"/><path d="M13 11c4 2 7 5 8 9-5-1-9-4-11-8 1-1 2-1 3-1Z" fill="#ff6a54"/><path d="M29 14c-1 3-3 5-6 6 0-4 2-7 5-9 1 1 1 2 1 3Z" fill="#d9272e"/></svg></a>
-            <button class="round-icon menu-trigger" type="button" aria-label="Открыть меню">☰</button>
+            <button class="round-icon menu-trigger home-menu-trigger" type="button" aria-label="Открыть меню">☰</button>
           </div>
           <section class="home-hero">
-            <span class="home-eyebrow">СВЕЖЕЕ К ВАШЕМУ ВРЕМЕНИ</span>
-            <h2>Вкус в каждой детали</h2>
-            <p>Любимые роллы, сеты и азиатские закуски. Готовим к выбранному времени — чтобы вы получили заказ свежим.</p>
-            <div class="home-actions">
-              <button class="add-cart-button" type="button" data-home-catalog>Открыть каталог <span>›</span></button>
-              <button class="home-secondary" type="button" data-home-builder>Собрать свой сет</button>
+            <img class="home-hero-photo" id="homeHeroPhoto" src="./assets/set-party.webp" alt="Свежие роллы" loading="eager">
+            <div class="home-hero-shade"></div>
+            <div class="home-hero-copy">
+              <h2>Вкус<br>в каждой<br>детали</h2>
+              <p>Роллы · Сеты · Хот-доги · Закуски</p>
+            </div>
+          </section>
+          <div class="home-actions home-actions-cards">
+            <button class="home-action-card home-action-catalog" type="button" data-home-catalog>
+              <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="15" height="15" rx="3"/><rect x="28" y="5" width="15" height="15" rx="3"/><rect x="5" y="28" width="15" height="15" rx="3"/><rect x="28" y="28" width="15" height="15" rx="3"/></svg>
+              <span>Открыть<br>каталог</span><i>›</i>
+            </button>
+            <button class="home-action-card home-action-builder" type="button" data-home-builder>
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5c-6 0-10 4-11 9-5 0-8 4-8 9 0 5 3 9 8 10v9h22v-9c5-2 8-6 8-11 0-5-4-9-9-9-2-5-5-8-10-8Z"/><path d="M17 36h14"/></svg>
+              <span>Собрать<br>свой сет</span><i>›</i>
+            </button>
+          </div>
+          <section class="home-section home-category-section">
+            <div class="home-section-heading"><span>ВЫБИРАЙТЕ СВОЁ</span><h3>Что сегодня хочется?</h3></div>
+            <div class="home-shortcuts home-category-grid">
+              <button class="home-category-card" type="button" data-home-filter="sets" aria-pressed="false">
+                <img data-home-category-image="sets" src="./assets/set-party.webp" alt="" loading="lazy"><span><b>Сеты</b><i>›</i></span>
+              </button>
+              <button class="home-category-card" type="button" data-home-filter="rolls" aria-pressed="false">
+                <img data-home-category-image="rolls" src="./assets/set-duo.webp" alt="" loading="lazy"><span><b>Роллы</b><i>›</i></span>
+              </button>
+              <button class="home-category-card" type="button" data-home-filter="dogs" aria-pressed="false">
+                <img data-home-category-image="dogs" src="./assets/set-duo.webp" alt="" loading="lazy"><span><b>Хот-доги</b><i>›</i></span>
+              </button>
+              <button class="home-category-card" type="button" data-home-filter="snacks" aria-pressed="false">
+                <img data-home-category-image="snacks" src="./assets/set-solo.webp" alt="" loading="lazy"><span><b>Закуски</b><i>›</i></span>
+              </button>
             </div>
           </section>
           <section class="home-service-panel" aria-label="Режим работы и заказ по телефону">
@@ -73,14 +99,9 @@
               <span class="home-phone-arrow" aria-hidden="true">↗</span>
             </a>
           </section>
-          <section class="home-section">
-            <div class="home-section-heading"><span>ВЫБИРАЙТЕ СВОЁ</span><h3>Что сегодня хочется?</h3></div>
-            <div class="home-shortcuts">
-              <button type="button" data-home-filter="sets"><span>🍱</span><b>Сеты</b><small>Готовые наборы</small></button>
-              <button type="button" data-home-filter="rolls"><span>🍣</span><b>Роллы</b><small>Любимая классика</small></button>
-              <button type="button" data-home-filter="dogs"><span>🌭</span><b>Хот-доги</b><small>Азиатский вкус</small></button>
-              <button type="button" data-home-filter="snacks"><span>🍤</span><b>Закуски</b><small>К заказу</small></button>
-            </div>
+          <section class="home-popular-section">
+            <header class="home-popular-heading"><h3>Популярное</h3><button type="button" data-home-catalog>Смотреть все <span>›</span></button></header>
+            <div class="catalogue-grid home-popular-grid" id="homePopularGrid"></div>
           </section>
         </div>
       </section>
@@ -307,7 +328,7 @@
           <button class="add-cart-button submit-order" type="submit" id="submitOrder">Отправить заказ ↗</button>
         </form></section></div>
   <div class="modal-layer" id="favoritesModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>СОХРАНЁННЫЕ БЛЮДА</small><h2>Избранное</h2></div><button type="button" class="sheet-close" data-close="favoritesModal">×</button></header><div id="favoritesList"></div></section></div>
-  <div class="modal-layer" id="filtersModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>МЕНЮ МАГАЗИНА</small><h2>Разделы и фильтры</h2></div><button type="button" class="sheet-close" data-close="filtersModal">×</button></header><div class="filter-options" id="filterOptions"></div><a class="admin-panel-entry" id="adminPanelEntry" href="./admin.html" hidden><span class="admin-panel-entry-icon">⚙</span><span class="admin-panel-entry-copy"><b>Админ-панель</b><small>Управление заказами и магазином</small></span><span class="admin-panel-entry-arrow">↗</span></a><button class="add-cart-button" id="applyFilters">Показать блюда</button></section></div>
+  <div class="modal-layer" id="filtersModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>МЕНЮ МАГАЗИНА</small><h2>Разделы и фильтры</h2></div><button type="button" class="sheet-close" data-close="filtersModal">×</button></header><div class="filter-options" id="filterOptions"></div><a class="admin-panel-entry" id="adminPanelEntry" href="./admin.html"><span class="admin-panel-entry-icon">⚙</span><span class="admin-panel-entry-copy"><b>Админ-панель</b><small>Управление заказами и магазином</small></span><span class="admin-panel-entry-arrow">↗</span></a><button class="add-cart-button" id="applyFilters">Показать блюда</button></section></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
