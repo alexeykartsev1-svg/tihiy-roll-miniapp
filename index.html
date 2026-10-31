@@ -3,105 +3,123 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#090b0d">
-  <meta name="description" content="Тихий ролл — свежие роллы, сеты и азиатские хот-доги. Заказ к удобному времени.">
-  <title>Тихий ролл — меню и заказ</title>
+  <meta name="theme-color" content="#05090c">
+  <meta name="description" content="Тихий ролл — роллы, сеты, азиатские хот-доги и закуски. Заказ к удобному времени.">
+  <title>Тихий ролл — меню</title>
   <link rel="preconnect" href="https://tihiy-roll-order-api.onrender.com">
-  <link rel="stylesheet" href="./assets/new-storefront.css?v=1">
+  <link rel="stylesheet" href="./assets/mockup-storefront.css?v=stage1">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="./assets/new-storefront.js?v=1" defer></script>
+  <script src="./assets/mockup-storefront.js?v=stage1" defer></script>
 </head>
 <body>
-  <div class="page-shell">
-    <header class="site-header">
-      <a class="brand" href="#home" aria-label="Тихий ролл — главная">
-        <span class="brand-symbol">ТР</span>
-        <span class="brand-copy"><strong>ТИХИЙ РОЛЛ</strong><small>АЗИАТСКАЯ КУХНЯ</small></span>
-      </a>
-      <div class="header-right">
-        <a class="header-phone" id="headerPhone" href="tel:+79230005857"><span class="phone-mark">↗</span><span><small>ЗАКАЗАТЬ ПО ТЕЛЕФОНУ</small><b>8 923 000 58 57</b></span></a>
-        <span class="open-status" id="openStatus"><i></i><span>Загружаем меню</span></span>
-      </div>
-    </header>
-
-    <nav class="desktop-nav" aria-label="Основная навигация">
-      <a class="nav-active" href="#home">Главная</a>
-      <a href="#menu">Меню</a>
-      <a href="#sets">Готовые сеты</a>
-      <a href="#builder">Конструктор</a>
-      <button type="button" data-open-favorites>Избранное <span id="favoriteBadge">0</span></button>
-      <button type="button" class="nav-orders" data-open-orders>Мои заказы</button>
-      <a class="nav-admin" id="adminLink" href="admin.html" hidden>Управление</a>
-    </nav>
-
-    <main id="home">
-      <section class="hero" aria-labelledby="heroTitle">
-        <div class="hero-backdrop"><img id="heroPhoto" src="" alt="Роллы Тихий ролл"></div>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-          <div class="kicker"><span></span> ВКУС, КОТОРЫЙ ХОЧЕТСЯ ПОВТОРИТЬ</div>
-          <h1 id="heroTitle">Тихо готовим.<br><em>Громко вкусно.</em></h1>
-          <p id="heroSubtitle">Свежие роллы и азиатские блюда — приготовим к выбранному времени.</p>
-          <div class="hero-actions"><a class="button button-primary" href="#menu" id="heroButton">Выбрать блюда <span>↗</span></a><a class="button button-ghost" href="#sets">Посмотреть сеты</a></div>
-          <div class="hero-proof"><span>01 <b>Свежие ингредиенты</b></span><span>02 <b>Готовим к вашему времени</b></span></div>
+  <main class="reference-board" id="referenceBoard">
+    <!-- Catalogue screen -->
+    <section class="device-frame catalogue-device" aria-label="Каталог магазина">
+      <div class="device-status"><span>9:41</span><span class="status-icons"><i class="signal"></i><i class="wifi"></i><i class="battery"></i></span></div>
+      <div class="catalogue-header">
+        <div class="brand-row">
+          <button class="round-icon menu-trigger" type="button" aria-label="Открыть меню">☰</button>
+          <a class="wordmark" href="#catalogue"><span>Т</span>ихий ролл</a>
+          <div class="header-actions">
+            <button class="header-icon" type="button" data-open-favorites aria-label="Избранное">♡<b id="favCount">0</b></button>
+            <button class="header-icon cart-head" type="button" data-open-cart aria-label="Корзина">🛒<b id="cartCount">0</b></button>
+          </div>
         </div>
-        <div class="hero-side-note">ТИХИЙ РОЛЛ <span>·</span> CHARYSH</div>
-      </section>
+        <div class="catalogue-title">
+          <h1>Наше меню</h1>
+          <p>Выберите любимые блюда</p>
+        </div>
+      </div>
 
-      <section class="intro-strip" aria-label="Преимущества">
-        <div><span class="intro-icon">✳</span><span><b>Свежеприготовленные</b><small>Готовим после заказа</small></span></div>
-        <div><span class="intro-icon">◷</span><span><b>К удобному времени</b><small>Выбираете дату и время</small></span></div>
-        <div><span class="intro-icon">⌖</span><span><b>Самовывоз и доставка</b><small>Условия уточним при заказе</small></span></div>
-      </section>
+      <div class="catalogue-scroll" id="catalogue">
+        <div class="category-tiles" id="categoryTiles">
+          <button class="category-tile active" type="button" data-filter="sets"><span class="category-emoji">🍱</span><span>Сеты</span></button>
+          <button class="category-tile" type="button" data-filter="rolls"><span class="category-emoji">🍣</span><span>Роллы</span></button>
+          <button class="category-tile" type="button" data-filter="dogs"><span class="category-emoji">🌭</span><span>Азиатские<br>хот-доги</span></button>
+          <button class="category-tile" type="button" data-filter="snacks"><span class="category-emoji">🍤</span><span>Закуски</span></button>
+        </div>
+        <div class="catalogue-controls">
+          <label class="sort-control"><select id="sortSelect" aria-label="Сортировка"><option value="popular">Сначала популярные</option><option value="price-asc">Сначала дешевле</option><option value="price-desc">Сначала дороже</option><option value="name">По названию</option></select><span>⌄</span></label>
+          <button class="filter-control" type="button" id="filterOpen"><span>☷</span> Фильтры</button>
+        </div>
+        <div class="search-wrap"><input id="catalogSearch" type="search" placeholder="Поиск по меню" aria-label="Поиск по меню"></div>
+        <div class="catalogue-grid" id="catalogueGrid"><div class="loading-state">Загружаем меню…</div></div>
+        <div class="empty-state" id="emptyState" hidden>В этой категории пока нет блюд.</div>
+      </div>
 
-      <section class="content-section categories-section" id="categories">
-        <div class="section-head"><div><div class="section-kicker">ВЫБИРАЙ СВОЁ</div><h2>Что сегодня по вкусу?</h2></div><p>Перейди в нужную категорию<br>и собери свой заказ</p></div>
-        <div class="category-grid" id="categoryGrid"><div class="loading-card">Загружаем категории…</div></div>
-      </section>
+      <nav class="bottom-nav" aria-label="Навигация магазина">
+        <button type="button" data-nav="home"><span class="nav-icon">⌂</span>Главная</button>
+        <button class="active" type="button" data-nav="catalogue"><span class="nav-icon grid-icon">▦</span>Каталог</button>
+        <button type="button" data-nav="builder"><span class="nav-icon">♧</span>Конструктор</button>
+        <button type="button" data-open-favorites><span class="nav-icon">♡</span>Избранное</button>
+        <button type="button" data-open-cart><span class="nav-icon">🛒<i id="navCartCount">0</i></span>Корзина</button>
+      </nav>
+    </section>
 
-      <section class="content-section featured-section" id="featured">
-        <div class="section-head"><div><div class="section-kicker">ЧАЩЕ ВСЕГО ВЫБИРАЮТ</div><h2>Популярное меню</h2></div><a class="text-link" href="#menu">Всё меню <span>↗</span></a></div>
-        <div class="product-grid featured-grid" id="featuredGrid"><div class="loading-card">Загружаем блюда…</div></div>
-      </section>
+    <!-- Product detail screen: always visible alongside the catalogue on desktop; opens as a full-screen view on mobile. -->
+    <section class="device-frame detail-device" id="detailDevice" aria-label="Карточка выбранного товара">
+      <div class="detail-image-stage">
+        <div class="device-status detail-status"><span>9:41</span><span class="status-icons"><i class="signal"></i><i class="wifi"></i><i class="battery"></i></span></div>
+        <img id="detailHero" src="./assets/set-party.webp" alt="Филадельфия">
+        <div class="detail-topbar">
+          <button class="round-icon detail-back" type="button" id="detailBack" aria-label="Назад">‹</button>
+          <div class="detail-top-actions">
+            <button class="round-icon" type="button" id="detailFavorite" aria-label="Добавить в избранное">♡</button>
+            <button class="round-icon" type="button" id="detailShare" aria-label="Поделиться">⇧</button>
+          </div>
+        </div>
+      </div>
+      <div class="detail-scroll">
+        <div class="photo-strip" id="photoStrip" aria-label="Фотографии блюда">
+          <button class="thumb active" type="button"><img src="./assets/set-party.webp" alt="></button>
+          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
+          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
+          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
+          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
+          <button class="thumb thumb-next" type="button" aria-label="Следующие фото">›</button>
+        </div>
+        <div class="detail-copy">
+          <h2 id="detailName">Филадельфия</h2>
+          <p id="detailDescription">Классический ролл с нежным лососем и сливочным сыром.</p>
+          <div class="product-facts">
+            <div><strong id="detailPieces">8 шт.</strong><span>Количество</span></div>
+            <div><strong id="detailWeight">260 г</strong><span>Вес</span></div>
+            <strong class="detail-price" id="detailPrice">450 ₽</strong>
+          </div>
+          <div class="composition-block">
+            <h3>Состав</h3>
+            <div class="ingredient-grid" id="ingredientGrid">
+              <div><strong class="ingredient-emoji">🐟</strong><span>Лосось</span></div>
+              <div><strong class="ingredient-emoji">🧀</strong><span>Сливочный<br>сыр</span></div>
+              <div><strong class="ingredient-emoji">🥒</strong><span>Огурец</span></div>
+              <div><strong class="ingredient-emoji">🍚</strong><span>Рис</span></div>
+              <div><strong class="ingredient-emoji">🌿</strong><span>Нори</span></div>
+            </div>
+              <div><img src="./assets/set-party.webp" alt="><span>Сливочный<br>сыр</span></div>
+              <div><img src="./assets/set-party.webp" alt="><span>Огурец</span></div>
+              <div><img src="./assets/set-party.webp" alt="><span>Рис</span></div>
+              <div><img src="./assets/set-party.webp" alt="><span>Нори</span></div>
+            </div>
+          </div>
+          <div class="detail-buy-row">
+            <div class="detail-quantity"><button type="button" id="detailMinus" aria-label="Уменьшить">−</button><output id="detailQty">1</output><button type="button" id="detailPlus" aria-label="Увеличить">＋</button></div>
+            <button type="button" class="add-cart-button" id="detailAdd">🛒 <span>Добавить в корзину</span></button>
+          </div>
+          <div class="quality-strip">
+            <div><span>♧</span><small>Всегда<br>свежие продукты</small></div>
+            <div><span>♧</span><small>Готовим<br>в день заказа</small></div>
+            <div><span>♙</span><small>Гарантия<br>качества</small></div>
+          </div>
+          <div class="detail-extra" id="detailExtra"></div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-      <section class="menu-section content-section" id="menu">
-        <div class="section-head"><div><div class="section-kicker">МЕНЮ ТИХОГО РОЛЛА</div><h2>Выбирай любимое</h2></div><p id="menuCount">Актуальные позиции и цены</p></div>
-        <div class="catalog-bar"><label class="search-field"><span>⌕</span><input id="menuSearch" type="search" placeholder="Найти блюдо…" autocomplete="off"></label><label class="sort-field"><span>Сортировка</span><select id="menuSort"><option value="popular">Сначала популярные</option><option value="price-asc">Сначала дешевле</option><option value="price-desc">Сначала дороже</option><option value="name">По названию</option></select></label></div>
-        <div class="filter-row" id="filterRow" aria-label="Категории меню"><button class="filter-pill active" data-filter="all" type="button">Всё меню</button></div>
-        <div class="product-grid catalog-grid" id="productGrid"><div class="loading-card">Загружаем меню…</div></div>
-        <div class="empty-state" id="emptyState" hidden>По этому запросу ничего не найдено. Попробуй изменить поиск.</div>
-      </section>
-
-      <section class="sets-section content-section" id="sets">
-        <div class="section-head"><div><div class="section-kicker">ГОТОВЫЕ СОЧЕТАНИЯ</div><h2>Сеты для хорошего вечера</h2></div><p>Уже собрали за тебя.<br>Остаётся только выбрать.</p></div>
-        <div class="sets-grid" id="setsGrid"><div class="loading-card">Загружаем сеты…</div></div>
-      </section>
-
-      <section class="builder-section content-section" id="builder">
-        <div class="builder-visual"><div class="builder-orbit orbit-one"></div><div class="builder-orbit orbit-two"></div><span>ТВОЙ<br><b>МИКС</b></span><small>01 / 01</small></div>
-        <div class="builder-content"><div class="section-kicker">СВОБОДА ВЫБОРА</div><h2>Собери свой<br><em>идеальный сет.</em></h2><p>Добавляй любимые роллы, выбирай количество и смотри, как меняется стоимость. Всё просто — только то, что нравится именно тебе.</p><div class="builder-products" id="builderProducts"><span>Подготавливаем конструктор…</span></div><div class="builder-total"><span><small>ТВОЙ НАБОР</small><b id="builderTotal">0 ₽</b></span><button type="button" class="button button-primary" id="addCustomSet" disabled>Добавить в корзину <span>↗</span></button></div></div>
-      </section>
-
-      <section class="pickup-panel content-section" id="pickupPanel">
-        <div><div class="section-kicker">ТВОЙ ЗАКАЗ — ТВОЁ ВРЕМЯ</div><h2>Забери тогда,<br><em>когда удобно.</em></h2><p id="pickupDescription">Выбирай блюда заранее — приготовим к согласованному времени.</p></div>
-        <div class="pickup-details"><div><small>ТЕЛЕФОН</small><a id="footerPhone" href="tel:+79230005857">8 923 000 58 57</a></div><div><small>АДРЕС САМОВЫВОЗА</small><b id="pickupAddress">Уточняем адрес…</b></div><a id="mapLink" href="#" target="_blank" rel="noopener">Открыть карту ↗</a></div>
-      </section>
-    </main>
-
-    <footer class="site-footer"><a class="brand footer-brand" href="#home"><span class="brand-symbol">ТР</span><span class="brand-copy"><strong>ТИХИЙ РОЛЛ</strong><small>АЗИАТСКАЯ КУХНЯ</small></span></a><span>Свежие блюда. Спокойный ритм. Яркий вкус.</span><span class="footer-copy">© <span id="footerYear">2026</span> Тихий ролл</span></footer>
-  </div>
-
-  <nav class="mobile-nav" aria-label="Мобильная навигация"><a href="#home"><span>⌂</span>Главная</a><a href="#menu"><span>▦</span>Меню</a><a href="#sets"><span>♧</span>Сеты</a><button type="button" data-open-favorites><span>♡</span>Избранное <i id="mobileFavoriteBadge">0</i></button><button type="button" data-open-orders><span>☷</span>Заказы</button><button type="button" data-open-cart><span>▣</span>Корзина</button></nav>
-  <div class="cart-dock" id="cartDock"><div class="cart-dock-inner"><div class="dock-summary"><span class="dock-icon">▣</span><span><b id="dockCount">Корзина пуста</b><small id="dockTotal">Добавь что-нибудь вкусное</small></span></div><button type="button" class="dock-button" data-open-cart>Открыть корзину <span>↗</span></button></div></div>
-
-  <div class="modal-layer" id="productModal" aria-hidden="true"><section class="modal-card product-modal-card" role="dialog" aria-modal="true" aria-labelledby="productModalTitle"><button class="modal-close" type="button" data-close-modal="productModal" aria-label="Закрыть">×</button><div class="modal-product-media"><img id="modalProductPhoto" alt=""><button type="button" class="gallery-control gallery-prev" id="galleryPrev" aria-label="Предыдущее фото">‹</button><button type="button" class="gallery-control gallery-next" id="galleryNext" aria-label="Следующее фото">›</button><span class="gallery-label" id="galleryLabel">01 / 01</span></div><div class="modal-product-copy"><div class="section-kicker">ТИХИЙ РОЛЛ · МЕНЮ</div><h2 id="productModalTitle">Блюдо</h2><p id="modalProductDesc"></p><div class="modal-meta" id="modalProductMeta"></div><div class="ingredient-block"><small>О БЛЮДЕ</small><p id="modalProductDetails"></p></div><div class="modal-product-bottom"><strong id="modalProductPrice">0 ₽</strong><button class="button button-primary" type="button" id="modalAddButton">Добавить в корзину ↗</button></div></div></section></div>
-
-  <div class="modal-layer" id="cartModal" aria-hidden="true"><section class="modal-card cart-modal-card" role="dialog" aria-modal="true" aria-labelledby="cartModalTitle"><div class="modal-header"><div><div class="section-kicker">ТВОЙ ВЫБОР</div><h2 id="cartModalTitle">Корзина <em>заказа</em></h2></div><button class="modal-close inline-close" type="button" data-close-modal="cartModal" aria-label="Закрыть">×</button></div><div class="cart-content-grid"><div><div id="cartLines" class="cart-lines"><div class="empty-cart">Корзина пока пуста.<br>Выбери что-нибудь вкусное в меню.</div></div><div id="cartSetSummary" class="cart-set-summary"></div></div><form id="checkoutForm" class="checkout-form"><div class="checkout-heading"><span>01 / ДЕТАЛИ ЗАКАЗА</span><h3>Куда и когда готовить?</h3></div><label class="form-label">Ваше имя<input name="name" type="text" maxlength="100" placeholder="Как к вам обращаться" required></label><label class="form-label">Номер телефона<input name="phone" type="tel" maxlength="50" placeholder="+7 900 000-00-00" required></label><div class="form-two"><label class="form-label">Дата<input name="pickup_date" id="pickupDate" type="date" required></label><label class="form-label">Время<select name="pickup_time" id="pickupTime" required><option value="">Выбери время</option></select></label></div><label class="form-label">Способ получения<select name="fulfillment" id="fulfillment"><option value="Самовывоз">Самовывоз</option><option value="Доставка">Доставка</option></select></label><label class="form-label" id="deliveryAddressField" hidden>Адрес доставки<input name="delivery_address" type="text" maxlength="300" placeholder="Улица, дом, квартира"></label><label class="form-label">Комментарий<textarea name="notes" rows="2" maxlength="700" placeholder="Например, без имбиря"></textarea></label><div class="checkout-note" id="checkoutNote">После отправки мы получим заказ в Telegram и отдельно подтвердим время выдачи.</div><div class="checkout-error" id="checkoutError" role="alert"></div><div class="checkout-total"><span>Итого</span><strong id="cartGrandTotal">0 ₽</strong></div><button class="button button-primary checkout-submit" id="submitOrder" type="submit">Отправить заказ <span>↗</span></button><p class="checkout-terms">Оплата и окончательное подтверждение заказа согласуются отдельно.</p></form></div></section></div>
-
-  <div class="modal-layer" id="favoritesModal" aria-hidden="true"><section class="modal-card compact-modal" role="dialog" aria-modal="true" aria-labelledby="favoritesTitle"><div class="modal-header"><div><div class="section-kicker">СОХРАНЁННЫЕ ПОЗИЦИИ</div><h2 id="favoritesTitle">Избранное</h2></div><button class="modal-close inline-close" type="button" data-close-modal="favoritesModal">×</button></div><div id="favoritesList" class="favorites-list"></div></section></div>
-
-  <div class="modal-layer" id="ordersModal" aria-hidden="true"><section class="modal-card compact-modal" role="dialog" aria-modal="true" aria-labelledby="ordersTitle"><div class="modal-header"><div><div class="section-kicker">ЛИЧНЫЙ КАБИНЕТ</div><h2 id="ordersTitle">Мои заказы</h2></div><button class="modal-close inline-close" type="button" data-close-modal="ordersModal">×</button></div><div id="ordersList" class="orders-list"><div class="empty-cart">Загрузка истории…</div></div></section></div>
-
+  <!-- Functional overlays -->
+  <div class="modal-layer" id="cartModal" aria-hidden="true"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="cartTitle"><header class="sheet-head"><div><small>ВАШ ВЫБОР</small><h2 id="cartTitle">Корзина</h2></div><button type="button" class="sheet-close" data-close="cartModal">×</button></header><div class="cart-lines" id="cartLines"><div class="empty-state">Корзина пока пуста.</div></div><form id="checkoutForm" class="checkout-form"><h3>Детали заказа</h3><label>Ваше имя<input name="name" maxlength="100" required placeholder="Как к вам обращаться"></label><label>Телефон<input name="phone" type="tel" maxlength="50" required placeholder="+7 900 000-00-00"></label><div class="form-row"><label>Дата<input name="pickup_date" id="pickupDate" type="date" required></label><label>Время<select name="pickup_time" id="pickupTime" required><option value="">Выбрать</option></select></label></div><label>Получение<select name="fulfillment" id="fulfillment"><option value="Самовывоз">Самовывоз</option><option value="Доставка">Доставка</option></select></label><label id="deliveryAddressField" hidden>Адрес доставки<input name="delivery_address" maxlength="300"></label><label>Комментарий<textarea name="notes" rows="2" maxlength="700"></textarea></label><p id="checkoutNote">Время выдачи подтвердим отдельно.</p><div id="checkoutError" role="alert"></div><div class="cart-total"><span>Итого</span><strong id="cartTotal">0 ₽</strong></div><button class="add-cart-button submit-order" type="submit" id="submitOrder">Отправить заказ ↗</button></form></section></div>
+  <div class="modal-layer" id="favoritesModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>СОХРАНЁННЫЕ БЛЮДА</small><h2>Избранное</h2></div><button type="button" class="sheet-close" data-close="favoritesModal">×</button></header><div id="favoritesList"></div></section></div>
+  <div class="modal-layer" id="filtersModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>НАСТРОЙКИ МЕНЮ</small><h2>Фильтры</h2></div><button type="button" class="sheet-close" data-close="filtersModal">×</button></header><div class="filter-options" id="filterOptions"></div><button class="add-cart-button" id="applyFilters">Показать блюда</button></section></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

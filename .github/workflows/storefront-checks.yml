@@ -7,6 +7,7 @@ on:
       - premium-redesign-20261031
       - full-premium-experience-20261031
       - storefront-complete-rebuild
+      - mockup-design-stage-1-20261031
   pull_request:
     branches:
       - main
@@ -45,9 +46,16 @@ jobs:
 
           const front = fs.readFileSync('index.html', 'utf8');
           const admin = fs.readFileSync('admin.html', 'utf8');
+          const isMockupStorefront = front.includes('assets/mockup-storefront.css') && front.includes('assets/mockup-storefront.js');
           const isNewStorefront = front.includes('assets/new-storefront.css') && front.includes('assets/new-storefront.js');
 
-          if (isNewStorefront) {
+          if (isMockupStorefront) {
+            new Function(fs.readFileSync('assets/mockup-storefront.js', 'utf8'));
+            for (const asset of ['assets/mockup-storefront.css', 'assets/mockup-storefront.js', 'assets/local-catalog-fallback.json', 'assets/set-party.webp']) {
+              if (!fs.existsSync(asset)) throw new Error('Missing mockup storefront asset: ' + asset);
+            }
+            console.log('OK: two-screen mockup storefront assets');
+          } else if (isNewStorefront) {
             new Function(fs.readFileSync('assets/new-storefront.js', 'utf8'));
             JSON.parse(fs.readFileSync('assets/local-catalog-fallback.json', 'utf8'));
             for (const asset of ['assets/new-storefront.css', 'assets/new-storefront.js', 'assets/local-catalog-fallback.json']) {
