@@ -53,12 +53,14 @@
   function addSet(setRow) {
     if (!setRow || setRow.active === false) return;
     const count = Number(state.setCounts[setRow.id] || 0);
+    if (count >= 20) { toast('В одном заказе можно выбрать не более 20 одинаковых сетов.'); return; }
     if (setRow.stock != null && count >= Number(setRow.stock)) { toast('Этот сет закончился.'); return; }
     const components = Array.isArray(setRow.items) ? setRow.items : [];
     if (!components.length) { toast('Состав этого сета пока не заполнен.'); return; }
     for (const item of components) {
       const product = productById(item.id); if (!product) { toast('В составе сета есть временно недоступная позиция.'); return; }
       const stock = stockLeft(product), add = Number(item.qty || 0);
+      if (qtyOf(product.id) + add > 99) { toast('Превышено максимальное количество товара в заказе.'); return; }
       if (stock !== null && qtyOf(product.id) + add > stock) { toast(`Недостаточно товара «${product.name}».`); return; }
     }
     components.forEach(item => { state.cart[item.id] = qtyOf(item.id) + Number(item.qty || 0); });
@@ -188,7 +190,8 @@
     const defaults={day:DAY_NAMES[date.getDay()],open:'12:00',close:'21:00',closed:[0,3].includes(date.getDay())}; return defaults;
   }
   function findInitialDate() {
-    const now=new Date(); for(let i=0;i<14;i++){const date=new Date(now);date.setDate(now.getDate()+i);const hours=hoursFor(date);if(!hours.closed && hours.open && hours.close)return date;}
+    const now=new Date(); const nowMinutes=now.getHours()*60+now.getMinutes();
+    for(let i=0;i<14;i++){const date=new Date(now);date.setDate(now.getDate()+i);const hours=hoursFor(date);const close=String(hours.close||'').split(':').map(Number);const closeMinutes=close.length===2?close[0]*60+close[1]:0;const alreadyClosed=i===0&&closeMinutes>0&&nowMinutes>=closeMinutes;if(!alreadyClosed&&!hours.closed&&hours.open&&hours.close)return date;}
     return now;
   }
   async function updatePickupTimes() {
@@ -262,8 +265,8 @@
     if(content.status==='fulfilled')state.sets=content.value.sets||[];
     if(settings.status==='fulfilled')state.settings=settings.value||{};
     state.cart=readStorage('tihiy-v3-cart',{}); state.favorites=new Set(readStorage('tihiy-v3-favorites',[])); state.setCounts=readStorage('tihiy-v3-set-counts',{});
-    // Remove unavailable IDs left by an earlier menu version.
-    for(const id of Object.keys(state.cart))if(!productById(id))delete state.cart[id];
+    // Remove unavailable IDs and reconcile saved quantities with live stock.
+    for(const id of Object.keys(state.cart)){const product=productById(id);if(!product){delete state.cart[id];continue;}const stock=stockLeft(product);if(stock!==null){if(stock===0)delete state.cart[id];else state.cart[id]=Math.min(Number(state.cart[id])||0,stock,99);}}
     for(const id of [...state.favorites])if(!productById(id))state.favorites.delete(id);
     const slide=(content.status==='fulfilled'?(content.value.slides||[]).find(x=>x.active!==false&&safeImage(x.image)):null);
     const heroPhoto=safeImage(slide?.image)||productImage(state.products[0]); if(heroPhoto)$('#heroPhoto').src=heroPhoto;
