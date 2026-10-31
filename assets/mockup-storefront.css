@@ -340,3 +340,14 @@
 .home-pickup-card>b{display:block;margin:6px 0;font-size:18px}
 .home-pickup-card p{margin:0 0 12px;color:#c0cbd1;font-size:13px;line-height:1.4}
 .home-pickup-card button{padding:9px 12px;border:1px solid rgba(255,112,96,.4);border-radius:10px;background:rgba(255,66,54,.1);color:#ff9a8f;font-size:12px;font-weight:750}
+
+.workflow-step.completed i{border-color:rgba(255,104,88,.9);background:rgba(255,65,55,.18);color:#ff9a8f}
+.workflow-step.completed:after{background:linear-gradient(90deg,#ff574a,#ff574a)}
+.cart-line{grid-template-columns:76px minmax(0,1fr) auto;gap:12px;padding:11px;border:1px solid rgba(161,184,197,.3);border-radius:14px;background:linear-gradient(145deg,rgba(16,27,34,.98),rgba(5,11,16,.99))}
+.cart-line>img{width:76px;height:72px;border-radius:10px}
+.cart-line .basket-item-copy>b{font-size:15px;line-height:1.15}
+.cart-line .basket-item-copy>small{font-size:11px;line-height:1.3}
+.cart-line .cart-qty{gap:8px;margin-top:9px}
+.cart-line .cart-qty button{width:31px;height:31px;border:1px solid rgba(179,199,211,.4);border-radius:9px;font-size:20px}
+.cart-line .cart-qty span{font-size:13px;font-weight:800}
+.cart-line .basket-item-price{font-size:14px;font-weight:850}
