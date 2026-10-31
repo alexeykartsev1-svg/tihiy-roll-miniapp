@@ -349,7 +349,7 @@
   </main>
 
   <!-- Functional overlays -->
-  <div class="modal-layer" id="cartModal" aria-hidden="true"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="cartTitle"><header class="sheet-head"><div><small>ВАШ ВЫБОР</small><h2 id="cartTitle">Корзина</h2></div><button type="button" class="sheet-close" data-close="cartModal">×</button></header><div class="cart-lines" id="cartLines"><div class="empty-state">Корзина пока пуста.</div></div><form id="checkoutForm" class="checkout-form">
+  <div class="modal-layer" id="cartModal" aria-hidden="true"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="cartTitle"><header class="sheet-head"><div><small>ВАШ ВЫБОР</small><h2 id="cartTitle">Корзина</h2></div><button type="button" class="sheet-close" data-close="cartModal">×</button></header><div class="cart-lines" id="cartLines"><div class="empty-state">Корзина пока пуста.</div></div><form id="checkoutForm" class="checkout-form" novalidate>
           <h3>Детали заказа</h3>
           <label class="checkout-field identity-field">Ваше имя<input id="checkoutName" name="name" maxlength="100" minlength="2" required autocomplete="name" placeholder="Как к вам обращаться" aria-describedby="checkoutNameError"><span class="field-error" id="checkoutNameError" hidden>Введите корректное имя — минимум две буквы, без цифр.</span></label>
           <label class="checkout-field identity-field">Телефон<input id="checkoutPhone" name="phone" type="tel" inputmode="tel" maxlength="18" required autocomplete="tel" value="+7 " placeholder="+7 900 000-00-00" aria-describedby="checkoutPhoneError"><span class="field-error" id="checkoutPhoneError" hidden>Введите 10 цифр номера после +7.</span></label>
