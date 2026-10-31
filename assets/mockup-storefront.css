@@ -11,3 +11,44 @@
 @media(max-width:1120px){.reference-board{width:min(548px,100vw);height:100dvh;min-height:620px;display:block}.catalogue-device{width:100%;height:100%;border-radius:0;border:0}.detail-device{display:none}.device-status{padding:0 24px}.catalogue-header{flex-basis:183px}.detail-device.mobile-active{position:fixed;z-index:60;inset:0;display:flex;width:100%;height:100dvh;border:0;border-radius:0}.detail-device.mobile-active .detail-image-stage{flex-basis:38%;min-height:250px}.detail-device.mobile-active .detail-topbar{top:42px}}
 @media(max-width:600px){.catalogue-header{flex-basis:177px;padding:32px 12px 10px}.brand-row{grid-template-columns:38px minmax(0,1fr) 91px;gap:3px}.wordmark{font-size:24px}.wordmark span{font-size:30px}.header-actions{gap:5px}.header-icon{width:39px;height:39px;font-size:33px}.cart-head{font-size:23px}.catalogue-title{margin-top:21px}.catalogue-title h1{font-size:32px}.catalogue-title p{font-size:16px}.catalogue-scroll{padding:0 10px 15px}.category-tiles{gap:5px;margin-bottom:11px}.category-tile{height:86px;border-radius:14px;font-size:12px}.category-emoji{width:58px;height:43px;font-size:30px}.catalogue-controls{grid-template-columns:minmax(0,1fr) 130px;gap:7px;margin-bottom:8px}.sort-control,.filter-control{height:43px;font-size:12px;padding:0 11px}.sort-control select{font-size:12px}.search-wrap{display:none}.catalogue-grid{gap:8px}.card-photo{height:clamp(112px,33vw,153px)}.card-info{padding:5px 8px 8px}.card-title{font-size:14px}.card-meta{font-size:11px;gap:10px}.card-price{font-size:19px}.card-add{width:43px;height:43px;flex-basis:43px;border-radius:11px;font-size:21px}.card-heart{width:29px;height:29px;font-size:25px}.bottom-nav{flex-basis:76px;border-radius:18px 18px 0 0}.bottom-nav button{height:62px;font-size:10px}.nav-icon{height:31px;font-size:27px;line-height:29px}.detail-image-stage{flex-basis:37%;min-height:235px}.detail-scroll{padding:7px 12px 15px}.photo-strip{gap:7px;padding-bottom:9px}.thumb{flex-basis:75px;height:59px}.detail-copy h2{font-size:30px}.detail-copy>p{font-size:15px}.product-facts{margin-top:12px;padding-bottom:13px}.product-facts>div strong{font-size:21px}.product-facts>div span{font-size:12px}.detail-price{font-size:35px}.composition-block h3{font-size:19px}.ingredient-grid{gap:6px}.ingredient-grid>div{height:85px;border-radius:11px}.ingredient-emoji{height:48px;font-size:29px}.ingredient-grid span{font-size:10px}.detail-buy-row{grid-template-columns:128px minmax(0,1fr);gap:8px;margin-top:17px}.detail-quantity{height:52px;border-radius:13px}.detail-quantity button{font-size:24px}.detail-quantity output{font-size:19px}.add-cart-button{min-height:52px;padding:0 9px;gap:7px;border-radius:13px;font-size:14px}.quality-strip{margin-top:15px;padding:12px 3px;border-radius:13px}.quality-strip span{font-size:22px}.quality-strip small{font-size:8px}}
 @media(max-width:370px){.catalogue-header{flex-basis:166px}.catalogue-title{margin-top:17px}.catalogue-title h1{font-size:29px}.category-tile{height:78px;font-size:11px}.category-emoji{height:37px;font-size:27px}.catalogue-controls{grid-template-columns:minmax(0,1fr) 112px}.sort-control,.filter-control{font-size:10px}.card-photo{height:105px}.card-title{font-size:12px}.card-meta{font-size:10px}.card-price{font-size:17px}.card-add{width:38px;height:38px;flex-basis:38px}}
+
+/* Stage 2: set details and robust full-width purchase controls */
+.detail-image-stage{position:relative}
+.detail-photo-count{position:absolute;z-index:3;left:50%;bottom:12px;transform:translateX(-50%);padding:5px 12px;border-radius:20px;background:rgba(0,0,0,.48);color:#fff;font-size:11px;font-weight:800;letter-spacing:.4px;backdrop-filter:blur(8px)}
+.set-composition-grid{display:flex!important;gap:8px!important;overflow-x:auto!important;overflow-y:hidden!important;padding:2px 1px 7px!important;scrollbar-width:thin!important;scroll-snap-type:x mandatory!important;-webkit-overflow-scrolling:touch}
+.set-composition-grid::-webkit-scrollbar{height:3px}
+.set-composition-grid::-webkit-scrollbar-thumb{background:#56616a;border-radius:6px}
+.set-composition-grid .set-component{flex:0 0 clamp(76px,15.2%,98px)!important;width:auto!important;height:112px!important;min-width:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;gap:3px!important;overflow:hidden!important;padding:5px 4px 7px!important;border:1px solid #34414a!important;border-radius:12px!important;background:linear-gradient(145deg,#101920,#080e13)!important;text-align:center!important;scroll-snap-align:start!important}
+.set-composition-grid .set-component img{width:100%!important;height:66px!important;flex:0 0 66px!important;display:block!important;object-fit:cover!important;border-radius:7px!important;background:#151d22!important}
+.set-composition-grid .set-component b{display:block!important;width:100%!important;overflow:hidden!important;color:#f1f4f5!important;font-size:9px!important;font-weight:800!important;line-height:1.1!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.set-composition-grid .set-component small{color:#aebbc2!important;font-size:8px!important;line-height:1!important;white-space:nowrap!important}
+.set-component-empty{color:#aebbc2;font-size:11px;padding:12px}
+.detail-buy-row{display:flex!important;align-items:stretch!important;width:100%!important;min-width:0!important;gap:10px!important;margin-top:20px!important}
+.detail-buy-row .detail-quantity{flex:0 0 clamp(126px,39%,190px)!important;width:auto!important;min-width:0!important;height:62px!important;overflow:hidden!important}
+.detail-buy-row .add-cart-button{flex:1 1 0!important;width:auto!important;min-width:0!important;max-width:none!important;min-height:62px!important;height:auto!important;white-space:nowrap!important;padding:0 12px!important;gap:9px!important;font-size:clamp(12px,1.35vw,18px)!important}
+.detail-buy-row .add-cart-button span{display:inline!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.quality-strip{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.quality-strip>div{gap:6px!important}
+.quality-strip small{font-size:9px!important}
+@media(max-width:1120px){
+  .detail-scroll{padding-bottom:calc(18px + env(safe-area-inset-bottom))!important}
+  .detail-buy-row{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;width:100%!important;gap:8px!important;margin-top:16px!important}
+  .detail-buy-row .detail-quantity{flex:0 0 38%!important;width:38%!important;max-width:180px!important;height:56px!important}
+  .detail-buy-row .detail-quantity button{min-width:0!important;width:100%!important;padding:0!important;font-size:25px!important}
+  .detail-buy-row .detail-quantity output{min-width:0!important;width:100%!important;font-size:20px!important}
+  .detail-buy-row .add-cart-button{flex:1 1 0!important;width:auto!important;min-width:0!important;height:56px!important;min-height:56px!important;padding:0 8px!important;gap:6px!important;font-size:clamp(10px,2.7vw,14px)!important}
+  .detail-buy-row .add-cart-button span{white-space:nowrap!important}
+  .set-composition-grid .set-component{flex-basis:clamp(72px,17%,92px)!important;height:104px!important}
+  .set-composition-grid .set-component img{height:59px!important;flex-basis:59px!important}
+  .quality-strip{grid-template-columns:repeat(4,minmax(0,1fr))!important;margin-top:16px!important;padding:11px 5px!important;gap:2px!important}
+  .quality-strip>div{flex-direction:column!important;gap:3px!important;text-align:center!important}
+  .quality-strip span{font-size:19px!important;line-height:1.1!important}
+  .quality-strip small{font-size:7px!important;line-height:1.2!important}
+}
+@media(max-width:380px){
+  .detail-buy-row{gap:6px!important}
+  .detail-buy-row .detail-quantity{flex-basis:36%!important;width:36%!important;height:51px!important}
+  .detail-buy-row .add-cart-button{height:51px!important;min-height:51px!important;padding:0 5px!important;font-size:10px!important;gap:4px!important}
+  .detail-buy-row .add-cart-button span{font-size:10px!important}
+  .set-composition-grid .set-component{flex-basis:76px!important}
+}
