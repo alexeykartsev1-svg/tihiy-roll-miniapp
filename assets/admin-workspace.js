@@ -5,8 +5,8 @@
   const statusNames={new:'Новый',accepted:'Принят',preparing:'Готовится',ready:'Готов к выдаче',completed:'Выдан',cancelled:'Отменён'};
   const statusOrder=['new','accepted','preparing','ready','completed'];
   const statusClass=status=>'status-'+(status||'new');
-  let ordersFilter='all',ordersSearch='',selectedOrderId=null,settingsCache=null;
-  let settingsLoaded=false;
+  let ordersFilter='all',ordersSearch='',ordersFrom='',ordersTo='',ordersMethod='all',selectedOrderId=null,settingsCache=null;
+  let settingsLoaded=false,orderStoreSettings=null,orderStoreSettingsPromise=null;
 
   function page(id,title,subtitle){
     const section=document.createElement('section');section.className='admin-page'+(id==='home'?' active':'');section.dataset.page=id;
@@ -57,15 +57,17 @@
     const orders=page('orders','Заказы','Новые заявки, приготовление, самовывоз и доставка');
     const ordersPanelNew=panel('Список заказов','Выбери заказ слева — подробная карточка откроется справа.');
     const ordersToolbar=document.createElement('div');ordersToolbar.className='admin-orders-toolbar';
-    ordersToolbar.innerHTML='<input id="adminOrderSearch" type="search" placeholder="Поиск по номеру, клиенту или телефону"><button class="btn" id="adminRefreshOrders" type="button">↻ Обновить заказы</button>';
+    ordersToolbar.innerHTML='<input id="adminOrderSearch" type="search" placeholder="⌕  Поиск по номеру, имени или телефону"><button class="btn" id="adminRefreshOrders" type="button">↻  Обновить</button>';
+    const ordersAdvanced=document.createElement('div');ordersAdvanced.className='admin-orders-advanced';
+    ordersAdvanced.innerHTML='<label>С даты<input id="adminOrderFrom" type="date" aria-label="Заказы с даты"></label><label>По дату<input id="adminOrderTo" type="date" aria-label="Заказы по дату"></label><label>Получение<select id="adminOrderMethod"><option value="all">Все способы</option><option value="pickup">Самовывоз</option><option value="delivery">Доставка</option></select></label>';
     const filters=document.createElement('div');filters.className='admin-orders-filters';
-    [['all','Все'],['new','Новые'],['accepted','Приняты'],['preparing','Готовятся'],['ready','Готовы'],['completed','Выданы'],['cancelled','Отменены']].forEach(([value,label])=>{
-      const button=document.createElement('button');button.type='button';button.className='admin-filter'+(value==='all'?' active':'');button.dataset.filter=value;button.textContent=label;filters.append(button);
+    [['all','Все'],['new','Новые'],['accepted','Приняты'],['preparing','Готовим'],['ready','Готовы'],['delivery','Доставка'],['completed','Выданы'],['cancelled','Отменены']].forEach(([value,label])=>{
+      const button=document.createElement('button');button.type='button';button.className='admin-filter'+(value==='all'?' active':'');button.dataset.filter=value;button.dataset.label=label;button.textContent=label;filters.append(button);
     });
     const orderLayout=document.createElement('div');orderLayout.className='admin-orders-layout';
     const orderList=document.createElement('div');orderList.className='admin-order-list';orderList.id='fullOrderList';
     const orderDetail=document.createElement('div');orderDetail.className='admin-order-detail';orderDetail.id='fullOrderDetail';
-    orderLayout.append(orderList,orderDetail);ordersPanelNew.append(ordersToolbar,filters,orderLayout);orders.append(ordersPanelNew);
+    orderLayout.append(orderList,orderDetail);ordersPanelNew.append(ordersToolbar,ordersAdvanced,filters,orderLayout);orders.append(ordersPanelNew);
 
     const products=page('products','Товары','Каталог, фотографии, состав, вес, цены и наличие');
     products.append(productPanel);if(editor)products.append(editor);
@@ -131,12 +133,17 @@
     navItems.forEach(([id,icon,label])=>{
       const button=document.createElement('button');button.type='button';button.dataset.go=id;
       const i=document.createElement('span');i.className='nav-icon';i.textContent=icon;
-      const t=document.createElement('span');t.textContent=label;button.append(i,t);button.addEventListener('click',()=>activate(id));nav.append(button);
+      const t=document.createElement('span');t.textContent=label;button.append(i,t);
+      if(id==='orders'){const count=document.createElement('b');count.className='admin-nav-count';count.id='adminNavOrderCount';count.textContent='0';button.append(count)}
+      button.addEventListener('click',()=>activate(id));nav.append(button);
     });
     app.querySelectorAll('[data-go]').forEach(button=>button.addEventListener('click',()=>activate(button.dataset.go)));
     $('#saveSetsFull')?.addEventListener('click',()=>$('#saveContent')?.click());
     $('#adminRefreshOrders')?.addEventListener('click',()=>window.TihiyAdmin?.reloadOrders());
     $('#adminOrderSearch')?.addEventListener('input',event=>{ordersSearch=event.target.value.trim().toLocaleLowerCase('ru');renderOrders()});
+    $('#adminOrderFrom')?.addEventListener('change',event=>{ordersFrom=event.target.value;renderOrders()});
+    $('#adminOrderTo')?.addEventListener('change',event=>{ordersTo=event.target.value;renderOrders()});
+    $('#adminOrderMethod')?.addEventListener('change',event=>{ordersMethod=event.target.value;renderOrders()});
     filters.addEventListener('click',event=>{
       const button=event.target.closest('[data-filter]');if(!button)return;
       ordersFilter=button.dataset.filter;
@@ -187,91 +194,250 @@
       const date=new Date(value);
       return Number.isNaN(date.getTime())?value:date.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
     }
+    function orderMethod(order){
+      return parseNotes(order.notes).fulfillment;
+    }
+    function matchesOrderFilter(order,key){
+      if(key==='delivery')return /достав/i.test(orderMethod(order));
+      if(key==='pickup')return /самовывоз/i.test(orderMethod(order));
+      if(key!=='all')return order.status===key;
+      return true;
+    }
+    function orderCount(rows,key){return rows.filter(order=>matchesOrderFilter(order,key)).length}
+    function orderInDateRange(order){
+      if(!ordersFrom&&!ordersTo)return true;
+      const date=new Date(order.created_at||'');
+      if(Number.isNaN(date.getTime()))return false;
+      const day=date.toISOString().slice(0,10);
+      return (!ordersFrom||day>=ordersFrom)&&(!ordersTo||day<=ordersTo);
+    }
     function renderOrders(){
       const rows=window.TihiyAdmin?.getOrders?.()||window.__TIHIY_ADMIN_ORDERS||[];
       const filtered=rows.filter(order=>{
-        if(ordersFilter!=='all'&&order.status!==ordersFilter)return false;
+        if(!matchesOrderFilter(order,ordersFilter))return false;
+        if(ordersMethod==='delivery'&&!/достав/i.test(orderMethod(order)))return false;
+        if(ordersMethod==='pickup'&&!/самовывоз/i.test(orderMethod(order)))return false;
+        if(!orderInDateRange(order))return false;
         if(!ordersSearch)return true;
-        const hay=[order.order_id,order.customer_name,order.phone,order.pickup_time].join(' ').toLocaleLowerCase('ru');
+        const hay=[order.order_id,order.customer_name,order.phone,order.pickup_time,order.notes].join(' ').toLocaleLowerCase('ru');
         return hay.includes(ordersSearch);
       });
       if(!filtered.some(order=>order.order_id===selectedOrderId))selectedOrderId=filtered[0]?.order_id||null;
+      filters.querySelectorAll('[data-filter]').forEach(button=>{
+        const key=button.dataset.filter;
+        const count=orderCount(rows,key);
+        button.classList.toggle('active',key===ordersFilter);
+        button.replaceChildren(document.createTextNode(button.dataset.label||key));
+        const badge=document.createElement('b');badge.textContent=String(count);button.append(badge);
+      });
+      const pending=rows.filter(order=>['new','accepted','preparing'].includes(order.status)).length;
+      const navCount=$('#adminNavOrderCount');if(navCount)navCount.textContent=String(pending);
       orderList.replaceChildren();
-      if(!filtered.length){const empty=document.createElement('div');empty.className='admin-empty';empty.textContent=rows.length?'По этому фильтру заказов нет.':'Заказов пока нет. Новые заявки появятся здесь после оформления.';orderList.append(empty)}
+      if(!filtered.length){
+        const empty=document.createElement('div');empty.className='admin-empty';
+        empty.textContent=rows.length?'По этому фильтру заказов нет.':'Заказов пока нет. Новые заявки появятся здесь после оформления.';
+        orderList.append(empty);
+      }
       filtered.forEach(order=>{
-        const row=document.createElement('button');row.type='button';row.className='admin-order-row'+(order.order_id===selectedOrderId?' active':'');
+        const row=document.createElement('button');row.type='button';
+        row.className='admin-order-row'+(order.order_id===selectedOrderId?' active':'');
+        const primary=document.createElement('span');primary.className='admin-order-primary';
         const thumb=document.createElement('img');thumb.className='admin-order-thumb';
-        const first=order.items?.[0];const product=window.TihiyAdmin?.getProducts?.().find(item=>item.id===first?.id);
-        thumb.src=safeImage(product?.photo||'');thumb.alt='';
+        const first=order.items?.[0];
+        const product=window.TihiyAdmin?.getProducts?.().find(item=>item.id===first?.id);
+        thumb.src=safeImage(product?.photo||first?.photo||'');thumb.alt='';
         const meta=document.createElement('span');meta.className='admin-order-meta';
         const id=document.createElement('b');id.textContent='#'+order.order_id;
-        const details=document.createElement('small');details.textContent=(order.customer_name||'Клиент')+' · '+orderDate(order);
-        meta.append(id,details);
-        const price=document.createElement('span');price.className='admin-order-price';
-        const amount=document.createElement('b');amount.textContent=money(order.total);
-        const info=document.createElement('small');info.textContent=(order.items||[]).length+' поз.';
-        price.append(amount,info);
-        row.append(thumb,meta,price,setStatusBadge(order.status));
+        const customer=document.createElement('strong');customer.textContent=order.customer_name||'Клиент';
+        const details=document.createElement('small');details.textContent=orderDate(order)+' · '+(order.items||[]).length+' поз.';
+        const method=document.createElement('small');method.className='admin-order-method';method.textContent=orderMethod(order);
+        meta.append(id,customer,details,method);primary.append(thumb,meta);
+        const aside=document.createElement('span');aside.className='admin-order-row-aside';
+        const amount=document.createElement('b');amount.className='admin-order-price';amount.textContent=money(order.total);
+        const status=setStatusBadge(order.status);aside.append(amount,status);
+        row.append(primary,aside);
         row.addEventListener('click',()=>{selectedOrderId=order.order_id;renderOrders()});
         orderList.append(row);
       });
       const selected=rows.find(order=>order.order_id===selectedOrderId);
       renderOrderDetail(selected);
     }
+    function loadOrderStoreSettings(){
+      if(orderStoreSettings)return Promise.resolve(orderStoreSettings);
+      if(!orderStoreSettingsPromise){
+        orderStoreSettingsPromise=window.TihiyAdmin.api('/api/admin/store-settings')
+          .then(result=>(orderStoreSettings=result||{}))
+          .catch(()=>{orderStoreSettings={settings:{pickup_address:'с. Чарышское, Алтайский край'},integrations:{}};return orderStoreSettings});
+      }
+      return orderStoreSettingsPromise;
+    }
+    function makeOrderCard(title,contentClass){
+      const card=document.createElement('section');card.className='admin-order-side-card '+(contentClass||'');
+      const heading=document.createElement('h3');heading.textContent=title;card.append(heading);return card;
+    }
     function renderOrderDetail(order){
       orderDetail.replaceChildren();
-      if(!order){const empty=document.createElement('div');empty.className='admin-empty';empty.textContent='Выбери заказ из списка, чтобы увидеть его состав и управлять статусом.';orderDetail.append(empty);return}
-      const head=document.createElement('div');head.className='admin-order-detail-head';
-      const title=document.createElement('div');const h=document.createElement('h2');h.textContent='Заказ #'+order.order_id;const date=document.createElement('p');date.textContent='Создан: '+orderDate(order);title.append(h,date);
-      const badge=setStatusBadge(order.status);head.append(title,badge);orderDetail.append(head);
-      const body=document.createElement('div');body.className='admin-order-body';
+      if(!order){
+        const empty=document.createElement('div');empty.className='admin-empty admin-order-empty';
+        empty.textContent='Выбери заказ из списка, чтобы увидеть состав, клиента и управлять статусом.';
+        orderDetail.append(empty);return;
+      }
+      const notes=parseNotes(order.notes);
+      const detailHeader=document.createElement('header');detailHeader.className='admin-order-detail-head';
+      const heading=document.createElement('div');heading.className='admin-order-detail-title';
+      const titleLine=document.createElement('div');titleLine.className='admin-order-title-line';
+      const h=document.createElement('h2');h.textContent='Заказ #'+order.order_id;
+      const copyId=document.createElement('button');copyId.type='button';copyId.className='admin-icon-btn';copyId.title='Скопировать номер';copyId.textContent='▢';
+      copyId.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(order.order_id));copyId.textContent='✓'}catch(_){copyId.textContent=String(order.order_id)}});
+      titleLine.append(h,copyId);
+      const date=document.createElement('p');date.textContent='Создан '+orderDate(order);
+      heading.append(titleLine,date);
+      const controls=document.createElement('div');controls.className='admin-order-head-actions';
+      const print=document.createElement('button');print.type='button';print.className='btn';print.textContent='▣  Печать чека';print.addEventListener('click',()=>window.print());
+      const message=document.createElement('a');message.className='btn';message.textContent='▤  Написать клиенту';
+      const phoneDigits=String(order.phone||'').replace(/\D/g,'');
+      message.href=phoneDigits?'https://wa.me/'+phoneDigits:'#';message.target='_blank';message.rel='noopener';
+      if(!phoneDigits){message.classList.add('disabled');message.setAttribute('aria-disabled','true')}
+      const more=document.createElement('details');more.className='admin-order-more';
+      more.innerHTML='<summary aria-label="Дополнительные действия">•••</summary><div class="admin-order-more-menu"><button type="button" data-copy-phone>Скопировать телефон</button><button type="button" data-copy-order>Скопировать номер заказа</button></div>';
+      more.querySelector('[data-copy-phone]').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(order.phone||''));more.open=false;status('Телефон скопирован','ok')}catch(_){status('Не удалось скопировать телефон','error')}});
+      more.querySelector('[data-copy-order]').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(order.order_id));more.open=false;status('Номер заказа скопирован','ok')}catch(_){status('Не удалось скопировать номер','error')}});
+      controls.append(print,message,more);detailHeader.append(heading,controls);orderDetail.append(detailHeader);
+
+      const flow=[['accepted','Принят'],['preparing','Готовим'],['ready','Готов к выдаче'],['completed','Выдан']];
+      const current=flow.findIndex(step=>step[0]===order.status);
       const progress=document.createElement('div');progress.className='admin-order-progress';
-      const flow=[['accepted','Принят'],['preparing','Готовится'],['ready','Готов'],['completed','Выдан']];
-      let current=flow.findIndex(step=>step[0]===order.status);if(order.status==='new')current=-1;
       flow.forEach(([key,label],index)=>{
         const step=document.createElement('div');step.className='admin-order-step'+(index<current?' done':'')+(index===current?' current':'');
-        const mark=document.createElement('i');mark.textContent=index<current?'✓':String(index+1);const text=document.createElement('span');text.textContent=label;step.append(mark,text);progress.append(step);
+        const mark=document.createElement('i');mark.textContent=index<current?'✓':String(index+1);
+        const caption=document.createElement('span');caption.textContent=label;step.append(mark,caption);progress.append(step);
       });
-      body.append(progress);
-      const notes=parseNotes(order.notes);
-      const infoGrid=document.createElement('div');infoGrid.className='admin-order-sections';
-      const client=document.createElement('section');client.className='admin-order-info';
-      const clientHead=document.createElement('h3');clientHead.textContent='Клиент';const clientName=document.createElement('b');clientName.textContent=order.customer_name||'Не указано';const phone=document.createElement('p');phone.textContent=order.phone||'Телефон не указан';
-      const phoneLink=document.createElement('a');phoneLink.href='tel:'+String(order.phone||'').replace(/[^\d+]/g,'');phoneLink.className='admin-order-call';phoneLink.textContent='Позвонить клиенту';
-      client.append(clientHead,clientName,phone,phoneLink);
-      const receive=document.createElement('section');receive.className='admin-order-info';
-      const receiveHead=document.createElement('h3');receiveHead.textContent='Получение заказа';const method=document.createElement('b');method.textContent=notes.fulfillment;
-      const time=document.createElement('p');time.textContent=order.pickup_time||'Время не указано';
-      receive.append(receiveHead,method,time);
-      if(notes.address){const address=document.createElement('p');address.textContent='Адрес: '+notes.address;receive.append(address)}
-      infoGrid.append(client,receive);body.append(infoGrid);
-      const itemsTitle=document.createElement('h3');itemsTitle.textContent='Состав заказа · '+(order.items||[]).length+' позиций';body.append(itemsTitle);
+      const columns=document.createElement('div');columns.className='admin-order-detail-columns';
+      const mainColumn=document.createElement('div');mainColumn.className='admin-order-main-column';
+      const itemsCard=document.createElement('section');itemsCard.className='admin-order-content-card';
+      const itemsHeading=document.createElement('div');itemsHeading.className='admin-order-content-heading';
+      const itemsTitle=document.createElement('h3');itemsTitle.textContent='Состав заказа';
+      const itemCount=document.createElement('span');itemCount.textContent=(order.items||[]).length+' позиций';
+      itemsHeading.append(itemsTitle,itemCount);itemsCard.append(itemsHeading);
       const items=document.createElement('div');items.className='admin-order-items';
       (order.items||[]).forEach(item=>{
         const row=document.createElement('div');row.className='admin-order-item';
         const product=window.TihiyAdmin?.getProducts?.().find(entry=>entry.id===item.id);
-        const image=document.createElement('img');image.src=safeImage(product?.photo||'');image.alt='';
-        const label=document.createElement('div');const name=document.createElement('b');name.textContent=item.name||product?.name||item.id;const amount=document.createElement('small');amount.textContent=(item.qty||0)+' × '+money(item.price||product?.price||0);label.append(name,amount);
-        const sum=document.createElement('strong');sum.textContent=money(item.subtotal||((item.qty||0)*(item.price||0)));
+        const image=document.createElement('img');image.src=safeImage(product?.photo||item.photo||'');image.alt='';
+        const label=document.createElement('div');label.className='admin-order-item-copy';
+        const name=document.createElement('b');name.textContent=item.name||product?.name||item.id;
+        const unitPrice=Number(item.price??product?.price??0),quantity=Number(item.qty)||0;
+        const amount=document.createElement('small');amount.textContent=(product?.pieces||item.pieces||8)+' шт. · '+(product?.weight||item.weight||'')+' · × '+quantity;
+        label.append(name,amount);
+        const sum=document.createElement('strong');sum.textContent=money(item.subtotal??(quantity*unitPrice));
         row.append(image,label,sum);items.append(row);
       });
-      body.append(items);
-      const total=document.createElement('div');total.className='admin-order-total';const totalLabel=document.createElement('span');totalLabel.textContent='Итого по товарам';const totalAmount=document.createElement('strong');totalAmount.textContent=money(order.total);total.append(totalLabel,totalAmount);body.append(total);
-      if(notes.remainder){const note=document.createElement('div');note.className='admin-order-note';note.textContent='Комментарий клиента: '+notes.remainder;body.append(note)}
-      const actions=document.createElement('div');actions.className='admin-order-actions';
-      const allowed=[['accepted','Принять заказ'],['preparing','Начать готовить'],['ready','Готов к выдаче'],['completed','Выдан'],['cancelled','Отменить']];
-      allowed.filter(([key])=>key!==order.status).forEach(([key,label])=>{
-        const button=document.createElement('button');button.type='button';button.className='btn'+(key==='cancelled'?' danger':key==='ready'?' primary':'');button.textContent=label;
-        button.addEventListener('click',async()=>{
-          if(key==='cancelled'&&!confirm('Отменить заказ #'+order.order_id+'?'))return;
-          button.disabled=true;
-          try{await window.TihiyAdmin.api('/api/admin/orders/'+encodeURIComponent(order.order_id),{method:'PATCH',body:JSON.stringify({status:key})});await window.TihiyAdmin.reloadOrders()}
-          catch(error){const status=$('#status');if(status){status.textContent=error.message;status.className='status error'}button.disabled=false}
-        });
-        actions.append(button);
+      itemsCard.append(items);
+      const summary=document.createElement('div');summary.className='admin-order-summary';
+      const itemsTotal=document.createElement('div');itemsTotal.innerHTML='<span>Товары</span><b>'+money(order.total)+'</b>';
+      const deliveryTotal=document.createElement('div');deliveryTotal.innerHTML='<span>Доставка</span><b>'+( /достав/i.test(notes.fulfillment)?'Уточняется':'Самовывоз')+'</b>';
+      const total=document.createElement('div');total.className='grand-total';total.innerHTML='<span>Итого к оплате</span><strong>'+money(order.total)+'</strong>';
+      summary.append(itemsTotal,deliveryTotal,total);itemsCard.append(summary);
+      mainColumn.append(itemsCard);
+
+      const payment=document.createElement('section');payment.className='admin-order-content-card admin-payment-card';
+      payment.innerHTML='<div><h3>Оплата</h3><p>При получении</p></div><div><h3>Онлайн-оплата</h3><p class="payment-unconfirmed">Не подключена</p></div>';
+      mainColumn.append(payment);
+      const actionCard=document.createElement('section');actionCard.className='admin-order-content-card admin-status-action-card';
+      const statusHeading=document.createElement('div');statusHeading.className='admin-order-content-heading';
+      const statusLabel=document.createElement('h3');statusLabel.textContent='Управление заказом';statusHeading.append(statusLabel);
+      const statusSelect=document.createElement('select');statusSelect.className='admin-order-status-select';
+      [['new','Новый'],['accepted','Принят'],['preparing','Готовим'],['ready','Готов к выдаче'],['completed','Выдан'],['cancelled','Отменён']].forEach(([key,label])=>{
+        const option=document.createElement('option');option.value=key;option.textContent=label;option.selected=key===order.status;statusSelect.append(option);
       });
-      const print=document.createElement('button');print.type='button';print.className='btn';print.textContent='Печать чека';print.addEventListener('click',()=>window.print());actions.append(print);
-      body.append(actions);orderDetail.append(body);
+      statusSelect.addEventListener('change',async()=>{
+        const next=statusSelect.value;if(next===order.status)return;
+        if(next==='cancelled'&&!confirm('Отменить заказ #'+order.order_id+'?')){statusSelect.value=order.status;return}
+        statusSelect.disabled=true;
+        try{
+          await window.TihiyAdmin.api('/api/admin/orders/'+encodeURIComponent(order.order_id),{method:'PATCH',body:JSON.stringify({status:next})});
+          await window.TihiyAdmin.reloadOrders();
+          status('Статус заказа обновлён'+(next!=='cancelled'?' · клиенту отправлено уведомление при доступности Telegram':'') ,'ok');
+        }catch(error){status(error.message,'error');statusSelect.value=order.status;statusSelect.disabled=false}
+      });
+      statusHeading.append(statusSelect);
+      const quickActions=document.createElement('div');quickActions.className='admin-order-actions';
+      const nextStatus=({new:'accepted',accepted:'preparing',preparing:'ready',ready:'completed'})[order.status];
+      const nextLabel=({new:'Принять заказ',accepted:'Начать готовить',preparing:'Готов к выдаче',ready:'Отметить выданным'})[order.status];
+      if(nextStatus){
+        const nextButton=document.createElement('button');nextButton.type='button';nextButton.className='btn primary';nextButton.textContent=nextLabel;
+        nextButton.addEventListener('click',async()=>{
+          nextButton.disabled=true;
+          try{await window.TihiyAdmin.api('/api/admin/orders/'+encodeURIComponent(order.order_id),{method:'PATCH',body:JSON.stringify({status:nextStatus})});await window.TihiyAdmin.reloadOrders();status('Статус заказа обновлён','ok')}
+          catch(error){status(error.message,'error');nextButton.disabled=false}
+        });
+        quickActions.append(nextButton);
+      }
+      if(order.status!=='cancelled'&&order.status!=='completed'){
+        const cancel=document.createElement('button');cancel.type='button';cancel.className='btn danger';cancel.textContent='Отменить заказ';
+        cancel.addEventListener('click',async()=>{
+          if(!confirm('Отменить заказ #'+order.order_id+'?'))return;
+          cancel.disabled=true;
+          try{await window.TihiyAdmin.api('/api/admin/orders/'+encodeURIComponent(order.order_id),{method:'PATCH',body:JSON.stringify({status:'cancelled'})});await window.TihiyAdmin.reloadOrders();status('Заказ отменён','ok')}
+          catch(error){status(error.message,'error');cancel.disabled=false}
+        });quickActions.append(cancel);
+      }
+      actionCard.append(statusHeading,quickActions);mainColumn.append(actionCard);
+
+      const sideColumn=document.createElement('aside');sideColumn.className='admin-order-side-column';
+      const clientCard=makeOrderCard('Информация о клиенте','client');
+      const clientName=document.createElement('b');clientName.className='admin-client-name';clientName.textContent=order.customer_name||'Не указано';
+      const clientPhone=document.createElement('p');clientPhone.className='admin-client-phone';clientPhone.textContent=order.phone||'Телефон не указан';
+      const contactActions=document.createElement('div');contactActions.className='admin-contact-actions';
+      if(phoneDigits){
+        const call=document.createElement('a');call.href='tel:'+phoneDigits;call.className='admin-contact-button';call.textContent='☎ Позвонить';
+        const whats=document.createElement('a');whats.href='https://wa.me/'+phoneDigits;whats.target='_blank';whats.rel='noopener';whats.className='admin-contact-button';whats.textContent='WhatsApp';
+        contactActions.append(call,whats);
+      }
+      clientCard.append(clientName,clientPhone,contactActions);
+      const receiveCard=makeOrderCard('Способ получения','receive');
+      const methodBadge=document.createElement('div');methodBadge.className='admin-receive-method';
+      const delivery=/достав/i.test(notes.fulfillment);
+      methodBadge.textContent=delivery?'🚚  Доставка':'♧  Самовывоз';
+      const timeLine=document.createElement('p');timeLine.className='admin-receive-time';timeLine.textContent='◷  '+(order.pickup_time||'Время не указано');
+      receiveCard.append(methodBadge,timeLine);
+      const addressNode=document.createElement('p');addressNode.className='admin-receive-address';
+      const detailsForAddress=delivery?notes.address:(orderStoreSettings?.settings?.pickup_address||'с. Чарышское, Алтайский край');
+      addressNode.textContent=delivery?(detailsForAddress?'Адрес доставки: '+detailsForAddress:'Адрес доставки не указан'):'Адрес магазина: '+detailsForAddress;
+      receiveCard.append(addressNode);
+      const mapQuery=detailsForAddress||'Чарышское, Алтайский край';
+      const map=document.createElement('iframe');map.className='admin-order-map';map.title='Карта адреса заказа';map.loading='lazy';map.src='https://yandex.ru/map-widget/v1/?text='+encodeURIComponent(mapQuery);
+      receiveCard.append(map);
+      const mapLink=document.createElement('a');mapLink.className='admin-order-map-link';mapLink.href=delivery?'https://yandex.ru/maps/?text='+encodeURIComponent(mapQuery):(orderStoreSettings?.settings?.pickup_map_url||'https://yandex.ru/maps/?text='+encodeURIComponent(mapQuery));mapLink.target='_blank';mapLink.rel='noopener';mapLink.textContent='Открыть в картах ↗';receiveCard.append(mapLink);
+
+      const history=makeOrderCard('История заказа','history');
+      const historyList=document.createElement('div');historyList.className='admin-order-history';
+      const created=document.createElement('div');created.className='admin-history-item done';
+      const createdTime=document.createElement('time');createdTime.textContent=orderDate(order);
+      const createdContent=document.createElement('div');const createdTitle=document.createElement('b');createdTitle.textContent='Заказ создан';const createdText=document.createElement('small');createdText.textContent='Заявка сохранена в магазине';createdContent.append(createdTitle,createdText);created.append(createdTime,createdContent);historyList.append(created);
+      const currentHistory=document.createElement('div');currentHistory.className='admin-history-item current';
+      const currentTime=document.createElement('time');currentTime.textContent='Сейчас';
+      const currentContent=document.createElement('div');const currentTitle=document.createElement('b');currentTitle.textContent=statusNames[order.status]||'Статус заказа';
+      const currentText=document.createElement('small');currentText.textContent='Текущий сохранённый статус';currentContent.append(currentTitle,currentText);currentHistory.append(currentTime,currentContent);historyList.append(currentHistory);
+      history.append(historyList);
+      sideColumn.append(clientCard,receiveCard,history);
+      columns.append(mainColumn,sideColumn);
+      const body=document.createElement('div');body.className='admin-order-body';body.append(progress,columns);orderDetail.append(body);
+
+      if(notes.remainder){
+        const note=document.createElement('section');note.className='admin-order-client-note';
+        const noteTitle=document.createElement('h3');noteTitle.textContent='Комментарий клиента';
+        const noteText=document.createElement('p');noteText.textContent=notes.remainder;note.append(noteTitle,noteText);orderDetail.append(note);
+      }
+      const printArea=document.createElement('section');printArea.className='admin-print-receipt';
+      printArea.innerHTML='<h1>Тихий ролл</h1><h2>Заказ #'+safeText(order.order_id)+'</h2><p>'+safeText(orderDate(order))+'</p><hr>';
+      (order.items||[]).forEach(item=>{const line=document.createElement('p');line.textContent=(item.name||item.id)+' × '+(item.qty||0)+' — '+money(item.subtotal??((item.qty||0)*Number(item.price||0)));printArea.append(line)});
+      const grand=document.createElement('h2');grand.textContent='Итого: '+money(order.total);printArea.append(document.createElement('hr'),grand);
+      printArea.append(document.createTextNode((order.customer_name||'')+' · '+(order.phone||'')));
+      orderDetail.append(printArea);
+      if(!orderStoreSettings&&!orderStoreSettingsPromise){
+        loadOrderStoreSettings().then(()=>{if(selectedOrderId===order.order_id)renderOrderDetail(order)});
+      }
     }
     function renderAnalytics(){
       const report=window.__TIHIY_ADMIN_REPORT__;analyticsRoot.replaceChildren();
