@@ -112,7 +112,7 @@ function showGalleryPhoto(index){
 function detail(p,openOnMobile=true){
  if(!p)return;
  state.selected=p;state.detailQty=1;
- state.photos=p.set?setGallery(p.set):[photo(p),...(Array.isArray(p.gallery)?p.gallery:[])].filter(Boolean).slice(0,5);
+ const ownGallery=Array.isArray(p.gallery)?p.gallery.filter(Boolean):[];const legacyGallery=state.products.filter(item=>item.id!==p.id).map(photo);state.photos=p.set?setGallery(p.set):Array.from(new Set([photo(p),...(ownGallery.length?ownGallery:legacyGallery)])).filter(Boolean).slice(0,5);
  state.photos=Array.from(new Set(state.photos)).slice(0,5);state.photoIndex=0;
  $('#detailHero').src=state.photos[0]||photo(p);$('#detailHero').alt=p.name;
  $('#detailName').textContent=p.name;$('#detailDescription').textContent=p.desc||'Свежеприготовленное блюдо.';
