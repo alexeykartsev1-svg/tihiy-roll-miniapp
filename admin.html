@@ -54,7 +54,8 @@ textarea { min-height:100px; }
 .slide-photo-preview{display:block;width:100%;max-width:220px;height:110px;object-fit:cover;border:1px solid var(--line);border-radius:10px;margin:7px 0;background:#130f0b}
 @media(max-width:700px){.admin-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-</style><link rel="stylesheet" href="./assets/premium-admin.css"></head><body><main class="wrap"><header class="head"><div class="brand">ТИХИЙ РОЛЛ<small>ПАНЕЛЬ УПРАВЛЕНИЯ</small></div><span class="tag">🔐 Только владелец</span></header><div id="status" class="status">Проверяем доступ Telegram…</div><section id="login" class="panel login hidden"><h2>Панель владельца</h2><p class="muted">Открой эту страницу через кнопку «Управление» внутри Telegram-магазина. Доступ проверяется на сервере по Telegram ID.</p><button class="btn" id="retry">Проверить ещё раз</button></section><section id="app" class="hidden"><div class="panel"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Меню и товары</h2><div class="muted">Меняй фотографии, названия, цены и описание — покупатели увидят обновления после перезагрузки магазина.</div></div><button class="btn primary" id="add">＋ Добавить товар</button></div><div id="list" class="list"></div></div><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Заказы</h2><div class="muted">Статусы заказов и сводка по продажам</div></div><button class="btn" id="refreshOrders" type="button">Обновить</button></div><div id="analyticsSummary" class="muted" style="margin-bottom:12px">Загружаем статистику…</div><div id="ordersList" class="list"></div></section><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 22px Georgia,serif;margin:0">Категории меню</h2><div class="muted">Создавай новые категории. Удалить можно только пустую категорию.</div></div></div><div class="formgrid" style="margin-top:14px"><div class="field"><label for="newCategoryName">Название категории</label><input id="newCategoryName" maxlength="60" placeholder="Например, Запечённые роллы"></div><div class="field"><label for="newCategoryId">ID (латиница)</label><input id="newCategoryId" maxlength="30" pattern="[A-Za-z0-9_-]{2,30}" placeholder="baked-rolls"></div><div class="field full"><button class="btn primary" id="addCategory" type="button">Добавить категорию</button></div></div><div id="categoriesList" class="list" style="margin-top:12px"></div></section><section id="editor" class="panel editor"><div class="toolbar"><h2 id="editorTitle" style="font:700 22px Georgia,serif;margin:0">Карточка товара</h2><span class="tag">Изменения сохраняются на сервере</span></div><form id="productForm"><div class="formgrid">
+</style><link rel="stylesheet" href="./assets/premium-admin.css">
+<link rel="stylesheet" href="./assets/full-admin.css"></head><body><main class="wrap"><header class="head"><div class="brand">ТИХИЙ РОЛЛ<small>ПАНЕЛЬ УПРАВЛЕНИЯ</small></div><span class="tag">🔐 Только владелец</span></header><div id="status" class="status">Проверяем доступ Telegram…</div><section id="login" class="panel login hidden"><h2>Панель владельца</h2><p class="muted">Открой эту страницу через кнопку «Управление» внутри Telegram-магазина. Доступ проверяется на сервере по Telegram ID.</p><button class="btn" id="retry">Проверить ещё раз</button></section><section id="app" class="hidden"><div class="panel"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Меню и товары</h2><div class="muted">Меняй фотографии, названия, цены и описание — покупатели увидят обновления после перезагрузки магазина.</div></div><button class="btn primary" id="add">＋ Добавить товар</button></div><div id="list" class="list"></div></div><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Заказы</h2><div class="muted">Статусы заказов и сводка по продажам</div></div><button class="btn" id="refreshOrders" type="button">Обновить</button></div><div id="analyticsSummary" class="muted" style="margin-bottom:12px">Загружаем статистику…</div><div id="ordersList" class="list"></div></section><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 22px Georgia,serif;margin:0">Категории меню</h2><div class="muted">Создавай новые категории. Удалить можно только пустую категорию.</div></div></div><div class="formgrid" style="margin-top:14px"><div class="field"><label for="newCategoryName">Название категории</label><input id="newCategoryName" maxlength="60" placeholder="Например, Запечённые роллы"></div><div class="field"><label for="newCategoryId">ID (латиница)</label><input id="newCategoryId" maxlength="30" pattern="[A-Za-z0-9_-]{2,30}" placeholder="baked-rolls"></div><div class="field full"><button class="btn primary" id="addCategory" type="button">Добавить категорию</button></div></div><div id="categoriesList" class="list" style="margin-top:12px"></div></section><section id="editor" class="panel editor"><div class="toolbar"><h2 id="editorTitle" style="font:700 22px Georgia,serif;margin:0">Карточка товара</h2><span class="tag">Изменения сохраняются на сервере</span></div><form id="productForm"><div class="formgrid">
 <div class="field"><label for="pid">ID товара (латиница, не менять у существующего)</label><input id="pid" required pattern="[A-Za-z0-9_-]{2,48}" maxlength="48"></div>
 <div class="field"><label for="name">Название</label><input id="name" required maxlength="100"></div>
 <div class="field"><label for="price">Цена, ₽</label><input id="price" type="number" required min="1" max="100000"></div>
@@ -89,21 +90,11 @@ async function loadOrders(){
     const summary=data.summary||{};
     const analytics=await api('/api/admin/analytics');
     const reportOrders=Array.isArray(data.orders)?data.orders:[];
-    const now=new Date();
-    const dayKeys=[];
-    for(let offset=6;offset>=0;offset--){const day=new Date(now);day.setDate(now.getDate()-offset);day.setHours(0,0,0,0);dayKeys.push({key:day.toLocaleDateString('ru-RU'),label:day.toLocaleDateString('ru-RU',{weekday:'short',day:'numeric'}),revenue:0,orders:0})}
-    const dayIndex=new Map(dayKeys.map((day,index)=>[day.key,index]));
-    const statusCounts={new:0,accepted:0,preparing:0,ready:0,completed:0,cancelled:0};
-    reportOrders.forEach(order=>{
-      if(statusCounts[order.status]!==undefined)statusCounts[order.status]++;
-      const when=new Date(order.created_at||'');
-      if(Number.isNaN(when.getTime()))return;
-      const index=dayIndex.get(when.toLocaleDateString('ru-RU'));
-      if(index===undefined)return;
-      dayKeys[index].orders++;
-      if(order.status!=='cancelled')dayKeys[index].revenue+=Number(order.total)||0;
-    });
-    window.__TIHIY_ADMIN_REPORT__={summary:analytics,trend:dayKeys,statusCounts,recentOrdersCount:reportOrders.length};
+    window.__TIHIY_ADMIN_ORDERS=reportOrders;
+    window.dispatchEvent(new CustomEvent('tihiy:orders-updated'));
+    const trend=Array.isArray(analytics.daily)?analytics.daily:[];
+    const statusCounts=analytics.status_counts||{};
+    window.__TIHIY_ADMIN_REPORT__={summary:analytics,trend,statusCounts,recentOrdersCount:reportOrders.length};
     window.dispatchEvent(new CustomEvent('tihiy:analytics-updated'));
     $('analyticsSummary').textContent='Заказов: '+(analytics.orders_count||0)+' · Выручка без отмен: '+new Intl.NumberFormat('ru-RU').format(analytics.revenue||0)+' ₽ · Расчётная валовая прибыль: '+new Intl.NumberFormat('ru-RU').format(analytics.gross_profit||0)+' ₽ · В работе: '+(analytics.active_orders||0);
     const list=$('ordersList');list.replaceChildren();
@@ -262,5 +253,15 @@ $('saveContent').addEventListener('click',async()=>{
   $('saveContent').disabled=true;await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify(payload)});status('Оформление, описания и фото готовых сетов сохранены. Открой магазин заново, чтобы увидеть обновления.','ok');
  }catch(e){status(e.message,'error')}finally{$('saveContent').disabled=false}
 });
+window.TihiyAdmin={
+  api,
+  reloadOrders:loadOrders,
+  reloadProducts:loadProducts,
+  reloadContent:loadSiteContent,
+  openEditor,
+  getProducts:()=>products,
+  getOrders:()=>window.__TIHIY_ADMIN_ORDERS||[],
+  getInitData:()=>initData
+};
 boot();
 </script><script src="./assets/admin-workspace.js"></script></body></html>
