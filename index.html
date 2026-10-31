@@ -1128,10 +1128,23 @@ const SET_PRESETS={solo:[['philadelphia',1],['lava',1]],duo:[['philadelphia',1],
 function renderSetPrices(){
   Object.entries({solo:'setSoloPrice',duo:'setDuoPrice',party:'setPartyPrice',newyear:'setNewYearPrice'}).forEach(([key,id])=>{
     const el=document.getElementById(id);if(!el)return;
-    const rows=SET_PRESETS[key];const available=rows.every(([pid])=>products.some(p=>p.id===pid));
-    const card=el.closest('.set-card');if(card)card.hidden=!available;
-    const total=rows.reduce((sum,[pid,qty])=>{const p=products.find(x=>x.id===pid);return sum+(p?p.price*qty:0)},0);
+    const rows=SET_PRESETS[key]||[];
+    const resolved=rows.map(([pid,qty])=>({product:products.find(p=>p.id===pid),qty}));
+    const available=resolved.length>0&&resolved.every(row=>row.product);
+    const card=el.closest('.set-card');
+    const content=editableSetsContent[key]||{};
+    if(card)card.hidden=!available||content.active===false;
+    const total=resolved.reduce((sum,row)=>sum+(row.product?Number(row.product.price||0)*row.qty:0),0);
+    const pieces=resolved.reduce((sum,row)=>sum+(row.product?Number(row.product.pieces||8)*row.qty:0),0);
+    const weight=resolved.reduce((sum,row)=>sum+(row.product?Number.parseInt(String(row.product.weight||'').replace(/[^0-9]/g,''),10)||0)*row.qty:0),0);
     el.textContent=available?money(total):'Временно недоступен';
+    const meta=card?.querySelectorAll('.set-meta span');
+    if(meta&&meta.length>=2){
+      meta[0].textContent='▣ '+pieces+' шт.';
+      meta[0].setAttribute('aria-label',pieces+' штук');
+      meta[1].textContent='⚖ '+(weight?new Intl.NumberFormat('ru-RU').format(weight)+' г':'Вес уточняется');
+      meta[1].setAttribute('aria-label',weight+' граммов');
+    }
   });
   populateSetImages();
   if(typeof setQuantities!=='undefined')Object.keys(setQuantities).forEach(syncSetCount);
@@ -1155,11 +1168,32 @@ function applyEditableSets(rows){
  if(!Array.isArray(rows))return;
  rows.forEach(row=>{
   if(!row||!Object.prototype.hasOwnProperty.call(DEFAULT_SET_CONTENT,row.id))return;
-  editableSetsContent[row.id]={description:typeof row.description==='string'?row.description:DEFAULT_SET_CONTENT[row.id].description,image:typeof row.image==='string'?row.image:'',photos:Array.isArray(row.photos)?row.photos.filter(x=>typeof x==='string').slice(0,5):[]};
+  const items=Array.isArray(row.items)&&row.items.length
+    ?row.items.filter(item=>item&&typeof item.id==='string'&&Number(item.qty)>0).map(item=>[item.id,Math.min(50,Number(item.qty))])
+    :SET_PRESETS[row.id];
+  if(items&&items.length)SET_PRESETS[row.id]=items;
+  editableSetsContent[row.id]={
+    description:typeof row.description==='string'?row.description:DEFAULT_SET_CONTENT[row.id].description,
+    image:typeof row.image==='string'?row.image:'',
+    photos:Array.isArray(row.photos)?row.photos.filter(x=>typeof x==='string').slice(0,5):[],
+    active:row.active!==false,
+    stock:Number(row.stock)||0
+  };
   const card=document.querySelector('[data-set-card="'+row.id+'"]');
   const description=card&&card.querySelector('[data-set-description]');
   if(description)description.textContent=editableSetsContent[row.id].description;
+  if(card){
+    card.hidden=editableSetsContent[row.id].active===false;
+    const badge=card.querySelector('.set-stock-badge');
+    if(badge)badge.remove();
+    if(editableSetsContent[row.id].stock>0){
+      const stock=document.createElement('span');stock.className='set-stock-badge';
+      stock.textContent='Осталось: '+editableSetsContent[row.id].stock;
+      card.querySelector('.set-card-copy')?.append(stock);
+    }
+  }
  });
+ renderSetPrices();
  populateSetImages();
 }
 function populateSetImages(){
