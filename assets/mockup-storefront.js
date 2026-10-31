@@ -187,12 +187,34 @@ function changeSetCart(id,delta){
  save();renderAll();toast('Количество сета изменено');
 }
 const DAYS=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+function storeNow(){
+ const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Barnaul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+ const v=Object.fromEntries(parts.map(x=>[x.type,x.value]));
+ return new Date(Number(v.year),Number(v.month)-1,Number(v.day),Number(v.hour),Number(v.minute));
+}
 function dateString(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function hoursFor(d){return (state.settings.weekly_hours||[]).find(x=>x.day===DAYS[d.getDay()])||{open:'12:00',close:'20:00',closed:[0,3].includes(d.getDay())};}
-function initialDate(){const now=new Date();for(let i=0;i<14;i++){const d=new Date(now);d.setDate(now.getDate()+i);const h=hoursFor(d);if(!h.closed&&h.open&&h.close)return d;}return now;}
-async function refreshTimes(){const value=$('#pickupDate').value,select=$('#pickupTime');if(!value)return;const parts=value.split('-').map(Number),h=hoursFor(new Date(parts[0],parts[1]-1,parts[2]));if(h.closed){select.innerHTML='<option value="">Выходной</option>';return;}let busy=[];try{busy=(await apiGet('/api/availability?date='+encodeURIComponent(value))).unavailable_times||[];}catch(e){}const minutes=s=>{const a=s.split(':').map(Number);return a[0]*60+a[1];};const now=new Date(),opts=[];for(let t=minutes(h.open);t<minutes(h.close);t+=30){if(value===dateString(now)&&t<=now.getHours()*60+now.getMinutes()+30)continue;const v=String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');opts.push('<option value="'+v+'" '+(busy.includes(v)?'disabled':'')+'>'+v+(busy.includes(v)?' — занято':'')+'</option>');}select.innerHTML='<option value="">Выбрать время</option>'+opts.join('');}
-function preparePickup(){const date=$('#pickupDate');if(!date.value){date.min=dateString(new Date());date.value=dateString(initialDate());}refreshTimes();}
-function pickupLabel(date,time){const p=date.split('-').map(Number),d=new Date(p[0],p[1]-1,p[2]);const label=date===dateString(new Date())?'Сегодня':date===dateString(new Date(Date.now()+86400000))?'Завтра':DAYS[d.getDay()];return label+' ('+date+') в '+time;}
+function hoursFor(d){return {open:'12:00',close:'20:00',closed:[0,3].includes(d.getDay())};}
+function initialDate(){const now=storeNow();for(let i=0;i<14;i++){const d=new Date(now);d.setDate(now.getDate()+i);const h=hoursFor(d);if(!h.closed)return d;}return now;}
+async function refreshTimes(){
+ const value=$('#pickupDate').value,select=$('#pickupTime');if(!value)return;
+ const parts=value.split('-').map(Number),h=hoursFor(new Date(parts[0],parts[1]-1,parts[2]));
+ if(h.closed){select.innerHTML='<option value="">Выходной</option>';return;}
+ let busy=[];try{busy=(await apiGet('/api/availability?date='+encodeURIComponent(value))).unavailable_times||[];}catch(e){}
+ const minutes=s=>{const a=s.split(':').map(Number);return a[0]*60+a[1];};
+ const now=storeNow(),opts=[];
+ for(let t=minutes(h.open);t<minutes(h.close);t+=30){
+  if(value===dateString(now)&&t<=now.getHours()*60+now.getMinutes()+30)continue;
+  const v=String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+  opts.push('<option value="'+v+'" '+(busy.includes(v)?'disabled':'')+'>'+v+(busy.includes(v)?' — занято':'')+'</option>');
+ }
+ select.innerHTML='<option value="">Выбрать время</option>'+opts.join('');
+}
+function preparePickup(){const date=$('#pickupDate'),now=storeNow();if(!date.value){date.min=dateString(now);date.value=dateString(initialDate());}else date.min=dateString(now);refreshTimes();}
+function pickupLabel(date,time){
+ const p=date.split('-').map(Number),d=new Date(p[0],p[1]-1,p[2]),now=storeNow(),tomorrow=new Date(now);tomorrow.setDate(now.getDate()+1);
+ const label=date===dateString(now)?'Сегодня':date===dateString(tomorrow)?'Завтра':DAYS[d.getDay()];
+ return label+' ('+date+') в '+time;
+}
 function builderEffective(){
  const out={...state.builderItems};
  for(const [setId,count] of Object.entries(state.builderSets)){
