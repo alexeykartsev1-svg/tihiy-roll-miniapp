@@ -743,16 +743,22 @@ DEFAULT_SITE_CONTENT = {
         {"title":"Собери свой сет","accent":"на свой вкус","desc":"Выбирай любимые роллы и создай собственное сочетание.","image":"","button":"Собрать сет","active":True}
     ],
     "sets": [
-        {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":"","photos":[]},
-        {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":"","photos":[]},
-        {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[]},
-        {"id":"newyear","description":"Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[]}
+        {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"lava","qty":1}],"active":True,"stock":0},
+        {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"warm_crab","qty":1},{"id":"lava","qty":1}],"active":True,"stock":0},
+        {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":2},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":0},
+        {"id":"newyear","description":"Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"california","qty":1},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":0}
     ],
     "promo_title":"Закажи к удобному времени",
     "promo_text":"Выбирай блюда заранее — мы приготовим заказ к согласованному времени.",
     "promo_button":"Перейти к меню",
     "promo_link":"#menu",
     "promo_image":""
+}
+DEFAULT_SET_ITEMS = {
+    "solo": [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 1}],
+    "duo": [{"id": "philadelphia", "qty": 1}, {"id": "warm_crab", "qty": 1}, {"id": "lava", "qty": 1}],
+    "party": [{"id": "philadelphia", "qty": 2}, {"id": "lava", "qty": 1}, {"id": "warm_crab", "qty": 1}, {"id": "warm_salmon", "qty": 1}],
+    "newyear": [{"id": "philadelphia", "qty": 1}, {"id": "california", "qty": 1}, {"id": "lava", "qty": 1}, {"id": "warm_crab", "qty": 1}, {"id": "warm_salmon", "qty": 1}],
 }
 def read_site_content() -> dict[str, Any]:
     try:
@@ -875,7 +881,30 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 if photo and not (photo.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", photo)):
                     raise HTTPException(status_code=400, detail=f"Фото {photo_index+1} сета {index+1}: нужен HTTPS URL или JPG, PNG, WebP.")
                 clean_photos.append(photo.strip())
-            clean_sets.append({"id": set_id, "description": description.strip(), "image": image.strip(), "photos": clean_photos})
+            items = item.get("items", DEFAULT_SET_ITEMS[set_id])
+            if not isinstance(items, list) or not items or len(items) > 12:
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: укажи от 1 до 12 позиций.")
+            available_ids = {str(product.get("id")) for product in read_products()}
+            clean_items = []
+            used_item_ids = set()
+            for item_index, row in enumerate(items):
+                if not isinstance(row, dict):
+                    raise HTTPException(status_code=400, detail=f"Сет {index+1}, позиция {item_index+1}: неверный формат.")
+                product_id = row.get("id")
+                quantity = row.get("qty", 1)
+                if product_id not in available_ids or product_id in used_item_ids:
+                    raise HTTPException(status_code=400, detail=f"Сет {index+1}: товар не найден или повторяется.")
+                if not isinstance(quantity, int) or isinstance(quantity, bool) or not 1 <= quantity <= 50:
+                    raise HTTPException(status_code=400, detail=f"Сет {index+1}: количество позиции должно быть от 1 до 50.")
+                clean_items.append({"id": product_id, "qty": quantity})
+                used_item_ids.add(product_id)
+            active = item.get("active", True)
+            stock = item.get("stock", 0)
+            if not isinstance(active, bool):
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: признак активности должен быть true/false.")
+            if not isinstance(stock, int) or isinstance(stock, bool) or not 0 <= stock <= 10000:
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: остаток должен быть от 0 до 10 000.")
+            clean_sets.append({"id": set_id, "description": description.strip(), "image": image.strip(), "photos": clean_photos, "items": clean_items, "active": active, "stock": stock})
             seen.add(set_id)
         current["sets"] = clean_sets
     write_site_content(current)
