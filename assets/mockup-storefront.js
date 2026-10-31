@@ -57,7 +57,7 @@ function renderCatalog(){
  $('#catalogueGrid').innerHTML=rows.length?rows.map(card).join(''):'<div class="loading-state">В этой категории пока нет блюд.</div>';
  $('#emptyState').hidden=rows.length>0;
 }
-function renderBadges(){$('#cartCount').textContent=cartCount();$('#navCartCount').textContent=cartCount();$('#favCount').textContent=state.favorites.size;['homeCartCount','builderCartCount','basketCartCount'].forEach(id=>{if($('#'+id))$('#'+id).textContent=cartCount();});['homeFavCount','builderFavCount','basketFavCount'].forEach(id=>{if($('#'+id))$('#'+id).textContent=state.favorites.size;});}
+function renderBadges(){$('#cartCount').textContent=cartCount();$('#navCartCount').textContent=cartCount();$('#favCount').textContent=state.favorites.size;['homeCartCount','builderCartCount','basketCartCount','favoritesScreenCartCount'].forEach(id=>{if($('#'+id))$('#'+id).textContent=cartCount();});['homeFavCount','builderFavCount','basketFavCount','favoritesScreenFavCount'].forEach(id=>{if($('#'+id))$('#'+id).textContent=state.favorites.size;});}
 function cartItems(){return state.products.filter(p=>qty(p.id)>0);}
 function cartPieces(){return cartItems().reduce((sum,p)=>sum+(Number(p.pieces)||8)*qty(p.id),0);}
 function cartWeight(){return cartItems().reduce((sum,p)=>sum+(parseInt(p.weight,10)||0)*qty(p.id),0);}
