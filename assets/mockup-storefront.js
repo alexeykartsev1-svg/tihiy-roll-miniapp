@@ -606,10 +606,10 @@ $('#catalogSearch').addEventListener('input',e=>{state.search=e.target.value.tri
 const homePhoneLink=$('#homePhoneOrder');
 if(homePhoneLink){
  homePhoneLink.addEventListener('click',event=>{
-  const digits=String(homePhoneLink.getAttribute('href')||'tel:+79230005857').replace(/^tel:/i,'').replace(/[^+\\d]/g,'');
+  const digits=String(homePhoneLink.getAttribute('href')||'tel:+79230005857').replace(/^tel:/i,'').replace(/[^0-9+]/g,'');
   const target='tel:'+(digits||'+79230005857');
   event.preventDefault();
-  window.location.href=target;
+  window.open(target,'_blank');
  },true);
 }
 $('#pickupDate').addEventListener('change',refreshTimes);
