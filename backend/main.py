@@ -882,6 +882,7 @@ DEFAULT_SITE_CONTENT = {
     "promo_image":""
 }
 DEFAULT_SEASONAL_BANNERS = [
+    {"id": "newyear", "active": True},
     {"id": "autumn", "active": True},
     {"id": "winter", "active": True},
     {"id": "spring", "active": True},
@@ -1068,9 +1069,9 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
         current["sets"] = clean_sets
     if "seasonal_banners" in payload:
         banners = payload["seasonal_banners"]
-        allowed_banner_ids = {"autumn", "winter", "spring", "summer"}
-        if not isinstance(banners, list) or len(banners) > 4:
-            raise HTTPException(status_code=400, detail="Можно настроить не более 4 сезонных баннеров.")
+        allowed_banner_ids = {"newyear", "autumn", "winter", "spring", "summer"}
+        if not isinstance(banners, list) or len(banners) > 5:
+            raise HTTPException(status_code=400, detail="Можно настроить не более 5 баннеров.")
         clean_banners = []
         seen_banner_ids = set()
         for index, banner in enumerate(banners):
