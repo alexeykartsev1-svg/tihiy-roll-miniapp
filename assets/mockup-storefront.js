@@ -655,5 +655,17 @@ deliveryAddress.addEventListener('change',updateDeliveryMap);
 $('#checkoutForm').addEventListener('submit',sendOrder);
 $$('.modal-layer').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){['cartModal','favoritesModal','filtersModal','builderInfoModal'].forEach(closeModal);$('#detailDevice').classList.remove('mobile-active');}});
+// Refresh seasonal banner visibility when the customer returns to an already-open shop.
+async function refreshSeasonalBannerVisibility(){
+ try{
+  const content=await apiGet('/api/site-content');
+  if(!Array.isArray(content.seasonal_banners))return;
+  state.seasonalBanners=content.seasonal_banners;
+  renderHomeContent();
+ }catch(error){console.warn('Не удалось обновить сезонные баннеры:',error);}
+}
+window.addEventListener('focus',refreshSeasonalBannerVisibility);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshSeasonalBannerVisibility();});
+if(!window.__tihiySeasonalRefreshTimer)window.__tihiySeasonalRefreshTimer=setInterval(refreshSeasonalBannerVisibility,30000);
 load().catch(e=>{console.error(e);toast('Не удалось загрузить меню.');});
 })();
