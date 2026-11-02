@@ -2034,3 +2034,37 @@
  content:none!important;
  display:none!important;
 }
+
+
+/* Seasonal banners use the exact same pulsing red arrow as the New Year banner. */
+.home-screen .home-seasonal-card::after{
+ content:"→"!important;
+ display:grid!important;
+ place-items:center!important;
+ position:absolute!important;
+ left:3.2%!important;
+ bottom:3.1%!important;
+ width:4.8%!important;
+ aspect-ratio:1/1!important;
+ min-width:21px!important;
+ max-width:44px!important;
+ box-sizing:border-box!important;
+ border:1px solid rgba(255,74,91,.95)!important;
+ border-radius:50%!important;
+ background:rgba(190,15,38,.76)!important;
+ color:#fff!important;
+ font-size:clamp(14px,2.3vw,21px)!important;
+ font-weight:900!important;
+ line-height:1!important;
+ text-align:center!important;
+ box-shadow:0 0 0 0 rgba(244,35,61,.36),0 0 12px rgba(238,27,54,.35)!important;
+ -webkit-backdrop-filter:blur(5px)!important;
+ backdrop-filter:blur(5px)!important;
+ pointer-events:none!important;
+ transform-origin:center!important;
+ animation:newyearArrowPulse 1.65s ease-in-out infinite!important;
+}
+@media(prefers-reduced-motion:reduce){
+ .home-screen .home-seasonal-card::after{animation:none!important}
+}
+.home-screen .home-newyear-card[hidden]{display:none!important}
