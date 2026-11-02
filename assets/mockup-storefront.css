@@ -1556,3 +1556,158 @@
  .home-screen .home-phone-copy b{font-size:clamp(9px,2.45vw,11px)!important}
  .home-screen .home-phone-copy small{font-size:clamp(8px,2vw,9px)!important}
 }
+
+
+/* Restore the approved home schedule and phone CTA exactly as in the reference screenshot */
+.home-screen section.home-service-panel{
+ display:block!important;
+ width:100%!important;
+ margin:0 0 7px!important;padding:11px!important;
+ border:1px solid rgba(148,176,191,.2)!important;
+ border-radius:17px!important;
+ background:linear-gradient(145deg,#10181f 0%,#080e13 100%)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important
+}
+.home-screen .home-hours-card{
+ display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
+ width:100%!important;min-width:0!important;min-height:0!important;
+ margin:0!important;padding:2px 1px 1px!important;
+ border:0!important;border-radius:0!important;
+ background:transparent!important;box-shadow:none!important
+}
+.home-screen .home-hours-state{
+ display:flex!important;align-items:center!important;gap:8px!important;
+ min-height:25px!important;margin:0 0 9px!important;white-space:nowrap!important
+}
+.home-screen .home-hours-state b{
+ color:#6fe7a2!important;font-size:clamp(15px,4vw,19px)!important;
+ line-height:1.15!important;font-weight:900!important;white-space:nowrap!important
+}
+.home-screen .home-hours-state b.is-closed{color:#ff7178!important}
+.home-screen .home-hours-state .hours-dot{
+ width:10px!important;height:10px!important;flex:0 0 10px!important;
+ border-radius:50%!important;background:#22df80!important;
+ box-shadow:0 0 0 5px rgba(34,223,128,.12),0 0 13px rgba(34,223,128,.45)!important
+}
+.home-screen .home-hours-state .hours-dot.is-closed{
+ background:#fb4b55!important;
+ box-shadow:0 0 0 5px rgba(251,75,85,.12),0 0 13px rgba(251,75,85,.35)!important
+}
+.home-screen .home-hours-days{
+ display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;
+ align-items:center!important;gap:6px!important;
+ min-width:0!important;margin:0 0 9px!important
+}
+.home-screen .home-hours-card .day-chip{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:100%!important;min-width:0!important;height:29px!important;
+ padding:0 3px!important;border:1px solid!important;border-radius:8px!important;
+ font-size:clamp(10px,2.9vw,13px)!important;line-height:1!important;
+ font-weight:900!important;letter-spacing:0!important
+}
+.home-screen .home-hours-card .day-chip.day-working{
+ color:#83e8ad!important;border-color:rgba(75,211,139,.42)!important;
+ background:rgba(44,170,105,.13)!important
+}
+.home-screen .home-hours-card .day-chip.day-closed{
+ color:#ff9398!important;border-color:rgba(241,87,98,.43)!important;
+ background:rgba(182,49,60,.15)!important
+}
+.home-screen .home-hours-pills{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:8px!important;margin:0!important;min-width:0!important
+}
+.home-screen .home-hours-pill{
+ display:flex!important;flex-direction:column!important;
+ align-items:flex-start!important;justify-content:center!important;
+ gap:5px!important;min-width:0!important;min-height:54px!important;
+ height:auto!important;padding:8px 10px!important;
+ border:1px solid!important;border-radius:11px!important
+}
+.home-screen .home-hours-pill small{
+ display:block!important;margin:0!important;
+ font-size:9px!important;font-weight:900!important;
+ line-height:1!important;letter-spacing:1.5px!important
+}
+.home-screen .home-hours-pill strong{
+ display:block!important;min-width:0!important;
+ font-size:clamp(11px,3.15vw,15px)!important;
+ font-weight:900!important;line-height:1.15!important;
+ white-space:normal!important
+}
+.home-screen .home-hours-pill.hours-pill-open{
+ border-color:rgba(72,206,137,.38)!important;
+ background:rgba(34,160,94,.105)!important
+}
+.home-screen .home-hours-pill.hours-pill-open small,
+.home-screen .home-hours-pill.hours-pill-open strong{color:#8cebb4!important}
+.home-screen .home-hours-pill.hours-pill-closed{
+ border-color:rgba(240,81,93,.38)!important;
+ background:rgba(161,43,53,.12)!important
+}
+.home-screen .home-hours-pill.hours-pill-closed small,
+.home-screen .home-hours-pill.hours-pill-closed strong{color:#ff9a9f!important}
+.home-screen .home-hours-note{
+ display:block!important;margin:9px 0 0!important;
+ color:#8d9ba3!important;font-size:10px!important;line-height:1.2!important
+}
+.home-screen>a.home-phone-button{
+ display:flex!important;flex-direction:row!important;
+ align-items:center!important;justify-content:flex-start!important;
+ width:100%!important;min-width:0!important;min-height:64px!important;height:64px!important;
+ margin:8px 0 17px!important;padding:8px 13px!important;gap:12px!important;
+ border:1px solid rgba(255,139,125,.35)!important;border-radius:16px!important;
+ background:linear-gradient(110deg,#f05449 0%,#e3312d 100%)!important;
+ color:#fff!important;text-align:left!important;text-decoration:none!important;
+ box-shadow:0 7px 19px rgba(222,49,44,.18),inset 0 1px 0 rgba(255,255,255,.15)!important;
+ pointer-events:auto!important;touch-action:manipulation!important
+}
+.home-screen>a.home-phone-button .home-phone-icon{
+ display:grid!important;place-items:center!important;
+ width:34px!important;height:34px!important;flex:0 0 34px!important;
+ border:1px solid rgba(255,255,255,.27)!important;border-radius:50%!important;
+ background:rgba(255,255,255,.1)!important;color:#fff!important
+}
+.home-screen>a.home-phone-button .home-phone-icon svg{
+ display:block!important;width:21px!important;height:21px!important;
+ fill:#fff!important;stroke:#fff!important;stroke-width:1.5!important;
+ stroke-linecap:round!important;stroke-linejoin:round!important
+}
+.home-screen>a.home-phone-button .home-phone-copy{
+ display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+ justify-content:center!important;gap:4px!important;min-width:0!important
+}
+.home-screen>a.home-phone-button .home-phone-copy b{
+ display:block!important;color:#fff!important;
+ font-size:clamp(15px,4vw,19px)!important;font-weight:900!important;
+ line-height:1.15!important;white-space:nowrap!important
+}
+.home-screen>a.home-phone-button .home-phone-copy small{
+ display:block!important;color:#fff!important;
+ font-size:clamp(14px,3.65vw,17px)!important;font-weight:750!important;
+ line-height:1.1!important;letter-spacing:0!important;white-space:nowrap!important
+}
+.home-screen>a.home-phone-button .home-phone-arrow{
+ display:block!important;flex:0 0 auto!important;margin-left:auto!important;
+ color:#fff!important;font-size:27px!important;font-weight:800!important;line-height:1!important
+}
+@media(max-width:430px){
+ .home-screen section.home-service-panel{padding:10px!important;margin-bottom:6px!important}
+ .home-screen .home-hours-state{margin-bottom:8px!important}
+ .home-screen .home-hours-days{gap:5px!important;margin-bottom:8px!important}
+ .home-screen .home-hours-card .day-chip{height:28px!important;font-size:10px!important;border-radius:7px!important}
+ .home-screen .home-hours-pills{gap:7px!important}
+ .home-screen .home-hours-pill{min-height:52px!important;padding:7px 9px!important;gap:5px!important}
+ .home-screen .home-hours-pill small{font-size:8px!important;letter-spacing:1.2px!important}
+ .home-screen .home-hours-pill strong{font-size:clamp(10px,3.2vw,13px)!important}
+ .home-screen .home-hours-note{margin-top:8px!important;font-size:9px!important}
+ .home-screen>a.home-phone-button{
+  min-height:63px!important;height:63px!important;margin:7px 0 15px!important;
+  padding:8px 11px!important;gap:10px!important;border-radius:15px!important
+ }
+ .home-screen>a.home-phone-button .home-phone-icon{width:32px!important;height:32px!important;flex-basis:32px!important}
+ .home-screen>a.home-phone-button .home-phone-icon svg{width:20px!important;height:20px!important}
+ .home-screen>a.home-phone-button .home-phone-copy b{font-size:clamp(14px,3.8vw,17px)!important}
+ .home-screen>a.home-phone-button .home-phone-copy small{font-size:clamp(13px,3.35vw,15px)!important}
+ .home-screen>a.home-phone-button .home-phone-arrow{font-size:25px!important}
+}
