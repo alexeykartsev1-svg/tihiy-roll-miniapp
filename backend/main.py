@@ -881,6 +881,12 @@ DEFAULT_SITE_CONTENT = {
     "promo_link":"#menu",
     "promo_image":""
 }
+DEFAULT_SEASONAL_BANNERS = [
+    {"id": "autumn", "active": True},
+    {"id": "winter", "active": True},
+    {"id": "spring", "active": True},
+    {"id": "summer", "active": True},
+]
 DEFAULT_SET_ITEMS = {
     "solo": [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 1}],
     "duo": [{"id": "philadelphia", "qty": 1}, {"id": "warm_crab", "qty": 1}, {"id": "lava", "qty": 1}],
@@ -909,6 +915,19 @@ def read_site_content() -> dict[str, Any]:
                 merged_row.setdefault("stock", None)
                 merged_sets.append(merged_row)
             merged["sets"] = merged_sets
+            saved_banners = data.get("seasonal_banners", DEFAULT_SEASONAL_BANNERS)
+            banner_by_id = {row["id"]: row for row in DEFAULT_SEASONAL_BANNERS}
+            merged_banners = []
+            for row in saved_banners if isinstance(saved_banners, list) else DEFAULT_SEASONAL_BANNERS:
+                if not isinstance(row, dict) or row.get("id") not in banner_by_id:
+                    continue
+                banner = dict(banner_by_id[row["id"]])
+                banner.update(row)
+                banner["active"] = banner.get("active") is not False
+                merged_banners.append(banner)
+            present_banner_ids = {row["id"] for row in merged_banners}
+            merged_banners.extend(dict(row) for row in DEFAULT_SEASONAL_BANNERS if row["id"] not in present_banner_ids)
+            merged["seasonal_banners"] = merged_banners
             return merged
     except (OSError, json.JSONDecodeError):
         pass
@@ -1047,6 +1066,28 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
             clean_sets.append({"id": set_id, "description": description.strip(), "image": image.strip(), "photos": clean_photos, "items": clean_items, "active": active, "stock": stock})
             seen.add(set_id)
         current["sets"] = clean_sets
+    if "seasonal_banners" in payload:
+        banners = payload["seasonal_banners"]
+        allowed_banner_ids = {"autumn", "winter", "spring", "summer"}
+        if not isinstance(banners, list) or len(banners) > 4:
+            raise HTTPException(status_code=400, detail="Можно настроить не более 4 сезонных баннеров.")
+        clean_banners = []
+        seen_banner_ids = set()
+        for index, banner in enumerate(banners):
+            if not isinstance(banner, dict):
+                raise HTTPException(status_code=400, detail=f"Баннер {index+1}: неверный формат.")
+            banner_id = banner.get("id")
+            active = banner.get("active", True)
+            if banner_id not in allowed_banner_ids or banner_id in seen_banner_ids:
+                raise HTTPException(status_code=400, detail=f"Баннер {index+1}: неизвестный или повторяющийся ID.")
+            if not isinstance(active, bool):
+                raise HTTPException(status_code=400, detail=f"Баннер {index+1}: признак видимости должен быть true/false.")
+            clean_banners.append({"id": banner_id, "active": active})
+            seen_banner_ids.add(banner_id)
+        for default_banner in DEFAULT_SEASONAL_BANNERS:
+            if default_banner["id"] not in seen_banner_ids:
+                clean_banners.append(dict(default_banner))
+        current["seasonal_banners"] = clean_banners
     write_site_content(current)
     return {"ok": True, "content": current}
 
