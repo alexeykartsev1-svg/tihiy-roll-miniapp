@@ -1835,3 +1835,70 @@
  .home-screen>a.home-phone-button .home-phone-icon,
  .home-screen>a.home-phone-button .home-phone-icon svg{animation:none!important}
 }
+
+
+/* Final phone CTA override: target its actual location inside .home-scroll */
+.home-screen .home-scroll > a.home-phone-button{
+ display:grid!important;
+ grid-template-columns:44px minmax(0,1fr) 24px!important;
+ align-items:center!important;justify-items:stretch!important;
+ box-sizing:border-box!important;
+ width:100%!important;min-width:0!important;max-width:100%!important;
+ min-height:88px!important;height:88px!important;
+ margin:8px 0 16px!important;padding:8px 12px!important;gap:8px!important;
+ border:1px solid rgba(255,126,113,.48)!important;border-radius:16px!important;
+ background:linear-gradient(110deg,rgba(119,37,39,.78),rgba(78,22,27,.68))!important;
+ color:#fff!important;text-decoration:none!important;text-align:center!important;
+ box-shadow:0 5px 17px rgba(185,40,44,.15),inset 0 1px 0 rgba(255,255,255,.13)!important;
+ -webkit-backdrop-filter:blur(12px)!important;backdrop-filter:blur(12px)!important;
+ pointer-events:auto!important;touch-action:manipulation!important
+}
+.home-screen .home-scroll > a.home-phone-button .home-phone-icon{
+ display:grid!important;place-items:center!important;
+ width:40px!important;height:40px!important;flex:0 0 40px!important;
+ border:1px solid rgba(49,239,139,.54)!important;border-radius:50%!important;
+ background:rgba(19,133,76,.2)!important;color:#45f59a!important;
+ animation:homePhoneGreenPulse 1.7s ease-in-out infinite!important
+}
+.home-screen .home-scroll > a.home-phone-button .home-phone-icon svg{
+ display:block!important;width:23px!important;height:23px!important;
+ fill:#46f39a!important;stroke:#46f39a!important;stroke-width:1.4!important;
+ stroke-linecap:round!important;stroke-linejoin:round!important;
+ transform-origin:50% 50%!important;
+ animation:homePhoneHandsetTilt 1.25s ease-in-out infinite!important
+}
+.home-screen .home-scroll > a.home-phone-button .home-phone-copy{
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ justify-content:center!important;gap:4px!important;min-width:0!important;
+ text-align:center!important
+}
+.home-screen .home-scroll > a.home-phone-button .home-phone-copy b{
+ display:block!important;color:#fff!important;
+ font-size:17px!important;font-weight:900!important;
+ line-height:1.12!important;white-space:nowrap!important
+}
+.home-screen .home-scroll > a.home-phone-button .home-phone-copy small{
+ display:block!important;color:#fff!important;
+ font-size:19px!important;font-weight:850!important;
+ line-height:1.12!important;letter-spacing:.1px!important;white-space:nowrap!important
+}
+.home-screen .home-scroll > a.home-phone-button .home-phone-arrow{
+ display:block!important;justify-self:end!important;
+ color:#fff!important;font-size:26px!important;font-weight:800!important;line-height:1!important
+}
+@media(max-width:430px){
+ .home-screen .home-scroll > a.home-phone-button{
+  grid-template-columns:40px minmax(0,1fr) 22px!important;
+  min-height:86px!important;height:86px!important;
+  margin:7px 0 15px!important;padding:7px 9px!important;gap:6px!important;
+  border-radius:15px!important
+ }
+ .home-screen .home-scroll > a.home-phone-button .home-phone-icon{
+  width:37px!important;height:37px!important;flex-basis:37px!important
+ }
+ .home-screen .home-scroll > a.home-phone-button .home-phone-icon svg{width:22px!important;height:22px!important}
+ .home-screen .home-scroll > a.home-phone-button .home-phone-copy{gap:4px!important}
+ .home-screen .home-scroll > a.home-phone-button .home-phone-copy b{font-size:16px!important}
+ .home-screen .home-scroll > a.home-phone-button .home-phone-copy small{font-size:18px!important}
+ .home-screen .home-scroll > a.home-phone-button .home-phone-arrow{font-size:24px!important}
+}
