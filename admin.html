@@ -82,6 +82,7 @@ textarea { min-height:100px; }
 </div><h3 style="margin:22px 0 8px">Готовые сеты</h3>
 <p class="muted">Описание меняется прямо на карточке. Для фото вставь HTTPS-ссылку или загрузи JPG, PNG, WebP.</p>
 <div id="setEditor" class="formgrid"></div>
+<h3 style="margin:22px 0 8px">Сезонные баннеры на главной</h3><p class="muted">Убирай и возвращай каждый баннер отдельно. Это не удаляет сам сет из меню и не меняет его состав.</p><div id="seasonalBannerEditor" class="formgrid"></div>
 <h3 style="margin:20px 0 8px">Слайды главного экрана</h3><p class="muted">До 3 слайдов. Для изображения укажи прямую HTTPS-ссылку. Пустая ссылка сохранит исходное фото.</p><div id="slideEditor" class="formgrid"></div><div class="formactions"><button class="btn primary" id="saveContent" type="button">Сохранить оформление</button></div></section><div class="foot">Тихий ролл · управление ассортиментом</div></main>
 <script>
 const API='https://tihiy-roll-order-api.onrender.com';const tg=window.Telegram&&window.Telegram.WebApp;let initData='';let products=[];let editingId=null;let photoData='';const $=id=>document.getElementById(id);if(tg){tg.ready();tg.expand();initData=tg.initData||''}function status(msg,type=''){const el=$('status');el.textContent=msg;el.className='status '+type}async function api(path,opts={}){if(!initData)throw new Error('Нет данных авторизации Telegram. Открой панель из Telegram.');const headers={...(opts.headers||{}),'X-Telegram-Init-Data':initData};if(opts.body)headers['Content-Type']='application/json';const res=await fetch(API+path,{...opts,headers,cache:'no-store'});let data={};try{data=await res.json()}catch(_){}if(!res.ok)throw new Error(data.detail||data.message||('Ошибка сервера: '+res.status));return data}function safeImage(src){return src||'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#241b10"/><text x="50%" y="52%" text-anchor="middle" fill="#e5b96f" font-size="18">Нет фото</text></svg>')}async function boot(){if(!initData){$('login').classList.remove('hidden');status('Открой админ-панель из Telegram-магазина.','error');return}try{const check=await fetch(API+'/api/admin/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({init_data:initData}),cache:'no-store'});const result=await check.json();if(!check.ok||!result.is_admin){$('login').classList.remove('hidden');status('Доступ запрещён. Проверь ADMIN_TELEGRAM_ID в настройках сервера.','error');return}status('Доступ подтверждён. Загружаем товары…','ok');$('app').classList.remove('hidden');await loadProducts();await loadOrders();await loadSiteContent()}catch(e){$('login').classList.remove('hidden');status(e.message,'error')}}const orderStatusLabels={new:'Новый',accepted:'Принят',preparing:'Готовится',ready:'Готов',completed:'Выдан',cancelled:'Отменён'};
@@ -186,6 +187,7 @@ function renderProductGalleryEditor(){
  }
 }
 function closeEditor(){$('editor').classList.remove('open');editingId=null}function compressImage(file){return new Promise((resolve,reject)=>{if(!file.type.match(/^image\/(jpeg|png|webp)$/))return reject(new Error('Выбери JPG, PNG или WebP.'));const reader=new FileReader();reader.onerror=()=>reject(new Error('Не удалось прочитать файл'));reader.onload=()=>{const img=new Image();img.onerror=()=>reject(new Error('Не удалось открыть изображение'));img.onload=()=>{const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);let mime=file.type==='image/png'?'image/png':'image/jpeg';const out=canvas.toDataURL('image/jpeg',0.78);if(out.length>900000)return reject(new Error('Фото слишком большое после сжатия. Выбери другое изображение.')); resolve(out)};img.src=reader.result};reader.readAsDataURL(file)})}$('photoFile').addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;try{photoData=await compressImage(file);$('photoPreview').src=photoData;status('Фото готово к сохранению.')}catch(err){status(err.message,'error');e.target.value=''}});$('clearPhoto').onclick=()=>{photoData='';$('photoPreview').src=safeImage('');$('photoFile').value=''};$('add').onclick=()=>openEditor();$('cancel').onclick=closeEditor;$('retry').onclick=boot;$('productForm').addEventListener('submit',async e=>{e.preventDefault();const payload={id:$('pid').value.trim(),name:$('name').value.trim(),price:Number($('price').value),cost:Number($('cost').value||0),weight:$('weight').value.trim()||'280 г',pieces:Number($('pieces').value||8),stock:$('stock').value===''?null:Number($('stock').value),details:$('details').value.trim(),gallery:productGalleryPhotos.filter(Boolean).slice(0,5),cat:$('cat').value,badge:$('badge').value,desc:$('desc').value.trim(),photo:photoData,active:$('active').checked,sort_order:Math.max(0,products.findIndex(p=>p.id===editingId))};if(!payload.photo&&editingId){const old=products.find(p=>p.id===editingId);payload.photo=old?old.photo||'':''}try{$('save').disabled=true;$('save').textContent='Сохраняем…';if(editingId)await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'PUT',body:JSON.stringify(payload)});else await api('/api/admin/products',{method:'POST',body:JSON.stringify(payload)});closeEditor();await loadProducts();status('Изменения сохранены на сервере. Открой магазин заново, чтобы увидеть обновления.','ok')}catch(err){status(err.message,'error')}finally{$('save').disabled=false;$('save').textContent='Сохранить'}});$('delete').onclick=async()=>{if(!editingId||!confirm('Удалить товар «'+($('name').value)+'»?'))return;try{await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'DELETE'});closeEditor();await loadProducts();status('Товар удалён.','ok')}catch(e){status(e.message,'error')}};let siteContent=null;let siteSetPhotos={};let siteSetGalleryPhotos={};let siteSetItems={};let siteSetActive={};let siteSetStock={};let siteSlidePhotos=[];let sitePromoImage='';
+let siteSeasonalBanners=[];
 async function loadSiteContent(){
  try{
   siteContent=await api('/api/admin/site-content');
@@ -220,6 +222,32 @@ async function loadSiteContent(){
  }catch(e){status('Не удалось загрузить оформление: '+e.message,'error')}
 }
 
+function renderSeasonalBannerEditor(){
+ const root=$('seasonalBannerEditor');if(!root||!siteContent)return;
+ const defs=[
+  {id:'autumn',title:'Осенний сет «Хорошее настроение»'},
+  {id:'winter',title:'Зимний сет «Согревающий»'},
+  {id:'spring',title:'Весенний сет «Цветение»'},
+  {id:'summer',title:'Летний сет «Охлаждающий»'}
+ ];
+ const saved=Array.isArray(siteContent.seasonal_banners)?siteContent.seasonal_banners:[];
+ root.replaceChildren();
+ siteSeasonalBanners=defs.map(def=>{
+  const row=saved.find(item=>item&&item.id===def.id);
+  return {id:def.id,active:row?row.active!==false:true};
+ });
+ defs.forEach(def=>{
+  const row=siteSeasonalBanners.find(item=>item.id===def.id);
+  const card=document.createElement('div');card.className='field';
+  card.style.cssText='border:1px solid var(--line);padding:13px;border-radius:12px;background:#120f0b';
+  const label=document.createElement('label');label.style.cssText='display:flex;align-items:center;gap:9px;color:var(--light);font-weight:700';
+  const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=row.active;checkbox.style.width='auto';
+  checkbox.addEventListener('change',()=>row.active=checkbox.checked);
+  label.append(checkbox,document.createTextNode('Показывать баннер'));
+  const title=document.createElement('div');title.textContent=def.title;title.style.marginTop='8px';
+  card.append(label,title);root.append(card);
+ });
+}
 function renderSetContentEditor(){
  const root=$('setEditor');if(!root||!siteContent)return;
  const definitions=[
@@ -288,14 +316,14 @@ function renderSetContentEditor(){
 }
 
 const loadSiteContentOriginal=loadSiteContent;
-loadSiteContent=async function(){await loadSiteContentOriginal();renderSetContentEditor()};
+loadSiteContent=async function(){await loadSiteContentOriginal();renderSetContentEditor();renderSeasonalBannerEditor()};
 
 $('reloadContent').addEventListener('click',loadSiteContent);
 $('promoImageFile').addEventListener('change',async event=>{const file=event.target.files&&event.target.files[0];if(!file)return;try{sitePromoImage=await compressImage(file);$('promoImagePreview').src=sitePromoImage;status('Фото рекламного блока загружено.','ok')}catch(error){status(error.message,'error');event.target.value=''}});
 $('clearPromoImage').addEventListener('click',()=>{sitePromoImage='';$('promoImagePreview').src=safeImage('');$('promoImageFile').value=''});
 $('saveContent').addEventListener('click',async()=>{
  try{
-  const payload={hero_title:$('heroTitle').value.trim(),hero_subtitle:$('heroSubtitle').value.trim(),hero_button:$('heroButton').value.trim(),promo_title:$('promoTitle').value.trim(),promo_text:$('promoText').value.trim(),promo_button:$('promoButton').value.trim(),promo_link:$('promoLink').value.trim(),promo_image:sitePromoImage,slides:[],sets:[]};
+  const payload={hero_title:$('heroTitle').value.trim(),hero_subtitle:$('heroSubtitle').value.trim(),hero_button:$('heroButton').value.trim(),promo_title:$('promoTitle').value.trim(),promo_text:$('promoText').value.trim(),promo_button:$('promoButton').value.trim(),promo_link:$('promoLink').value.trim(),promo_image:sitePromoImage,slides:[],sets:[],seasonal_banners:siteSeasonalBanners.map(row=>({id:row.id,active:row.active!==false}))};
   document.querySelectorAll('#slideEditor [data-slide]').forEach(el=>{const i=Number(el.dataset.slide);payload.slides[i]=payload.slides[i]||{title:'',accent:'',desc:'',image:'',button:'',active:true};payload.slides[i][el.dataset.key]=el.dataset.key==='active'?el.checked:el.value.trim()});
   payload.slides.forEach((slide,i)=>{const imageInput=document.querySelector('[data-slide="'+i+'"][data-key="image"]');slide.image=siteSlidePhotos[i]||(imageInput?imageInput.value.trim():'')});
   payload.sets=['solo','duo','party','newyear'].map(id=>{
@@ -303,7 +331,7 @@ $('saveContent').addEventListener('click',async()=>{
    const url=document.querySelector('[data-set-url="'+id+'"]');
    return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5),items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
   });
-  $('saveContent').disabled=true;await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify(payload)});status('Оформление, описания и фото готовых сетов сохранены. Открой магазин заново, чтобы увидеть обновления.','ok');
+  $('saveContent').disabled=true;await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify(payload)});status('Оформление, сеты и видимость сезонных баннеров сохранены. Обнови магазин, чтобы увидеть изменения.','ok');
  }catch(e){status(e.message,'error')}finally{$('saveContent').disabled=false}
 });
 window.TihiyAdmin={
