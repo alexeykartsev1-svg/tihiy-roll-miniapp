@@ -2017,3 +2017,20 @@
 /* Ensure admin-disabled seasonal banners stay hidden despite card display styling. */
 .home-screen .home-seasonal-card[hidden],
 .home-screen .home-seasonal-stack[hidden]{display:none!important}
+
+
+/* Seasonal banners: match the approved New Year banner proportions exactly.
+   Keep artwork undistorted and remove the duplicate CSS arrow (the artwork
+   already contains its own red arrow). */
+.home-screen .home-seasonal-card{
+ height:auto!important;
+ min-height:0!important;
+ aspect-ratio:852 / 246!important;
+ background-size:cover!important;
+ background-position:center center!important;
+ background-repeat:no-repeat!important;
+}
+.home-screen .home-seasonal-card::after{
+ content:none!important;
+ display:none!important;
+}
