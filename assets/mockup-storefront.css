@@ -1953,3 +1953,62 @@
 @media(prefers-reduced-motion:reduce){
  .home-screen .home-newyear-card::after{animation:none!important}
 }
+
+
+/* Four seasonal promo banners under the existing New Year banner.
+   Keep the exact same display dimensions and rounded-card treatment. */
+.home-screen .home-seasonal-stack{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ gap:11px!important;
+ width:100%!important;
+ margin:12px 0 0!important;
+ padding:0!important;
+}
+.home-screen .home-seasonal-card{
+ position:relative!important;
+ display:block!important;
+ width:100%!important;
+ height:clamp(155px,46vw,210px)!important;
+ min-height:155px!important;
+ box-sizing:border-box!important;
+ overflow:hidden!important;
+ border:1px solid rgba(255,174,91,.38)!important;
+ border-radius:17px!important;
+ background-color:#101315!important;
+ background-image:var(--season-banner-image)!important;
+ background-size:100% 100%!important;
+ background-position:center!important;
+ background-repeat:no-repeat!important;
+ box-shadow:0 9px 24px rgba(0,0,0,.25)!important;
+}
+.home-screen .home-seasonal-card::after{
+ content:"→"!important;
+ display:grid!important;
+ place-items:center!important;
+ position:absolute!important;
+ left:3.2%!important;
+ bottom:3.1%!important;
+ width:4.8%!important;
+ aspect-ratio:1/1!important;
+ min-width:21px!important;
+ max-width:44px!important;
+ box-sizing:border-box!important;
+ border:1px solid rgba(255,74,91,.95)!important;
+ border-radius:50%!important;
+ background:rgba(190,15,38,.76)!important;
+ color:#fff!important;
+ font-size:clamp(14px,2.3vw,21px)!important;
+ font-weight:900!important;
+ line-height:1!important;
+ text-align:center!important;
+ box-shadow:0 0 0 0 rgba(244,35,61,.36),0 0 12px rgba(238,27,54,.35)!important;
+ -webkit-backdrop-filter:blur(5px)!important;
+ backdrop-filter:blur(5px)!important;
+ pointer-events:none!important;
+ transform-origin:center!important;
+ animation:newyearArrowPulse 1.65s ease-in-out infinite!important;
+}
+@media(prefers-reduced-motion:reduce){
+ .home-screen .home-seasonal-card::after{animation:none!important}
+}
