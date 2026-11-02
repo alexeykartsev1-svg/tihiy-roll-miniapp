@@ -1902,3 +1902,54 @@
  .home-screen .home-scroll > a.home-phone-button .home-phone-copy small{font-size:18px!important}
  .home-screen .home-scroll > a.home-phone-button .home-phone-arrow{font-size:24px!important}
 }
+
+
+/* Exact approved New Year banner — replace only the existing promo artwork */
+.home-screen .home-newyear-card{
+ background-image:url("https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/46a0deeb-794a-46d5-9ab1-d43e0c26ed94.png")!important;
+ background-size:100% 100%!important;
+ background-position:center!important;
+ background-repeat:no-repeat!important;
+}
+/* Overlay the printed arrow with a real translucent, animated arrow control.
+   Pointer events stay on the original promo card. */
+.home-screen .home-newyear-card::after{
+ content:"→"!important;
+ display:grid!important;
+ place-items:center!important;
+ position:absolute!important;
+ left:3.2%!important;
+ bottom:3.1%!important;
+ width:4.8%!important;
+ aspect-ratio:1/1!important;
+ min-width:21px!important;
+ max-width:44px!important;
+ box-sizing:border-box!important;
+ border:1px solid rgba(255,74,91,.95)!important;
+ border-radius:50%!important;
+ background:rgba(190,15,38,.76)!important;
+ color:#fff!important;
+ font-size:clamp(14px,2.3vw,21px)!important;
+ font-weight:900!important;
+ line-height:1!important;
+ text-align:center!important;
+ box-shadow:0 0 0 0 rgba(244,35,61,.36),0 0 12px rgba(238,27,54,.35)!important;
+ -webkit-backdrop-filter:blur(5px)!important;
+ backdrop-filter:blur(5px)!important;
+ pointer-events:none!important;
+ transform-origin:center!important;
+ animation:newyearArrowPulse 1.65s ease-in-out infinite!important;
+}
+@keyframes newyearArrowPulse{
+ 0%,100%{
+  transform:scale(.94);
+  box-shadow:0 0 0 0 rgba(244,35,61,.34),0 0 9px rgba(238,27,54,.28)
+ }
+ 50%{
+  transform:scale(1.08);
+  box-shadow:0 0 0 5px rgba(244,35,61,.12),0 0 17px rgba(238,27,54,.5)
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .home-screen .home-newyear-card::after{animation:none!important}
+}
