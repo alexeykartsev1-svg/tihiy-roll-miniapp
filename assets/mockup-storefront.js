@@ -603,6 +603,15 @@ $('#homePopularGrid')?.addEventListener('click',openProductInfoFromGrid);
 $('#favoritesGrid')?.addEventListener('click',openProductInfoFromGrid);
 $('#sortSelect').addEventListener('change',e=>{state.sort=e.target.value;renderCatalog();});
 $('#catalogSearch').addEventListener('input',e=>{state.search=e.target.value.trim().toLowerCase();renderCatalog();});
+const homePhoneLink=$('#homePhoneOrder');
+if(homePhoneLink){
+ homePhoneLink.addEventListener('click',event=>{
+  const digits=String(homePhoneLink.getAttribute('href')||'tel:+79230005857').replace(/^tel:/i,'').replace(/[^+\\d]/g,'');
+  const target='tel:'+(digits||'+79230005857');
+  event.preventDefault();
+  window.location.href=target;
+ },true);
+}
 $('#pickupDate').addEventListener('change',refreshTimes);
 const checkoutName=$('#checkoutName'),checkoutPhone=$('#checkoutPhone'),deliveryAddress=$('#deliveryAddress');
 checkoutPhone.value=formatRussianPhone(checkoutPhone.value||'+7 ');
