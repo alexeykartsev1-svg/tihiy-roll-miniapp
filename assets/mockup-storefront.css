@@ -2012,3 +2012,8 @@
 @media(prefers-reduced-motion:reduce){
  .home-screen .home-seasonal-card::after{animation:none!important}
 }
+
+
+/* Ensure admin-disabled seasonal banners stay hidden despite card display styling. */
+.home-screen .home-seasonal-card[hidden],
+.home-screen .home-seasonal-stack[hidden]{display:none!important}
