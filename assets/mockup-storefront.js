@@ -154,7 +154,7 @@ function renderHomeContent(){
  }
  // Use the same proven visibility loop for all five banners.
  // Each homepage banner has data-seasonal-banner with its matching API ID.
- const seasonalCards=$('[data-seasonal-banner]');
+ const seasonalCards=$$('[data-seasonal-banner]');
  seasonalCards.forEach(card=>{
   const banner=state.seasonalBanners.find(row=>row&&row.id===card.dataset.seasonalBanner);
   const disabled=banner ? banner.active===false || banner.active===0 || banner.active==='false' : false;
