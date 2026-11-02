@@ -83,7 +83,7 @@ textarea { min-height:100px; }
 <p class="muted">Описание меняется прямо на карточке. Для фото вставь HTTPS-ссылку или загрузи JPG, PNG, WebP.</p>
 <div id="setEditor" class="formgrid"></div>
 <h3 style="margin:22px 0 8px">Сезонные баннеры на главной</h3><p class="muted">Убирай и возвращай каждый баннер отдельно. Это не удаляет сам сет из меню и не меняет его состав.</p><div id="seasonalBannerEditor" class="formgrid"></div>
-<h3 style="margin:20px 0 8px">Слайды главного экрана</h3><p class="muted">До 3 слайдов. Для изображения укажи прямую HTTPS-ссылку. Пустая ссылка сохранит исходное фото.</p><div id="slideEditor" class="formgrid"></div><div class="formactions"><button class="btn primary" id="saveContent" type="button">Сохранить оформление</button></div></section><div class="foot">Тихий ролл · управление ассортиментом</div></main>
+<h3 style="margin:20px 0 8px">Слайды главного экрана</h3><p class="muted">До 3 слайдов. Для изображения укажи прямую HTTPS-ссылку. Пустая ссылка сохранит исходное фото.</p><div id="slideEditor" class="formgrid"></div><div class="formactions"><button class="btn primary" id="saveContent" type="button">Сохранить оформление</button><span id="saveContentStatus" class="muted" role="status" aria-live="polite">Изменения ещё не сохранены</span></div></section><div class="foot">Тихий ролл · управление ассортиментом</div></main>
 <script>
 const API='https://tihiy-roll-order-api.onrender.com';const tg=window.Telegram&&window.Telegram.WebApp;let initData='';let products=[];let editingId=null;let photoData='';const $=id=>document.getElementById(id);if(tg){tg.ready();tg.expand();initData=tg.initData||''}function status(msg,type=''){const el=$('status');el.textContent=msg;el.className='status '+type}async function api(path,opts={}){if(!initData)throw new Error('Нет данных авторизации Telegram. Открой панель из Telegram.');const headers={...(opts.headers||{}),'X-Telegram-Init-Data':initData};if(opts.body)headers['Content-Type']='application/json';const res=await fetch(API+path,{...opts,headers,cache:'no-store'});let data={};try{data=await res.json()}catch(_){}if(!res.ok)throw new Error(data.detail||data.message||('Ошибка сервера: '+res.status));return data}function safeImage(src){return src||'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#241b10"/><text x="50%" y="52%" text-anchor="middle" fill="#e5b96f" font-size="18">Нет фото</text></svg>')}async function boot(){if(!initData){$('login').classList.remove('hidden');status('Открой админ-панель из Telegram-магазина.','error');return}try{const check=await fetch(API+'/api/admin/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({init_data:initData}),cache:'no-store'});const result=await check.json();if(!check.ok||!result.is_admin){$('login').classList.remove('hidden');status('Доступ запрещён. Проверь ADMIN_TELEGRAM_ID в настройках сервера.','error');return}status('Доступ подтверждён. Загружаем товары…','ok');$('app').classList.remove('hidden');await loadProducts();await loadOrders();await loadSiteContent()}catch(e){$('login').classList.remove('hidden');status(e.message,'error')}}const orderStatusLabels={new:'Новый',accepted:'Принят',preparing:'Готовится',ready:'Готов',completed:'Выдан',cancelled:'Отменён'};
 async function loadOrders(){
@@ -322,6 +322,12 @@ $('reloadContent').addEventListener('click',loadSiteContent);
 $('promoImageFile').addEventListener('change',async event=>{const file=event.target.files&&event.target.files[0];if(!file)return;try{sitePromoImage=await compressImage(file);$('promoImagePreview').src=sitePromoImage;status('Фото рекламного блока загружено.','ok')}catch(error){status(error.message,'error');event.target.value=''}});
 $('clearPromoImage').addEventListener('click',()=>{sitePromoImage='';$('promoImagePreview').src=safeImage('');$('promoImageFile').value=''});
 $('saveContent').addEventListener('click',async()=>{
+ const saveButton=$('saveContent');
+ const saveNotice=$('saveContentStatus');
+ saveButton.disabled=true;
+ saveButton.textContent='Сохраняем…';
+ if(saveNotice){saveNotice.textContent='Отправляем изменения на сервер…';saveNotice.className='muted';}
+ status('Сохраняем оформление на сервере…');
  try{
   const payload={hero_title:$('heroTitle').value.trim(),hero_subtitle:$('heroSubtitle').value.trim(),hero_button:$('heroButton').value.trim(),promo_title:$('promoTitle').value.trim(),promo_text:$('promoText').value.trim(),promo_button:$('promoButton').value.trim(),promo_link:$('promoLink').value.trim(),promo_image:sitePromoImage,slides:[],sets:[],seasonal_banners:siteSeasonalBanners.map(row=>({id:row.id,active:row.active!==false}))};
   document.querySelectorAll('#slideEditor [data-slide]').forEach(el=>{const i=Number(el.dataset.slide);payload.slides[i]=payload.slides[i]||{title:'',accent:'',desc:'',image:'',button:'',active:true};payload.slides[i][el.dataset.key]=el.dataset.key==='active'?el.checked:el.value.trim()});
@@ -331,7 +337,6 @@ $('saveContent').addEventListener('click',async()=>{
    const url=document.querySelector('[data-set-url="'+id+'"]');
    return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5),items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
   });
-  $('saveContent').disabled=true;
   const saved=await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify(payload)});
   const verify=await api('/api/admin/site-content');
   const verified=Array.isArray(verify.seasonal_banners)?verify.seasonal_banners:[];
@@ -339,11 +344,14 @@ $('saveContent').addEventListener('click',async()=>{
   const mismatches=expected.filter(row=>{const actual=verified.find(item=>item.id===row.id);return !actual||actual.active!==row.active;});
   siteContent=verify;
   if(mismatches.length){
-   status('Сервер не подтвердил настройки видимости: '+mismatches.map(row=>row.id).join(', ')+'. Баннеры не считаются отключёнными.','error');
+   const message='Сервер сохранил оформление, но не подтвердил видимость баннеров: '+mismatches.map(row=>row.id).join(', ')+'.';
+   status(message,'error');if(saveNotice){saveNotice.textContent=message;saveNotice.className='status error';}
   }else{
-   status('Сервер подтвердил видимость: '+verified.map(row=>(row.active?'ВКЛ ':'ВЫКЛ ')+row.id).join(' · ')+'.','ok');
+   const message='Изменения сохранены и подтверждены сервером. Баннеры: '+verified.map(row=>(row.active?'ВКЛ ':'ВЫКЛ ')+row.id).join(' · ')+'.';
+   status(message,'ok');if(saveNotice){saveNotice.textContent=message;saveNotice.className='status ok';}
   }
- }catch(e){status(e.message,'error')}finally{$('saveContent').disabled=false}
+ }catch(e){const message='Не удалось сохранить изменения: '+(e&&e.message?e.message:String(e));status(message,'error');if(saveNotice){saveNotice.textContent=message;saveNotice.className='status error';}}
+ finally{saveButton.disabled=false;saveButton.textContent='Сохранить оформление'}
 });
 window.TihiyAdmin={
   api,
