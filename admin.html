@@ -331,7 +331,18 @@ $('saveContent').addEventListener('click',async()=>{
    const url=document.querySelector('[data-set-url="'+id+'"]');
    return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5),items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
   });
-  $('saveContent').disabled=true;await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify(payload)});status('Оформление, сеты и видимость сезонных баннеров сохранены. Обнови магазин, чтобы увидеть изменения.','ok');
+  $('saveContent').disabled=true;
+  const saved=await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify(payload)});
+  const verify=await api('/api/admin/site-content');
+  const verified=Array.isArray(verify.seasonal_banners)?verify.seasonal_banners:[];
+  const expected=payload.seasonal_banners;
+  const mismatches=expected.filter(row=>{const actual=verified.find(item=>item.id===row.id);return !actual||actual.active!==row.active;});
+  siteContent=verify;
+  if(mismatches.length){
+   status('Сервер не подтвердил настройки видимости: '+mismatches.map(row=>row.id).join(', ')+'. Баннеры не считаются отключёнными.','error');
+  }else{
+   status('Сервер подтвердил видимость: '+verified.map(row=>(row.active?'ВКЛ ':'ВЫКЛ ')+row.id).join(' · ')+'.','ok');
+  }
  }catch(e){status(e.message,'error')}finally{$('saveContent').disabled=false}
 });
 window.TihiyAdmin={
