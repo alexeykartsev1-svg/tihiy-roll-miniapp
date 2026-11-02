@@ -154,7 +154,7 @@ function renderHomeContent(){
  }
  // Apply visibility directly to each banner. Inline !important prevents
  // legacy storefront rules from forcing disabled cards back onto the screen.
- const seasonalCards=$('.home-seasonal-card');
+ const seasonalCards=$$('.home-seasonal-card');
  seasonalCards.forEach(card=>{
   const banner=state.seasonalBanners.find(row=>row&&row.id===card.dataset.seasonalBanner);
   const disabled=banner ? banner.active===false || banner.active===0 || banner.active==='false' : false;
