@@ -152,9 +152,18 @@ function renderHomeContent(){
   if(promoText)promoText.textContent=promoSet.description||'Праздничный набор роллов для особенного вечера.';
   if(promoPrice)promoPrice.textContent=money(setPrice(promoSet));
  }
- // Apply visibility directly to each banner. Inline !important prevents
- // legacy storefront rules from forcing disabled cards back onto the screen.
- const seasonalCards=$$('.home-seasonal-card');
+ // Apply visibility to the New Year banner and all seasonal banners.
+ // Inline !important prevents legacy storefront rules from forcing disabled cards back onto the screen.
+ const newYearCard=$('.home-newyear-card');
+ const newYearSetting=state.seasonalBanners.find(row=>row&&row.id==='newyear');
+ const newYearDisabled=newYearSetting ? newYearSetting.active===false || newYearSetting.active===0 || newYearSetting.active==='false' : false;
+ if(newYearCard){
+  newYearCard.hidden=newYearDisabled;
+  newYearCard.setAttribute('aria-hidden',newYearDisabled?'true':'false');
+  if(newYearDisabled)newYearCard.style.setProperty('display','none','important');
+  else newYearCard.style.removeProperty('display');
+ }
+ const seasonalCards=$('.home-seasonal-card');
  seasonalCards.forEach(card=>{
   const banner=state.seasonalBanners.find(row=>row&&row.id===card.dataset.seasonalBanner);
   const disabled=banner ? banner.active===false || banner.active===0 || banner.active==='false' : false;
