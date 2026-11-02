@@ -1756,3 +1756,82 @@
  }
  .home-screen>a.home-phone-button .home-phone-arrow{font-size:31px!important}
 }
+
+
+/* Phone banner — full-width, compact, translucent, with green animated handset */
+.home-screen>a.home-phone-button{
+ display:grid!important;
+ grid-template-columns:48px minmax(0,1fr) 28px!important;
+ align-items:center!important;justify-items:stretch!important;
+ width:100%!important;min-width:0!important;
+ min-height:90px!important;height:90px!important;
+ margin:8px 0 17px!important;padding:8px 13px!important;gap:8px!important;
+ border:1px solid rgba(255,111,99,.5)!important;border-radius:17px!important;
+ background:linear-gradient(110deg,rgba(112,31,32,.76),rgba(80,19,23,.62))!important;
+ color:#fff!important;text-decoration:none!important;text-align:center!important;
+ box-shadow:0 5px 18px rgba(191,38,42,.16),inset 0 1px 0 rgba(255,255,255,.13)!important;
+ -webkit-backdrop-filter:blur(12px)!important;backdrop-filter:blur(12px)!important;
+ pointer-events:auto!important;touch-action:manipulation!important
+}
+.home-screen>a.home-phone-button .home-phone-icon{
+ display:grid!important;place-items:center!important;
+ width:44px!important;height:44px!important;flex:0 0 44px!important;
+ border:1px solid rgba(49,239,139,.5)!important;border-radius:50%!important;
+ background:rgba(19,133,76,.2)!important;color:#45f59a!important;
+ box-shadow:0 0 0 0 rgba(43,245,143,.45)!important;
+ animation:homePhoneGreenPulse 1.7s ease-in-out infinite!important
+}
+.home-screen>a.home-phone-button .home-phone-icon svg{
+ display:block!important;width:25px!important;height:25px!important;
+ fill:#46f39a!important;stroke:#46f39a!important;stroke-width:1.4!important;
+ stroke-linecap:round!important;stroke-linejoin:round!important;
+ transform-origin:50% 50%!important;
+ animation:homePhoneHandsetTilt 1.25s ease-in-out infinite!important
+}
+.home-screen>a.home-phone-button .home-phone-copy{
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ justify-content:center!important;gap:4px!important;min-width:0!important;
+ text-align:center!important
+}
+.home-screen>a.home-phone-button .home-phone-copy b{
+ display:block!important;color:#fff!important;
+ font-size:18px!important;font-weight:900!important;
+ line-height:1.12!important;white-space:nowrap!important
+}
+.home-screen>a.home-phone-button .home-phone-copy small{
+ display:block!important;color:#fff!important;
+ font-size:20px!important;font-weight:850!important;
+ line-height:1.12!important;letter-spacing:.1px!important;white-space:nowrap!important
+}
+.home-screen>a.home-phone-button .home-phone-arrow{
+ display:block!important;justify-self:end!important;
+ color:#fff!important;font-size:27px!important;font-weight:800!important;line-height:1!important
+}
+@keyframes homePhoneGreenPulse{
+ 0%,100%{box-shadow:0 0 0 0 rgba(43,245,143,.35),0 0 8px rgba(43,245,143,.22);background:rgba(19,133,76,.17)}
+ 50%{box-shadow:0 0 0 6px rgba(43,245,143,.12),0 0 19px rgba(43,245,143,.55);background:rgba(19,153,83,.3)}
+}
+@keyframes homePhoneHandsetTilt{
+ 0%,100%{transform:rotate(-5deg)}
+ 50%{transform:rotate(5deg)}
+}
+@media(max-width:430px){
+ .home-screen>a.home-phone-button{
+  grid-template-columns:42px minmax(0,1fr) 24px!important;
+  min-height:88px!important;height:88px!important;
+  margin:7px 0 15px!important;padding:7px 10px!important;gap:6px!important;
+  border-radius:15px!important
+ }
+ .home-screen>a.home-phone-button .home-phone-icon{
+  width:39px!important;height:39px!important;flex-basis:39px!important
+ }
+ .home-screen>a.home-phone-button .home-phone-icon svg{width:23px!important;height:23px!important}
+ .home-screen>a.home-phone-button .home-phone-copy{gap:4px!important}
+ .home-screen>a.home-phone-button .home-phone-copy b{font-size:16px!important}
+ .home-screen>a.home-phone-button .home-phone-copy small{font-size:18px!important}
+ .home-screen>a.home-phone-button .home-phone-arrow{font-size:25px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .home-screen>a.home-phone-button .home-phone-icon,
+ .home-screen>a.home-phone-button .home-phone-icon svg{animation:none!important}
+}
