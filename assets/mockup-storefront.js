@@ -152,12 +152,25 @@ function renderHomeContent(){
   if(promoText)promoText.textContent=promoSet.description||'Праздничный набор роллов для особенного вечера.';
   if(promoPrice)promoPrice.textContent=money(setPrice(promoSet));
  }
- $('.home-seasonal-card').forEach(card=>{
-  const banner=state.seasonalBanners.find(row=>row.id===card.dataset.seasonalBanner);
-  card.hidden=!!banner&&banner.active===false;
+ // Apply visibility directly to each banner. Inline !important prevents
+ // legacy storefront rules from forcing disabled cards back onto the screen.
+ const seasonalCards=$('.home-seasonal-card');
+ seasonalCards.forEach(card=>{
+  const banner=state.seasonalBanners.find(row=>row&&row.id===card.dataset.seasonalBanner);
+  const disabled=banner ? banner.active===false || banner.active===0 || banner.active==='false' : false;
+  card.hidden=disabled;
+  card.setAttribute('aria-hidden',disabled?'true':'false');
+  if(disabled)card.style.setProperty('display','none','important');
+  else card.style.removeProperty('display');
  });
  const seasonalStack=$('.home-seasonal-stack');
- if(seasonalStack)seasonalStack.hidden=$('.home-seasonal-card').every(card=>card.hidden);
+ const allSeasonalHidden=seasonalCards.length>0&&seasonalCards.every(card=>card.hidden);
+ if(seasonalStack){
+  seasonalStack.hidden=allSeasonalHidden;
+  seasonalStack.setAttribute('aria-hidden',allSeasonalHidden?'true':'false');
+  if(allSeasonalHidden)seasonalStack.style.setProperty('display','none','important');
+  else seasonalStack.style.removeProperty('display');
+ }
  const popular=$('#homePopularGrid');
  if(popular){
   const preferred=['philadelphia','lava','warm_crab','warm_salmon'];
