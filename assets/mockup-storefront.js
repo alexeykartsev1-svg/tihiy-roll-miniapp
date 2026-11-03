@@ -86,7 +86,7 @@ function ingredientRows(p){
  const patterns=[
   [/соус.*лава|lava.*sauce/i,'🍯','Соус лава'],[/лосос|salmon/i,'🐟','Лосось'],[/кревет|shrimp/i,'🦐','Креветка'],[/краб|crab/i,'🦀','Краб'],
   [/тобик|масаг|икр|caviar|roe/i,'🟠','Икра тобико'],[/сливочн.{0,8}соус|cream sauce/i,'🥛','Сливочный соус'],[/сыр|cream cheese|cheese/i,'🧀','Сливочный сыр'],
-  [/огурц|cucumber/i,'🥒','Огурец'],[/авокад|avocado/i,'🥑','Авокадо'],[/рис|rice/i,'🍚','Рис'],[/нори|водорос|seaweed/i,'🌿','Нори'],
+  [/огур|cucumber/i,'🥒','Огурец'],[/авокад|avocado/i,'🥑','Авокадо'],[/рис|rice/i,'🍚','Рис'],[/нори|водорос|seaweed/i,'🌿','Нори'],
   [/угор|unagi|eel/i,'🐟','Угорь'],[/куриц|chicken/i,'🍗','Курица'],[/булоч|булка|bun|bread/i,'🥖','Булочка'],
   [/темпур|паниров|panko/i,'🍤','Темпура'],[/соус унаги|унаги соус/i,'🍯','Соус унаги'],[/соус|sauce/i,'🥣','Соус'],[/кунжут|sesame/i,'🌰','Кунжут'],
   [/лук|onion/i,'🧅','Лук'],[/чеснок|garlic/i,'🧄','Чеснок'],[/мяс|beef|говядин/i,'🥩','Мясо'],
@@ -94,7 +94,8 @@ function ingredientRows(p){
   [/морков|carrot/i,'🥕','Морковь'],[/яйц|egg/i,'🥚','Яйцо'],[/масло|butter/i,'🧈','Масло']
  ];
  const rows=patterns.filter(([pattern])=>pattern.test(source)).map(([,icon,label])=>({icon,label}));
- const seen=new Set();return rows.filter(row=>{if(seen.has(row.label))return false;seen.add(row.label);return true;}).slice(0,10);
+ const hasSpecificSauce=rows.some(row=>['Соус лава','Соус унаги','Сливочный соус'].includes(row.label));
+ const seen=new Set();return rows.filter(row=>{if(row.label==='Соус'&&hasSpecificSauce)return false;if(seen.has(row.label))return false;seen.add(row.label);return true;}).slice(0,10);
 }
 function ingredientMarkup(p){
  const rows=ingredientRows(p);
