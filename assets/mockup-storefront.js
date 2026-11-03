@@ -123,7 +123,7 @@ function ingredientRows(p){
   if(row.label==='Икра'&&hasSpecificRoe)return false;
   if(seen.has(row.label))return false;
   seen.add(row.label);return true;
- }).slice(0,10);
+ }).slice(0,14);
 }
 function ingredientVisual(row){
  if(!row.key)return '<span class="ingredient-fallback-icon" aria-hidden="true">🍽️</span>';
