@@ -873,7 +873,11 @@ DEFAULT_SITE_CONTENT = {
         {"id":"solo","description":"Филадельфия и Лава — для уютного ужина.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"lava","qty":1}],"active":True,"stock":None},
         {"id":"duo","description":"Филадельфия, Тёплый краб и Лава — поделиться вкусом.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"warm_crab","qty":1},{"id":"lava","qty":1}],"active":True,"stock":None},
         {"id":"party","description":"Две Филадельфии, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":2},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":None},
-        {"id":"newyear","description":"Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"california","qty":1},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":None}
+        {"id":"newyear","description":"Праздничная подборка: Филадельфия, Калифорния, Лава, Тёплый краб и Тёплый лосось.","image":"","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"california","qty":1},{"id":"lava","qty":1},{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1}],"active":True,"stock":None},
+        {"id":"autumn","description":"Осенний сет «Хорошее настроение»: любимые роллы с рыбой, нежным сыром и насыщенными соусами для уютного вечера.","image":"https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/750a6357-d9aa-41e4-b255-7130c9a38bf3.webp","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"lava","qty":1},{"id":"california","qty":1},{"id":"unagi","qty":1}],"active":True,"stock":None},
+        {"id":"winter","description":"Зимний сет «Согревающий»: горячие роллы и азиатские хот-доги — сытное сочетание для холодного вечера.","image":"https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jchY8/b75760da-c927-4718-84ee-711abca0da51.webp","photos":[],"items":[{"id":"warm_crab","qty":1},{"id":"warm_salmon","qty":1},{"id":"asian_hotdog_chicken","qty":1},{"id":"asian_hotdog_shrimp","qty":1}],"active":True,"stock":None},
+        {"id":"spring","description":"Весенний сет «Цветение»: лёгкое сочетание роллов с рыбой, свежими овощами и нежными вкусами.","image":"https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jchY8/470cf8a2-6945-4889-a564-f394004f6013.webp","photos":[],"items":[{"id":"philadelphia","qty":1},{"id":"california","qty":1},{"id":"lava","qty":1}],"active":True,"stock":None},
+        {"id":"summer","description":"Летний сет «Охлаждающий»: сочные роллы и хрустящие закуски для яркого летнего перекуса.","image":"https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jchY8/db23cf4f-01a3-4842-8779-16541fb34fd7.webp","photos":[],"items":[{"id":"unagi","qty":1},{"id":"california","qty":1},{"id":"asian_hotdog_shrimp","qty":1},{"id":"snack_tempura_shrimp","qty":1}],"active":True,"stock":None}
     ],
     "promo_title":"Закажи к удобному времени",
     "promo_text":"Выбирай блюда заранее — мы приготовим заказ к согласованному времени.",
@@ -893,6 +897,10 @@ DEFAULT_SET_ITEMS = {
     "duo": [{"id": "philadelphia", "qty": 1}, {"id": "warm_crab", "qty": 1}, {"id": "lava", "qty": 1}],
     "party": [{"id": "philadelphia", "qty": 2}, {"id": "lava", "qty": 1}, {"id": "warm_crab", "qty": 1}, {"id": "warm_salmon", "qty": 1}],
     "newyear": [{"id": "philadelphia", "qty": 1}, {"id": "california", "qty": 1}, {"id": "lava", "qty": 1}, {"id": "warm_crab", "qty": 1}, {"id": "warm_salmon", "qty": 1}],
+    "autumn": [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 1}, {"id": "california", "qty": 1}, {"id": "unagi", "qty": 1}],
+    "winter": [{"id": "warm_crab", "qty": 1}, {"id": "warm_salmon", "qty": 1}, {"id": "asian_hotdog_chicken", "qty": 1}, {"id": "asian_hotdog_shrimp", "qty": 1}],
+    "spring": [{"id": "philadelphia", "qty": 1}, {"id": "california", "qty": 1}, {"id": "lava", "qty": 1}],
+    "summer": [{"id": "unagi", "qty": 1}, {"id": "california", "qty": 1}, {"id": "asian_hotdog_shrimp", "qty": 1}, {"id": "snack_tempura_shrimp", "qty": 1}],
 }
 def read_site_content() -> dict[str, Any]:
     try:
@@ -915,6 +923,8 @@ def read_site_content() -> dict[str, Any]:
                 merged_row.setdefault("active", True)
                 merged_row.setdefault("stock", None)
                 merged_sets.append(merged_row)
+            present_set_ids = {row.get("id") for row in merged_sets}
+            merged_sets.extend(dict(row) for row in DEFAULT_SITE_CONTENT["sets"] if row["id"] not in present_set_ids)
             merged["sets"] = merged_sets
             saved_banners = data.get("seasonal_banners", DEFAULT_SEASONAL_BANNERS)
             banner_by_id = {row["id"]: row for row in DEFAULT_SEASONAL_BANNERS}
@@ -1012,9 +1022,9 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
         current["slides"] = clean
     if "sets" in payload:
         sets = payload["sets"]
-        allowed_set_ids = {"solo", "duo", "party", "newyear"}
-        if not isinstance(sets, list) or len(sets) > 4:
-            raise HTTPException(status_code=400, detail="Можно настроить не более 4 готовых сетов.")
+        allowed_set_ids = {"solo", "duo", "party", "newyear", "autumn", "winter", "spring", "summer"}
+        if not isinstance(sets, list) or len(sets) > 8:
+            raise HTTPException(status_code=400, detail="Можно настроить не более 8 готовых сетов.")
         clean_sets = []
         seen = set()
         for index, item in enumerate(sets):

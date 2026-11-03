@@ -1966,6 +1966,10 @@
  padding:0!important;
 }
 .home-screen .home-seasonal-card{
+ cursor:pointer!important;
+}
+.home-screen .home-seasonal-card[role="button"]:focus-visible{outline:2px solid rgba(255,209,115,.95)!important;outline-offset:3px!important}
+.home-screen .home-seasonal-card{
  position:relative!important;
  display:block!important;
  width:100%!important;
