@@ -269,7 +269,7 @@ function detail(p,openOnMobile=true){
 function setDetail(s){detail({id:'set:'+s.id,name:SET_NAMES[s.id]||s.name||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',set:s,desc:s.description||'Готовый набор роллов.'});}
 function openSetFromHome(id){
  state.filter='sets';state.search='';returnToCatalogue();syncHomeShortcutState();
- $('.category-tile').forEach(button=>button.classList.toggle('active',button.dataset.filter==='sets'));
+ $$('.category-tile').forEach(button=>button.classList.toggle('active',button.dataset.filter==='sets'));
  renderCatalog();const catalogue=$('#catalogue');if(catalogue)catalogue.scrollTop=0;
  const set=state.sets.find(row=>row.id===id&&row.active!==false);
  if(set)setDetail(set);else toast('Этот сет пока не добавлен в каталог.');
