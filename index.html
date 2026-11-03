@@ -7,7 +7,7 @@
   <meta name="description" content="Тихий ролл — роллы, сеты, азиатские хот-доги и закуски. Заказ к удобному времени.">
   <title>Тихий ролл — меню</title>
   <link rel="preconnect" href="https://tihiy-roll-order-api.onrender.com">
-  <link rel="stylesheet" href="./assets/mockup-storefront.css?v=catalogue-sushi-chef-banner-20261103">
+  <link rel="stylesheet" href="./assets/mockup-storefront.css?v=catalogue-butterfly-flutter-20261103">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="./assets/mockup-storefront.js?v=ingredient-icons-set-composition-20261103-3" defer></script>
 </head>
@@ -30,7 +30,36 @@
           <button class="round-icon menu-trigger" type="button" aria-label="Открыть меню">☰</button>
         </div>
         <div class="catalogue-title">
-          <h1>Наше меню</h1>
+          <h1>Наше <span class="catalogue-menu-word">меню
+            <svg class="catalogue-butterfly" viewBox="0 0 36 30" aria-hidden="true" focusable="false">
+              <defs>
+                <linearGradient id="butterfly-gold" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#fff6d6"/>
+                  <stop offset=".48" stop-color="#f5d28b"/>
+                  <stop offset="1" stop-color="#c58a3c"/>
+                </linearGradient>
+                <linearGradient id="butterfly-inner" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#fff9e9"/>
+                  <stop offset="1" stop-color="#dfae62"/>
+                </linearGradient>
+              </defs>
+              <g class="catalogue-butterfly__wing catalogue-butterfly__wing--left">
+                <path d="M17.2 14.4C12.2 8.1 7.1 2.2 3.2 4.1C-.1 5.8 1.1 13.3 6.1 16.8C9.5 19.2 13.5 18 17.2 14.4Z" fill="url(#butterfly-gold)" stroke="#fff0c5" stroke-width=".65"/>
+                <path d="M15.9 15.2C11.3 15.3 6.4 17.1 6.3 21.3C6.3 24.7 10.4 25.6 13.2 22.5C15.1 20.5 15.8 17.9 15.9 15.2Z" fill="url(#butterfly-inner)" stroke="#e8c17d" stroke-width=".55"/>
+                <path d="M4.2 7.1C7.8 7.2 11.2 10.2 13.2 13.7" fill="none" stroke="#fff9e9" stroke-width=".7" opacity=".9"/>
+                <circle cx="6.2" cy="10.3" r="1" fill="#fff8df"/>
+              </g>
+              <g class="catalogue-butterfly__wing catalogue-butterfly__wing--right">
+                <path d="M18.8 14.4C23.8 8.1 28.9 2.2 32.8 4.1C36.1 5.8 34.9 13.3 29.9 16.8C26.5 19.2 22.5 18 18.8 14.4Z" fill="url(#butterfly-gold)" stroke="#fff0c5" stroke-width=".65"/>
+                <path d="M20.1 15.2C24.7 15.3 29.6 17.1 29.7 21.3C29.7 24.7 25.6 25.6 22.8 22.5C20.9 20.5 20.2 17.9 20.1 15.2Z" fill="url(#butterfly-inner)" stroke="#e8c17d" stroke-width=".55"/>
+                <path d="M31.8 7.1C28.2 7.2 24.8 10.2 22.8 13.7" fill="none" stroke="#fff9e9" stroke-width=".7" opacity=".9"/>
+                <circle cx="29.8" cy="10.3" r="1" fill="#fff8df"/>
+              </g>
+              <path d="M18 10.2C16.8 7.2 16 5.3 14.7 4.1M18 10.2C19.2 7.2 20 5.3 21.3 4.1" fill="none" stroke="#ead09c" stroke-width=".8" stroke-linecap="round"/>
+              <path d="M17.1 10.1Q18 8.8 18.9 10.1L19.6 19.8Q18 22 16.4 19.8Z" fill="#8e632d" stroke="#f9e7b8" stroke-width=".55"/>
+              <ellipse cx="18" cy="10.7" rx="1.2" ry="1.5" fill="#fff1c9"/>
+            </svg>
+          </span></h1>
           <p>Выберите любимые блюда</p>
         </div>
       </div>
