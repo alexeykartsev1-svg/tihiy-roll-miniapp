@@ -105,7 +105,7 @@ class OrderPayload(BaseModel):
     time: str = Field(min_length=2, max_length=100)
     notes: str = Field(default="", max_length=1000)
     items: list[OrderItem] = Field(min_length=1, max_length=20)
-    sets: list[SetOrderItem] = Field(default_factory=list, max_length=4)
+    sets: list[SetOrderItem] = Field(default_factory=list, max_length=8)
 
     @model_validator(mode="before")
     @classmethod
