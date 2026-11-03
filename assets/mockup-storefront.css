@@ -2163,3 +2163,58 @@
 @media(prefers-reduced-motion:reduce){
  .catalogue-title .catalogue-butterfly__wing{animation:none!important}
 }
+
+
+/* Approved four-card premium category artwork — keeps the existing tile geometry */
+.home-screen .home-quick-category-grid .home-category-card{
+ position:relative!important;
+ isolation:isolate!important;
+ border:1px solid transparent!important;
+ border-radius:13px!important;
+ padding:0!important;
+ background-color:#050608!important;
+ background-image:url("https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4f394d7c-b9d4-4414-b51e-ba02ccb3c04a.png")!important;
+ background-repeat:no-repeat!important;
+ background-origin:border-box!important;
+ background-clip:border-box!important;
+ box-shadow:none!important;
+}
+.home-screen .home-quick-category-grid .home-category-card img,
+.home-screen .home-quick-category-grid .home-category-card>span{
+ visibility:hidden!important;
+}
+.home-screen .home-quick-category-grid .home-category-card[data-home-filter="sets"]{
+ background-size:420.930% 119.669%!important;
+ background-position:2.415% 46.218%!important;
+}
+.home-screen .home-quick-category-grid .home-category-card[data-home-filter="rolls"]{
+ background-size:417.692% 119.669%!important;
+ background-position:33.535% 46.218%!important;
+}
+.home-screen .home-quick-category-grid .home-category-card[data-home-filter="dogs"]{
+ background-size:420.930% 119.669%!important;
+ background-position:64.855% 46.218%!important;
+}
+.home-screen .home-quick-category-grid .home-category-card[data-home-filter="snacks"]{
+ background-size:404.469% 119.669%!important;
+ background-position:97.248% 46.218%!important;
+}
+.home-screen .home-quick-category-grid .home-category-card[data-home-filter="sets"]:not(.active)::before{
+ content:""!important;
+ position:absolute!important;
+ inset:0!important;
+ z-index:1!important;
+ border-radius:inherit!important;
+ background:rgba(3,5,7,.34)!important;
+ pointer-events:none!important;
+}
+.home-screen .home-quick-category-grid .home-category-card.active::after{
+ content:""!important;
+ position:absolute!important;
+ inset:0!important;
+ z-index:2!important;
+ border:2px solid rgba(255,79,68,.98)!important;
+ border-radius:inherit!important;
+ box-shadow:0 0 0 2px rgba(255,64,54,.17),0 0 16px rgba(255,47,41,.38)!important;
+ pointer-events:none!important;
+}
