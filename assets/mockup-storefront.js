@@ -95,11 +95,11 @@ function ingredientRows(p){
   [/лосос|salmon/i,'salmon','Лосось'],[/тунец|tuna/i,'tuna','Тунец'],
   [/кревет|shrimp/i,'shrimp','Креветка'],
   [/краб|crab/i,'','Краб'],
-  [/сливочн.{0,10}соус|cream\s*sauce/i,'spicy_sauce','Сливочный соус'],
+  [/сливочн.{0,10}соус|cream\s*sauce/i,'','Сливочный соус'],
   [/сливочн.{0,8}сыр|крем[- ]?чиз|cream\s*cheese|cheese/i,'cream_cheese','Сливочный сыр'],
   [/огур|cucumber/i,'cucumber','Огурец'],[/авокад|avocado/i,'avocado','Авокадо'],
   [/рис|rice/i,'rice','Рис'],[/нори|водорос|seaweed/i,'nori','Нори'],
-  [/угор|eel/i,'tuna','Угорь'],
+  [/угор|eel/i,'','Угорь'],
   [/куриц|chicken/i,'chicken','Курица'],[/говядин|beef/i,'beef','Говядина'],
   [/мяс|meat/i,'beef','Мясо'],[/булоч|булка|bun|bread/i,'','Булочка'],
   [/темпур|tempura/i,'batter','Темпура'],
@@ -125,8 +125,9 @@ function ingredientRows(p){
   seen.add(row.label);return true;
  }).slice(0,14);
 }
+const FALLBACK_INGREDIENT_ICONS={'Краб':'🦀','Угорь':'🐟','Булочка':'🥖','Сливочный соус':'🥣','Чеснок':'🧄','Лук':'🧅','Томат':'🍅','Перец':'🌶️','Зелень':'🥬','Морковь':'🥕','Яйцо':'🥚','Масло':'🧈','Мясо':'🥩'};
 function ingredientVisual(row){
- if(!row.key)return '<span class="ingredient-fallback-icon" aria-hidden="true">🍽️</span>';
+ if(!row.key)return '<span class="ingredient-fallback-icon" role="img" aria-label="'+esc(row.label)+'">'+(FALLBACK_INGREDIENT_ICONS[row.label]||'🍽️')+'</span>';
  return '<span class="ingredient-visual" data-ingredient="'+esc(row.key)+'" role="img" aria-label="'+esc(row.label)+'"></span>';
 }
 function ingredientMarkup(p){
@@ -137,7 +138,7 @@ function ingredientMarkup(p){
 function ingredientCompactMarkup(p){
  const rows=ingredientRows(p);
  if(!rows.length)return '<span class="set-ingredient-tag"><span class="ingredient-visual ingredient-visual--compact" role="img" aria-label="Состав уточняется"></span><small>Состав уточняется</small></span>';
- return rows.slice(0,6).map(row=>'<span class="set-ingredient-tag" title="'+esc(row.label)+'">'+(row.key?'<span class="ingredient-visual ingredient-visual--compact" data-ingredient="'+esc(row.key)+'" role="img" aria-label="'+esc(row.label)+'"></span>':'<span class="ingredient-fallback-icon" aria-hidden="true">🍽️</span>')+'<small>'+esc(row.label)+'</small></span>').join('');
+ return rows.slice(0,6).map(row=>'<span class="set-ingredient-tag" title="'+esc(row.label)+'">'+(row.key?'<span class="ingredient-visual ingredient-visual--compact" data-ingredient="'+esc(row.key)+'" role="img" aria-label="'+esc(row.label)+'"></span>':ingredientVisual(row))+'<small>'+esc(row.label)+'</small></span>').join('');
 }
 function showBuilderInfo(id){
  const key=String(id||'');let item;

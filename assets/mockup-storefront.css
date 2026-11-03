@@ -2259,3 +2259,5 @@
 .ingredient-visual[data-ingredient="panko"]{--ingredient-x:66.6667%;--ingredient-y:100%}
 .ingredient-visual[data-ingredient="tamago"]{--ingredient-x:100%;--ingredient-y:100%}
 .ingredient-fallback-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:25px!important;height:25px!important;flex:0 0 25px!important;font-size:17px!important;line-height:1!important}
+
+.set-component-ingredients .ingredient-fallback-icon{width:17px!important;height:17px!important;flex:0 0 17px!important;font-size:12px!important;line-height:1!important}
