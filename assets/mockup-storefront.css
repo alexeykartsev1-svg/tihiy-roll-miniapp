@@ -2075,3 +2075,24 @@
  .home-screen .home-seasonal-card::after{animation:none!important}
 }
 .home-screen .home-newyear-card[hidden]{display:none!important}
+
+/* Ingredient badges inside set composition cards */
+.set-composition-grid .set-component{flex:0 0 clamp(132px,27%,152px)!important;height:174px!important;justify-content:flex-start!important;gap:4px!important;padding:6px 6px 7px!important}
+.set-composition-grid .set-component img{height:48px!important;flex:0 0 48px!important}
+.set-composition-grid .set-component b{white-space:normal!important;min-height:20px!important;overflow:hidden!important;text-overflow:clip!important;line-height:1.12!important}
+.set-composition-grid .set-component small{margin-top:0!important}
+.set-component-ingredients{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:3px 5px!important;width:100%!important;margin-top:2px!important}
+.set-ingredient-tag{display:flex!important;align-items:center!important;gap:3px!important;min-width:0!important;overflow:hidden!important;color:#eaf0f2!important}
+.set-ingredient-icon{display:block!important;flex:0 0 auto!important;width:auto!important;min-height:0!important;overflow:visible!important;color:inherit!important;font-size:11px!important;line-height:1!important;white-space:nowrap!important}
+.set-ingredient-tag small{display:block!important;min-width:0!important;overflow:hidden!important;color:#d6e0e5!important;font-size:8px!important;line-height:1.05!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.builder-info-ingredients .set-info-component{grid-column:1/-1!important;min-width:0!important;padding:8px 9px!important;border:1px solid rgba(169,196,207,.16)!important;border-radius:11px!important;background:rgba(255,255,255,.025)!important}
+.set-info-component>b{display:block!important;margin-bottom:6px!important;color:#fff!important;font-size:11px!important;font-weight:850!important}
+.builder-info-ingredients .set-component-ingredients{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px 8px!important}
+@media(max-width:1120px){
+ .set-composition-grid .set-component{flex-basis:clamp(132px,37%,146px)!important;height:174px!important}
+ .set-composition-grid .set-component img{height:48px!important;flex-basis:48px!important}
+}
+@media(max-width:380px){
+ .set-composition-grid .set-component{flex-basis:128px!important;height:174px!important}
+ .builder-info-ingredients .set-component-ingredients{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}

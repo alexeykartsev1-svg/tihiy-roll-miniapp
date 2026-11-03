@@ -67,23 +67,44 @@ function productDescription(p){
  };
  return defaults[p?.id]||'Свежеприготовленное блюдо из меню «Тихий ролл».';
 }
+const DEFAULT_INGREDIENTS={
+ philadelphia:'Лосось, сливочный сыр, огурец, рис, нори',
+ lava:'Соус лава, сливочный сыр, рис, нори',
+ warm_crab:'Краб, темпура, рис, нори, соус',
+ warm_salmon:'Лосось, темпура, рис, нори, соус',
+ california:'Краб, огурец, икра тобико, рис, нори',
+ unagi:'Угорь, рис, нори, соус унаги, кунжут',
+ asian_hotdog_shrimp:'Креветка, рис, соус, хрустящая булочка',
+ asian_hotdog_chicken:'Курица, сливочный соус, рис, хрустящая булочка',
+ snack_tempura_shrimp:'Креветка, темпура, соус',
+ snack_crispy_rolls:'Краб, сливочный сыр, рис, темпура'
+};
 function ingredientRows(p){
- const source=[p?.details,p?.composition,p?.ingredients,p?.desc,p?.description].map(compositionValue).filter(Boolean).join(', ')+' '+productDescription(p);
+ const hasManualComposition=[p?.details,p?.composition,p?.ingredients].some(value=>compositionValue(value));
+ const fallback=!hasManualComposition?(DEFAULT_INGREDIENTS[p?.id]||''):'';
+ const source=[p?.details,p?.composition,p?.ingredients,fallback,p?.desc,p?.description].map(compositionValue).filter(Boolean).join(', ')+' '+productDescription(p);
  const patterns=[
-  [/лосос|salmon/i,'🐟','Лосось'],[/кревет|shrimp/i,'🦐','Креветка'],[/краб|crab/i,'🦀','Краб'],
-  [/икр|caviar/i,'🟠','Икра'],[/сыр|cheese/i,'🧀','Сливочный сыр'],[/огурц|cucumber/i,'🥒','Огурец'],
-  [/авокад|avocado/i,'🥑','Авокадо'],[/рис|rice/i,'🍚','Рис'],[/нори|водорос|seaweed/i,'🌿','Нори'],
-  [/угор|unagi|eel/i,'🐟','Угорь'],[/куриц|chicken/i,'🍗','Курица'],[/соус|sauce/i,'🥣','Соус'],
-  [/темпур|паниров|хруст|crispy/i,'🍤','Темпура'],[/кунжут|sesame/i,'🌰','Кунжут'],[/лук|onion/i,'🧅','Лук'],
-  [/мяс|beef|говядин/i,'🥩','Мясо']
+  [/соус.*лава|lava.*sauce/i,'🍯','Соус лава'],[/лосос|salmon/i,'🐟','Лосось'],[/кревет|shrimp/i,'🦐','Креветка'],[/краб|crab/i,'🦀','Краб'],
+  [/тобик|масаг|икр|caviar|roe/i,'🟠','Икра тобико'],[/сливочн.{0,8}соус|cream sauce/i,'🥛','Сливочный соус'],[/сыр|cream cheese|cheese/i,'🧀','Сливочный сыр'],
+  [/огурц|cucumber/i,'🥒','Огурец'],[/авокад|avocado/i,'🥑','Авокадо'],[/рис|rice/i,'🍚','Рис'],[/нори|водорос|seaweed/i,'🌿','Нори'],
+  [/угор|unagi|eel/i,'🐟','Угорь'],[/куриц|chicken/i,'🍗','Курица'],[/булоч|булка|bun|bread/i,'🥖','Булочка'],
+  [/темпур|паниров|хруст|crispy|panko/i,'🍤','Темпура'],[/соус|sauce/i,'🥣','Соус'],[/кунжут|sesame/i,'🌰','Кунжут'],
+  [/лук|onion/i,'🧅','Лук'],[/чеснок|garlic/i,'🧄','Чеснок'],[/мяс|beef|говядин/i,'🥩','Мясо'],
+  [/томат|помидор|tomato/i,'🍅','Томат'],[/перец|pepper/i,'🌶️','Перец'],[/салат|зелень|lettuce|greens/i,'🥬','Зелень'],
+  [/морков|carrot/i,'🥕','Морковь'],[/яйц|egg/i,'🥚','Яйцо'],[/масло|butter/i,'🧈','Масло']
  ];
  const rows=patterns.filter(([pattern])=>pattern.test(source)).map(([,icon,label])=>({icon,label}));
- const seen=new Set();return rows.filter(row=>{if(seen.has(row.label))return false;seen.add(row.label);return true;}).slice(0,8);
+ const seen=new Set();return rows.filter(row=>{if(seen.has(row.label))return false;seen.add(row.label);return true;}).slice(0,10);
 }
 function ingredientMarkup(p){
  const rows=ingredientRows(p);
  if(!rows.length)return '<div class="ingredient-chip"><strong>🍽️</strong><span>Состав уточняется</span></div>';
  return rows.map(row=>'<div class="ingredient-chip"><strong>'+row.icon+'</strong><span>'+esc(row.label)+'</span></div>').join('');
+}
+function ingredientCompactMarkup(p){
+ const rows=ingredientRows(p);
+ if(!rows.length)return '<span class="set-ingredient-tag"><span class="set-ingredient-icon">🍽️</span><small>Состав уточняется</small></span>';
+ return rows.slice(0,6).map(row=>'<span class="set-ingredient-tag" title="'+esc(row.label)+'"><span class="set-ingredient-icon">'+row.icon+'</span><small>'+esc(row.label)+'</small></span>').join('');
 }
 function showBuilderInfo(id){
  const key=String(id||'');let item;
@@ -98,7 +119,7 @@ function showBuilderInfo(id){
  $('#builderInfoWeight').textContent=item.weight||'280 г';
  $('#builderInfoPrice').textContent=money(item.price);
  $('#builderInfoIngredients').innerHTML=item.set
-  ?(item.set.items||[]).map(row=>{const p=find(row.id);return p?'<div class="ingredient-chip"><strong>🍣</strong><span>'+esc(p.name)+(Number(row.qty)>1?' × '+row.qty:'')+'</span></div>':'';}).join('')||'<div class="ingredient-chip"><strong>🍽️</strong><span>Состав уточняется</span></div>'
+  ?(item.set.items||[]).map(row=>{const p=find(row.id);return p?'<div class="set-info-component"><b>'+esc(p.name)+(Number(row.qty)>1?' × '+row.qty:'')+'</b><div class="set-component-ingredients">'+ingredientCompactMarkup(p)+'</div></div>':'';}).join('')||'<div class="ingredient-chip"><strong>🍽️</strong><span>Состав уточняется</span></div>'
   :ingredientMarkup(item);
  openModal('builderInfoModal');
 }
@@ -256,7 +277,7 @@ function detail(p,openOnMobile=true){
  const counter=$('#detailPhotoCount');if(counter){counter.textContent='1 / '+Math.max(1,state.photos.length);counter.hidden=state.photos.length<2;}
  const grid=$('#ingredientGrid');grid.classList.toggle('set-composition-grid',!!p.set);
  if(p.set){
-   const rows=(p.set.items||[]).map(item=>{const component=find(item.id);if(!component)return '';const pieces=Number(component.pieces)||8;const multiplier=Number(item.qty)||1;return '<div class="set-component" title="'+esc(component.name)+'"><img src="'+photo(component)+'" alt="'+esc(component.name)+'" loading="lazy"><b>'+esc(component.name)+'</b><small>'+pieces+' шт.'+(multiplier>1?' × '+multiplier:'')+'</small></div>';}).filter(Boolean);
+   const rows=(p.set.items||[]).map(item=>{const component=find(item.id);if(!component)return '';const pieces=Number(component.pieces)||8;const multiplier=Number(item.qty)||1;return '<div class="set-component" title="'+esc(component.name)+'"><img src="'+photo(component)+'" alt="'+esc(component.name)+'" loading="lazy"><b>'+esc(component.name)+'</b><small>'+pieces+' шт.'+(multiplier>1?' × '+multiplier:'')+'</small><div class="set-component-ingredients">'+ingredientCompactMarkup(component)+'</div></div>';}).filter(Boolean);
    grid.innerHTML=rows.length?rows.join(''):'<div class="set-component-empty">Состав пока не заполнен.</div>';
  }else{
    grid.innerHTML=ingredientMarkup(p);
