@@ -2218,3 +2218,44 @@
  box-shadow:0 0 0 2px rgba(255,64,54,.17),0 0 16px rgba(255,47,41,.38)!important;
  pointer-events:none!important;
 }
+
+
+/* Approved realistic ingredient sprite: 24 premium ingredient visuals, 4 x 6 */
+.ingredient-visual{
+ display:inline-block!important;flex:0 0 25px!important;width:25px!important;height:25px!important;
+ border-radius:7px!important;background-image:url("https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/9392d26c-652a-4ef2-b785-bf89f751c3ad.webp")!important;
+ background-size:400% 600%!important;background-repeat:no-repeat!important;
+ background-position:var(--ingredient-x,0%) var(--ingredient-y,0%)!important;
+ box-shadow:0 1px 5px rgba(0,0,0,.28)!important;vertical-align:middle!important;
+}
+.ingredient-chip .ingredient-visual{flex:0 0 25px!important;width:25px!important;height:25px!important}
+.ingredient-grid .ingredient-chip .ingredient-visual{width:29px!important;height:29px!important;flex-basis:29px!important}
+.set-ingredient-icon,.set-component-ingredients .ingredient-visual--compact{
+ display:inline-block!important;flex:0 0 17px!important;width:17px!important;height:17px!important;
+ min-height:17px!important;border-radius:5px!important;font-size:0!important;line-height:0!important;
+}
+.ingredient-visual[data-ingredient="rice"]{--ingredient-x:0%;--ingredient-y:0%}
+.ingredient-visual[data-ingredient="nori"]{--ingredient-x:33.3333%;--ingredient-y:0%}
+.ingredient-visual[data-ingredient="cream_cheese"]{--ingredient-x:66.6667%;--ingredient-y:0%}
+.ingredient-visual[data-ingredient="salmon"]{--ingredient-x:100%;--ingredient-y:0%}
+.ingredient-visual[data-ingredient="tuna"]{--ingredient-x:0%;--ingredient-y:20%}
+.ingredient-visual[data-ingredient="shrimp"]{--ingredient-x:33.3333%;--ingredient-y:20%}
+.ingredient-visual[data-ingredient="chicken"]{--ingredient-x:66.6667%;--ingredient-y:20%}
+.ingredient-visual[data-ingredient="beef"]{--ingredient-x:100%;--ingredient-y:20%}
+.ingredient-visual[data-ingredient="cucumber"]{--ingredient-x:0%;--ingredient-y:40%}
+.ingredient-visual[data-ingredient="avocado"]{--ingredient-x:33.3333%;--ingredient-y:40%}
+.ingredient-visual[data-ingredient="spicy_sauce"]{--ingredient-x:66.6667%;--ingredient-y:40%}
+.ingredient-visual[data-ingredient="lava_sauce"]{--ingredient-x:100%;--ingredient-y:40%}
+.ingredient-visual[data-ingredient="teriyaki_sauce"]{--ingredient-x:0%;--ingredient-y:60%}
+.ingredient-visual[data-ingredient="unagi_sauce"]{--ingredient-x:33.3333%;--ingredient-y:60%}
+.ingredient-visual[data-ingredient="soy_sauce"]{--ingredient-x:66.6667%;--ingredient-y:60%}
+.ingredient-visual[data-ingredient="wasabi"]{--ingredient-x:100%;--ingredient-y:60%}
+.ingredient-visual[data-ingredient="ginger"]{--ingredient-x:0%;--ingredient-y:80%}
+.ingredient-visual[data-ingredient="roe"]{--ingredient-x:33.3333%;--ingredient-y:80%}
+.ingredient-visual[data-ingredient="masago"]{--ingredient-x:66.6667%;--ingredient-y:80%}
+.ingredient-visual[data-ingredient="sesame"]{--ingredient-x:100%;--ingredient-y:80%}
+.ingredient-visual[data-ingredient="green_onion"]{--ingredient-x:0%;--ingredient-y:100%}
+.ingredient-visual[data-ingredient="batter"]{--ingredient-x:33.3333%;--ingredient-y:100%}
+.ingredient-visual[data-ingredient="panko"]{--ingredient-x:66.6667%;--ingredient-y:100%}
+.ingredient-visual[data-ingredient="tamago"]{--ingredient-x:100%;--ingredient-y:100%}
+.ingredient-fallback-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:25px!important;height:25px!important;flex:0 0 25px!important;font-size:17px!important;line-height:1!important}

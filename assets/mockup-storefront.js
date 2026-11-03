@@ -84,28 +84,60 @@ function ingredientRows(p){
  const fallback=!hasManualComposition?(DEFAULT_INGREDIENTS[p?.id]||''):'';
  const source=[p?.details,p?.composition,p?.ingredients,fallback,p?.desc,p?.description].map(compositionValue).filter(Boolean).join(', ')+' '+productDescription(p);
  const patterns=[
-  [/соус.*лава|lava.*sauce/i,'🍯','Соус лава'],[/лосос|salmon/i,'🐟','Лосось'],[/кревет|shrimp/i,'🦐','Креветка'],[/краб|crab/i,'🦀','Краб'],
-  [/тобик|масаг|икр|caviar|roe/i,'🟠','Икра тобико'],[/сливочн.{0,8}соус|cream sauce/i,'🥛','Сливочный соус'],[/сыр|cream cheese|cheese/i,'🧀','Сливочный сыр'],
-  [/огур|cucumber/i,'🥒','Огурец'],[/авокад|avocado/i,'🥑','Авокадо'],[/рис|rice/i,'🍚','Рис'],[/нори|водорос|seaweed/i,'🌿','Нори'],
-  [/угор|unagi|eel/i,'🐟','Угорь'],[/куриц|chicken/i,'🍗','Курица'],[/булоч|булка|bun|bread/i,'🥖','Булочка'],
-  [/темпур|паниров|panko/i,'🍤','Темпура'],[/соус унаги|унаги соус/i,'🍯','Соус унаги'],[/соус|sauce/i,'🥣','Соус'],[/кунжут|sesame/i,'🌰','Кунжут'],
-  [/лук|onion/i,'🧅','Лук'],[/чеснок|garlic/i,'🧄','Чеснок'],[/мяс|beef|говядин/i,'🥩','Мясо'],
-  [/томат|помидор|tomato/i,'🍅','Томат'],[/перец|pepper/i,'🌶️','Перец'],[/салат|зелень|lettuce|greens/i,'🥬','Зелень'],
-  [/морков|carrot/i,'🥕','Морковь'],[/яйц|egg/i,'🥚','Яйцо'],[/масло|butter/i,'🧈','Масло']
+  [/соус\s*лава|лава\s*соус|lava\s*sauce/i,'lava_sauce','Соус Лава'],
+  [/соус\s*спайси|спайси|spicy\s*sauce/i,'spicy_sauce','Соус Спайси'],
+  [/соус\s*терияки|терияки|teriyaki/i,'teriyaki_sauce','Соус Терияки'],
+  [/соус\s*унаги|унаги\s*соус|unagi\s*sauce/i,'unagi_sauce','Соус Унаги'],
+  [/соев.{0,8}соус|soy\s*sauce/i,'soy_sauce','Соевый соус'],
+  [/масаго|masago/i,'masago','Икра масаго'],
+  [/тобико|tobiko/i,'roe','Икра тобико'],
+  [/икр|caviar|roe/i,'roe','Икра'],
+  [/лосос|salmon/i,'salmon','Лосось'],[/тунец|tuna/i,'tuna','Тунец'],
+  [/кревет|shrimp/i,'shrimp','Креветка'],
+  [/краб|crab/i,'','Краб'],
+  [/сливочн.{0,10}соус|cream\s*sauce/i,'spicy_sauce','Сливочный соус'],
+  [/сливочн.{0,8}сыр|крем[- ]?чиз|cream\s*cheese|cheese/i,'cream_cheese','Сливочный сыр'],
+  [/огур|cucumber/i,'cucumber','Огурец'],[/авокад|avocado/i,'avocado','Авокадо'],
+  [/рис|rice/i,'rice','Рис'],[/нори|водорос|seaweed/i,'nori','Нори'],
+  [/угор|eel/i,'tuna','Угорь'],
+  [/куриц|chicken/i,'chicken','Курица'],[/говядин|beef/i,'beef','Говядина'],
+  [/мяс|meat/i,'beef','Мясо'],[/булоч|булка|bun|bread/i,'','Булочка'],
+  [/темпур|tempura/i,'batter','Темпура'],
+  [/панко|panko|паниров/i,'panko','Панировка Панко'],
+  [/кляр|batter/i,'batter','Кляр'],
+  [/кунжут|sesame/i,'sesame','Белый кунжут'],
+  [/зел[её]н.{0,6}лук|green\s*onion|лук\s*зел/i,'green_onion','Зелёный лук'],
+  [/имбир|ginger/i,'ginger','Имбирь'],[/васаби|wasabi/i,'wasabi','Васаби'],
+  [/тамаго|омлет|tamago/i,'tamago','Тамаго'],
+  [/чеснок|garlic/i,'','Чеснок'],[/лук|onion/i,'green_onion','Лук'],
+  [/томат|помидор|tomato/i,'','Томат'],[/перец|pepper/i,'','Перец'],
+  [/салат|зелень|lettuce|greens/i,'green_onion','Зелень'],
+  [/морков|carrot/i,'','Морковь'],[/яйц|egg/i,'tamago','Яйцо'],[/масло|butter/i,'','Масло']
  ];
- const rows=patterns.filter(([pattern])=>pattern.test(source)).map(([,icon,label])=>({icon,label}));
- const hasSpecificSauce=rows.some(row=>['Соус лава','Соус унаги','Сливочный соус'].includes(row.label));
- const seen=new Set();return rows.filter(row=>{if(row.label==='Соус'&&hasSpecificSauce)return false;if(seen.has(row.label))return false;seen.add(row.label);return true;}).slice(0,10);
+ const rows=patterns.filter(([pattern])=>pattern.test(source)).map(([,key,label])=>({key,label}));
+ const hasSpecificSauce=rows.some(row=>['Соус Лава','Соус Унаги','Соус Терияки','Соус Спайси','Соевый соус','Сливочный соус'].includes(row.label));
+ const hasSpecificRoe=rows.some(row=>['Икра масаго','Икра тобико'].includes(row.label));
+ const seen=new Set();
+ return rows.filter(row=>{
+  if(row.label==='Соус'&&hasSpecificSauce)return false;
+  if(row.label==='Икра'&&hasSpecificRoe)return false;
+  if(seen.has(row.label))return false;
+  seen.add(row.label);return true;
+ }).slice(0,10);
+}
+function ingredientVisual(row){
+ if(!row.key)return '<span class="ingredient-fallback-icon" aria-hidden="true">🍽️</span>';
+ return '<span class="ingredient-visual" data-ingredient="'+esc(row.key)+'" role="img" aria-label="'+esc(row.label)+'"></span>';
 }
 function ingredientMarkup(p){
  const rows=ingredientRows(p);
  if(!rows.length)return '<div class="ingredient-chip"><strong>🍽️</strong><span>Состав уточняется</span></div>';
- return rows.map(row=>'<div class="ingredient-chip"><strong>'+row.icon+'</strong><span>'+esc(row.label)+'</span></div>').join('');
+ return rows.map(row=>'<div class="ingredient-chip">'+ingredientVisual(row)+'<span>'+esc(row.label)+'</span></div>').join('');
 }
 function ingredientCompactMarkup(p){
  const rows=ingredientRows(p);
- if(!rows.length)return '<span class="set-ingredient-tag"><span class="set-ingredient-icon">🍽️</span><small>Состав уточняется</small></span>';
- return rows.slice(0,6).map(row=>'<span class="set-ingredient-tag" title="'+esc(row.label)+'"><span class="set-ingredient-icon">'+row.icon+'</span><small>'+esc(row.label)+'</small></span>').join('');
+ if(!rows.length)return '<span class="set-ingredient-tag"><span class="ingredient-visual ingredient-visual--compact" role="img" aria-label="Состав уточняется"></span><small>Состав уточняется</small></span>';
+ return rows.slice(0,6).map(row=>'<span class="set-ingredient-tag" title="'+esc(row.label)+'">'+(row.key?'<span class="ingredient-visual ingredient-visual--compact" data-ingredient="'+esc(row.key)+'" role="img" aria-label="'+esc(row.label)+'"></span>':'<span class="ingredient-fallback-icon" aria-hidden="true">🍽️</span>')+'<small>'+esc(row.label)+'</small></span>').join('');
 }
 function showBuilderInfo(id){
  const key=String(id||'');let item;
