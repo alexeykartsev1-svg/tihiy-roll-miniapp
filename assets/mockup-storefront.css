@@ -958,7 +958,7 @@
 
 /* Unified composition controls on product, set, popular and favorite cards */
 .brand-logo,.detail-brand-logo{display:none!important}
-.detail-topbar{grid-template-columns:48px minmax(0,1fr)!important;justify-content:start!important}
+.detail-topbar{grid-template-columns:48px minmax(0,1fr)!important;justify-content:space-between!important}
 .detail-back{
  display:grid!important;place-items:center!important;width:48px!important;height:48px!important;
  border:2px solid rgba(81,231,151,.72)!important;border-radius:15px!important;
@@ -2261,3 +2261,8 @@
 .ingredient-fallback-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:25px!important;height:25px!important;flex:0 0 25px!important;font-size:17px!important;line-height:1!important}
 
 .set-component-ingredients .ingredient-fallback-icon{width:17px!important;height:17px!important;flex:0 0 17px!important;font-size:12px!important;line-height:1!important}
+
+/* Keep the product/share action in the top-right corner of every detail card. */
+.detail-topbar{justify-content:space-between!important}
+.detail-top-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;margin-left:auto!important;flex:0 0 auto!important}
+.detail-top-actions #detailShare{margin-left:auto!important}

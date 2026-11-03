@@ -7,14 +7,14 @@
   <meta name="description" content="Тихий ролл — роллы, сеты, азиатские хот-доги и закуски. Заказ к удобному времени.">
   <title>Тихий ролл — меню</title>
   <link rel="preconnect" href="https://tihiy-roll-order-api.onrender.com">
-  <link rel="stylesheet" href="./assets/mockup-storefront.css?v=ingredient-icon-sprite-20261103">
+  <link rel="stylesheet" href="./assets/mockup-storefront.css?v=home-start-share-top-right-20261103">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="./assets/mockup-storefront.js?v=ingredient-icon-sprite-20261103-3" defer></script>
+  <script src="./assets/mockup-storefront.js?v=home-start-share-top-right-20261103" defer></script>
 </head>
 <body>
-  <main class="reference-board" id="referenceBoard">
+  <main class="reference-board workflow-mode" id="referenceBoard">
     <!-- Catalogue screen -->
-    <section class="device-frame catalogue-device" aria-label="Каталог магазина">
+    <section class="device-frame catalogue-device workflow-mode" aria-label="Каталог магазина">
       
       <div class="catalogue-header">
         <div class="brand-row">
@@ -80,7 +80,7 @@
         <div class="empty-state" id="emptyState" hidden>В этой категории пока нет блюд.</div>
       </div>
 
-      <section class="workflow-screen home-screen" id="homeScreen" aria-label="Главная">
+      <section class="workflow-screen home-screen active" id="homeScreen" aria-label="Главная">
         <div class="workflow-scroll home-scroll">
           <div class="workflow-topbar home-topbar">
             <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
@@ -335,8 +335,8 @@
       </section>
 
       <nav class="bottom-nav" aria-label="Навигация магазина">
-        <button type="button" data-nav="home"><span class="nav-icon">⌂</span>Главная</button>
-        <button class="active" type="button" data-nav="catalogue"><span class="nav-icon grid-icon">▦</span>Каталог</button>
+        <button class="active" type="button" data-nav="home"><span class="nav-icon">⌂</span>Главная</button>
+        <button type="button" data-nav="catalogue"><span class="nav-icon grid-icon">▦</span>Каталог</button>
         <button type="button" data-nav="builder"><span class="nav-icon">♧</span>Конструктор</button>
         <button type="button" data-nav="favorites"><span class="nav-icon">♡</span>Избранное</button>
         <button type="button" data-nav="cart"><span class="nav-icon">🛒<i id="navCartCount">0</i></span>Корзина</button>
