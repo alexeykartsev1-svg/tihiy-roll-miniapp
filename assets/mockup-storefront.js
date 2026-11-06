@@ -180,7 +180,7 @@ function card(p){
  const heart='<button class="card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-label="Избранное">'+(fav?'♥':'♡')+'</button>';
  if(hit){
   return '<article class="product-card hit-template '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
-   +'<div class="card-photo hit-photo"><img class="hit-food" src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy"><img class="hit-chef" src="./assets/hit-chef-template.webp" alt="" aria-hidden="true">'
+   +'<div class="card-photo hit-photo"><img class="hit-food" src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy"><img class="hit-chef" src="./assets/hit-chef-portrait.jpg" alt="" aria-hidden="true">'
    +'<span class="hit-kicker">♛ ХИТ</span><div class="hit-promo-tags"><span class="hit-order-tag">Готовим под заказ</span><span class="hit-fresh-tag">Свежая сборка</span></div>'+heart+'</div>'
    +'<div class="card-info hit-info"><h3 class="card-title hit-title">'+esc(p.name)+'</h3>'
    +'<p class="card-description hit-description">'+esc(desc)+'</p>'

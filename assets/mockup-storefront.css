@@ -2427,3 +2427,49 @@
  .product-card.hit-template .hit-chef{max-width:57%!important;height:106%!important}
  .product-card.hit-template .hit-promo-tags{left:39%!important;right:26px!important;top:30px!important}
 }
+
+
+/* Final HIT card correction: clean portrait panel from the real store chef banner. */
+.product-card.hit-template .card-photo.hit-photo{
+ height:clamp(112px,33vw,153px)!important;
+}
+.product-card.hit-template .hit-chef{
+ display:block!important;position:absolute!important;z-index:3!important;
+ left:6px!important;bottom:6px!important;
+ width:70px!important;height:92px!important;max-width:41%!important;
+ object-fit:cover!important;object-position:center 18%!important;
+ border:1px solid rgba(238,190,91,.88)!important;border-radius:11px!important;
+ background:#17110b!important;background-image:none!important;
+ -webkit-mask-image:none!important;mask-image:none!important;
+ opacity:1!important;filter:drop-shadow(0 3px 7px rgba(0,0,0,.55))!important;
+ pointer-events:none!important;
+}
+.product-card.hit-template .hit-promo-tags{
+ left:41%!important;right:29px!important;top:37px!important;
+ display:grid!important;gap:5px!important;
+}
+.product-card.hit-template .hit-promo-tags span{
+ display:block!important;width:max-content!important;max-width:100%!important;
+ padding:4px 6px!important;border-radius:5px!important;
+ font-size:clamp(7px,1.95vw,9px)!important;line-height:1.05!important;
+ white-space:normal!important;transform:none!important;
+}
+.product-card.hit-template .hit-order-tag{
+ background:linear-gradient(100deg,#f12828,#bc171b)!important;
+}
+.product-card.hit-template .hit-fresh-tag{
+ background:linear-gradient(100deg,#278a28,#17651e)!important;
+}
+@media(max-width:600px){
+ .product-card.hit-template .card-photo.hit-photo{height:clamp(112px,33vw,153px)!important}
+ .product-card.hit-template .hit-chef{
+  left:5px!important;bottom:5px!important;width:66px!important;height:88px!important;max-width:40%!important;
+  object-position:center 18%!important;
+ }
+ .product-card.hit-template .hit-promo-tags{left:41%!important;right:27px!important;top:35px!important;gap:4px!important}
+ .product-card.hit-template .hit-promo-tags span{padding:3px 5px!important;font-size:7px!important}
+}
+@media(max-width:370px){
+ .product-card.hit-template .hit-chef{width:59px!important;height:80px!important;max-width:39%!important}
+ .product-card.hit-template .hit-promo-tags{left:40%!important;right:25px!important;top:33px!important}
+}
