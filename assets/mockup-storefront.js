@@ -176,8 +176,19 @@ function card(p){
  const controls=selected>0
   ?'<div class="card-quantity" aria-label="Количество в корзине"><button type="button" data-card-qty="-1" data-id="'+id+'" aria-label="Уменьшить количество">−</button><span>'+selected+'</span><button type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Увеличить количество">+</button></div>'
   :'<button class="card-add" type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Добавить в корзину">+</button>';
- const desc=productDescription(p);
- return '<article class="product-card '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'"><div class="card-photo"><img src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy">'+(p.badge?'<span class="card-ribbon">'+esc(p.badge)+'</span>':'')+'<button class="card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-label="Избранное">'+(fav?'♥':'♡')+'</button></div><div class="card-info"><h3 class="card-title">'+esc(p.name)+'</h3><p class="card-description">'+esc(desc)+'</p><div class="card-meta"><span>'+Number(p.pieces||8)+' шт.</span><span>'+esc(p.weight||'280 г')+'</span></div><button class="card-composition" type="button" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав</button><div class="card-bottom card-purchase"><strong class="card-price">'+money(p.price)+'</strong>'+controls+'</div></div></article>';
+ const desc=productDescription(p),hit=!isSet&&p.hit_template===true;
+ const heart='<button class="card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-label="Избранное">'+(fav?'♥':'♡')+'</button>';
+ if(hit){
+  return '<article class="product-card hit-template '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
+   +'<div class="card-photo hit-photo"><img class="hit-food" src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy"><div class="hit-chef" aria-hidden="true"></div>'
+   +'<span class="hit-kicker">♛ ХИТ</span><div class="hit-promo-tags"><span class="hit-order-tag">Готовим под заказ</span><span class="hit-fresh-tag">Свежая сборка</span></div>'+heart+'</div>'
+   +'<div class="card-info hit-info"><h3 class="card-title hit-title">'+esc(p.name)+'</h3>'
+   +'<p class="card-description hit-description">'+esc(desc)+'</p>'
+   +'<div class="hit-meta-row"><div class="card-meta hit-meta"><span><i aria-hidden="true">◉</i>'+Number(p.pieces||8)+' шт.</span><span><i aria-hidden="true">◈</i>'+esc(p.weight||'280 г')+'</span></div>'
+   +'<button class="card-composition hit-composition" type="button" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">››</b></button></div>'
+   +'<div class="card-bottom card-purchase"><strong class="card-price">'+money(p.price)+'</strong>'+controls+'</div></div></article>';
+ }
+ return '<article class="product-card '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'"><div class="card-photo"><img src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy">'+(p.badge?'<span class="card-ribbon">'+esc(p.badge)+'</span>':'')+heart+'</div><div class="card-info"><h3 class="card-title">'+esc(p.name)+'</h3><p class="card-description">'+esc(desc)+'</p><div class="card-meta"><span>'+Number(p.pieces||8)+' шт.</span><span>'+esc(p.weight||'280 г')+'</span></div><button class="card-composition" type="button" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав</button><div class="card-bottom card-purchase"><strong class="card-price">'+money(p.price)+'</strong>'+controls+'</div></div></article>';
 }
 function renderHomeContent(){
  const hero=$('#homeHeroPhoto');
