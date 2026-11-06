@@ -439,6 +439,7 @@ class ProductPayload(BaseModel):
     stock: int | None = Field(default=None, ge=0, le=10000)
     details: str = Field(default="", max_length=1000)
     gallery: list[str] = Field(default_factory=list, max_length=5)
+    hit_template: bool = False
     active: bool = True
     sort_order: int = Field(default=0, ge=0, le=10000)
 
