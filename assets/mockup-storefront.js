@@ -173,8 +173,9 @@ function allRows(){
 function cardControlsMarkup(p,alwaysStepper=false){
  const id=esc(p.id),isSet=!!p.set,limit=isSet?p.set.stock:stock(p),available=limit==null||Number(limit)>0;
  const selected=isSet?Number(state.setCounts[p.set.id]||0):qty(p.id);
+ const reachedLimit=limit!=null&&selected>=Number(limit);
  if(alwaysStepper||selected>0){
-  return '<div class="card-quantity '+(alwaysStepper?'hit-art-quantity':'')+'" aria-label="Количество в корзине"><button type="button" data-card-qty="-1" data-id="'+id+'" '+(selected<=0?'disabled':'')+' aria-label="Уменьшить количество">−</button><span>'+selected+'</span><button type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Увеличить количество">+</button></div>';
+  return '<div class="card-quantity '+(alwaysStepper?'hit-art-quantity':'')+'" aria-label="Количество в корзине"><button type="button" data-card-qty="-1" data-id="'+id+'" '+(selected<=0?'disabled':'')+' aria-label="Уменьшить количество">−</button><span>'+selected+'</span><button type="button" data-card-qty="1" data-id="'+id+'" '+(!available||reachedLimit?'disabled':'')+' aria-label="Увеличить количество">+</button></div>';
  }
  return '<button class="card-add" type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Добавить в корзину">+</button>';
 }
@@ -369,7 +370,7 @@ function refreshCartViews(){
    const plus=cardNode.querySelector('.hit-art-quantity [data-card-qty="1"]');
    if(count)count.textContent=String(qty(p.id));
    if(minus)minus.disabled=qty(p.id)<=0;
-   if(plus)plus.disabled=stock(p)===0;
+   const limit=stock(p);if(plus)plus.disabled=limit!==null&&qty(p)>=limit;
    return;
   }
   const host=cardNode.querySelector('.card-bottom');
