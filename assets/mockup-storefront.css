@@ -3898,3 +3898,20 @@
  font-size:clamp(19px,9cqw,34px)!important;
  line-height:1!important;
 }
+
+
+/* v32: Philadelphia's favorite icon is baked into the photo.
+   The transparent button remains the click target in both states; never draw a second glyph. */
+.rr-card .rr-card-photo-art .rr-card-heart-art,
+.rr-card .rr-card-photo-art .rr-card-heart-art.active{
+ display:grid!important;
+ place-items:center!important;
+ opacity:.001!important;
+ color:transparent!important;
+ background:transparent!important;
+ border:0!important;
+ box-shadow:none!important;
+ text-shadow:none!important;
+ outline:0!important;
+ pointer-events:auto!important;
+}
