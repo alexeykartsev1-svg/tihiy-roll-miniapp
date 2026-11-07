@@ -2884,7 +2884,7 @@
 /* HIT reference refinement: clearer chef, typography and non-overlapping meta. */
 .product-card.hit-template .hit-chef{
  left:0!important;bottom:0!important;width:54%!important;max-width:54%!important;height:100%!important;
- background-image:url("./hit-chef-target-pose.webp?v=20261107-hq1")!important;
+ background-image:url("./hit-chef-target-pose.webp?v=20261107-hq3")!important;
  background-repeat:no-repeat!important;background-size:contain!important;background-position:left bottom!important;
  -webkit-mask-image:none!important;mask-image:none!important;
  filter:drop-shadow(3px 1px 7px rgba(0,0,0,.48))!important;
