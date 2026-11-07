@@ -3636,3 +3636,43 @@
  line-height:18px!important;
  font-style:normal!important;
 }
+
+
+/* 2026-11-07: slim translucent Tihiy Roll brand header only */
+.home-screen .home-topbar.home-brandbar{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:clamp(9px,2.8vw,17px)!important;
+ position:relative!important;z-index:8!important;
+ width:auto!important;height:58px!important;min-height:58px!important;
+ margin:0 -12px 8px!important;padding:4px 12px!important;
+ border:1px solid rgba(255,255,255,.13)!important;
+ border-top:0!important;border-radius:0 0 17px 17px!important;
+ background:rgba(8,11,15,.62)!important;
+ -webkit-backdrop-filter:blur(13px) saturate(1.25)!important;
+ backdrop-filter:blur(13px) saturate(1.25)!important;
+ box-shadow:0 8px 22px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.08)!important;
+}
+.home-brand-lockup{
+ display:flex!important;align-items:center!important;gap:7px!important;
+ min-width:0!important;flex:0 1 auto!important;text-decoration:none!important;
+}
+.home-brand-emblem{display:block!important;width:57px!important;height:51px!important;flex:0 0 57px!important;filter:drop-shadow(0 2px 4px rgba(0,0,0,.45))}
+.home-brand-name{
+ color:#fff!important;font-family:"Brush Script MT","Segoe Script",Georgia,cursive!important;
+ font-size:clamp(21px,6.1vw,29px)!important;font-style:italic!important;
+ font-weight:700!important;line-height:1!important;white-space:nowrap!important;
+ letter-spacing:-1.1px!important;text-shadow:0 2px 7px rgba(0,0,0,.75)!important;
+}
+.home-brand-divider{display:block!important;width:1px!important;height:32px!important;flex:0 0 1px!important;background:rgba(255,70,66,.85)!important}
+.home-brand-tagline{
+ display:block!important;flex:0 0 auto!important;color:#fff!important;
+ font-size:clamp(8px,2.35vw,10.5px)!important;font-weight:750!important;
+ line-height:1.22!important;letter-spacing:.55px!important;text-align:center!important;
+ text-shadow:0 2px 6px rgba(0,0,0,.8)!important;white-space:nowrap!important;
+}
+@media(max-width:360px){
+ .home-screen .home-topbar.home-brandbar{gap:7px!important;padding-left:8px!important;padding-right:8px!important}
+ .home-brand-emblem{width:48px!important;height:46px!important;flex-basis:48px!important}
+ .home-brand-name{font-size:20px!important}
+ .home-brand-tagline{font-size:7.5px!important;letter-spacing:.25px!important}
+}
