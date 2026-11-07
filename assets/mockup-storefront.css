@@ -3010,3 +3010,76 @@
   .product-card.hit-template .hit-title{font-size:clamp(14px,3.9vw,18px)!important;gap:4px!important}
   .product-card.hit-template .hit-meta-row{grid-template-columns:minmax(0,1fr) 39%!important}
 }
+
+
+/* Final approved HIT artwork and brush-stroke promo labels.
+   The character layer uses the exact approved chin-resting pose asset. */
+.product-card.hit-template .card-photo.hit-photo{
+  width:100%!important;height:auto!important;aspect-ratio:1.88 / 1!important;
+  min-height:0!important;max-height:none!important;overflow:hidden!important;isolation:isolate!important;
+}
+.product-card.hit-template .hit-food{object-fit:cover!important;object-position:76% center!important;}
+.product-card.hit-template .hit-chef{
+  position:absolute!important;z-index:3!important;display:block!important;visibility:visible!important;opacity:1!important;
+  left:0!important;bottom:0!important;width:50%!important;max-width:50%!important;height:100%!important;
+  margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background-color:transparent!important;
+  background-image:url("./hit-chef-approved-pose.webp?v=20261107-approved1")!important;
+  background-repeat:no-repeat!important;background-size:auto 88%!important;background-position:left bottom!important;
+  -webkit-mask-image:none!important;mask-image:none!important;box-shadow:none!important;
+  filter:drop-shadow(2px 0 7px rgba(0,0,0,.48))!important;pointer-events:none!important;
+}
+.product-card.hit-template .hit-promo-tags{
+  position:absolute!important;z-index:5!important;top:15%!important;left:25%!important;right:13%!important;
+  display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:5px!important;pointer-events:none!important;
+}
+.product-card.hit-template .hit-promo-tags span{
+  position:relative!important;display:block!important;width:max-content!important;max-width:82px!important;
+  min-height:30px!important;padding:5px 8px!important;border:0!important;border-radius:0!important;color:#fff!important;
+  font-size:clamp(10px,2.8vw,11.5px)!important;font-weight:950!important;line-height:1.04!important;letter-spacing:0!important;
+  text-align:center!important;white-space:normal!important;text-shadow:0 1px 2px rgba(0,0,0,.7)!important;
+  box-shadow:0 3px 8px rgba(0,0,0,.34)!important;
+  clip-path:polygon(1% 13%,5% 7%,3% 1%,12% 5%,16% 0,25% 4%,31% 1%,42% 5%,49% 0,58% 4%,66% 1%,75% 5%,83% 2%,94% 6%,100% 14%,97% 26%,100% 37%,97% 49%,100% 61%,96% 73%,99% 86%,94% 94%,83% 91%,76% 100%,64% 96%,55% 100%,45% 96%,35% 100%,25% 95%,15% 100%,8% 94%,1% 97%,4% 84%,0 72%,4% 60%,0 48%,3% 36%,0 24%)!important;
+}
+.product-card.hit-template .hit-order-tag{
+  min-width:72px!important;background:linear-gradient(100deg,#fb2928 0%,#e71920 72%,#c7111a 100%)!important;
+  rotate:0deg!important;translate:0 0!important;transform:rotate(-7deg) skewX(-3deg)!important;
+}
+.product-card.hit-template .hit-fresh-tag{
+  min-width:68px!important;background:linear-gradient(100deg,#35a52d 0%,#238326 70%,#145d1c 100%)!important;
+  rotate:0deg!important;translate:7px 0!important;transform:rotate(-4deg) skewX(-2deg)!important;padding-left:7px!important;
+}
+.product-card.hit-template .hit-fresh-tag:before{
+  content:"🍃"!important;display:inline-block!important;margin-right:3px!important;font-size:1em!important;vertical-align:baseline!important;
+}
+.product-card.hit-template .hit-kicker{z-index:7!important;}
+.product-card.hit-template .card-heart{z-index:8!important;}
+.product-card.hit-template .hit-title{font-size:clamp(14px,3.8vw,17px)!important;}
+.product-card.hit-template .hit-meta-row{
+  display:grid!important;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr)!important;gap:4px!important;width:100%!important;min-width:0!important;
+}
+.product-card.hit-template .hit-meta{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:2px!important;
+  min-width:0!important;overflow:visible!important;white-space:nowrap!important;padding:4px 3px!important;
+  font-size:clamp(7px,1.95vw,8px)!important;
+}
+.product-card.hit-template .hit-meta span{
+  display:inline-flex!important;align-items:center!important;flex:0 0 auto!important;min-width:0!important;gap:1px!important;white-space:nowrap!important;
+}
+.product-card.hit-template .hit-meta i{flex:0 0 auto!important;font-size:9px!important;}
+.product-card.hit-template .card-composition.hit-composition{
+  display:flex!important;align-items:center!important;justify-content:center!important;gap:2px!important;min-width:0!important;width:100%!important;
+  padding:4px 2px!important;font-size:clamp(7px,1.95vw,8px)!important;white-space:nowrap!important;
+}
+@media(max-width:600px){
+  .product-card.hit-template .card-photo.hit-photo{aspect-ratio:1.88 / 1!important;}
+  .product-card.hit-template .hit-chef{width:50%!important;max-width:50%!important;height:100%!important;background-size:auto 88%!important;background-position:left bottom!important;}
+  .product-card.hit-template .hit-promo-tags{top:15%!important;left:25%!important;right:13%!important;gap:5px!important;}
+  .product-card.hit-template .hit-promo-tags span{max-width:82px!important;min-height:30px!important;padding:5px 8px!important;font-size:clamp(10px,2.8vw,11.5px)!important;}
+}
+@media(max-width:370px){
+  .product-card.hit-template .hit-chef{width:48%!important;max-width:48%!important;background-size:auto 84%!important;}
+  .product-card.hit-template .hit-promo-tags{left:24%!important;right:12%!important;}
+  .product-card.hit-template .hit-promo-tags span{max-width:76px!important;min-height:28px!important;padding:4px 7px!important;font-size:10px!important;}
+  .product-card.hit-template .hit-meta{font-size:7px!important;padding:4px 2px!important;}
+  .product-card.hit-template .card-composition.hit-composition{font-size:7px!important;}
+}
