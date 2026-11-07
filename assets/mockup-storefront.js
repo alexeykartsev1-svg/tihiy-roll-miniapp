@@ -193,7 +193,7 @@ function card(p){
   +'<div class="rr-card-info">'
   +'<h3 class="rr-card-title"><span>'+esc(p.name)+'</span></h3>'
   +'<p class="rr-card-description">'+esc(desc)+'</p>'
-  +'<div class="rr-card-meta-row"><div class="rr-card-meta"><span><i aria-hidden="true">◉</i>'+Number(p.pieces||8)+' шт.</span><span><i aria-hidden="true">◇</i>'+esc(p.weight||'280 г')+'</span></div>'
+  +'<div class="rr-card-meta-row"><div class="rr-card-meta"><span><i aria-hidden="true">🍣</i>'+Number(p.pieces||8)+' шт.</span><span><i aria-hidden="true">⚖</i>'+esc(p.weight||'280 г')+'</span></div>'
   +'<button class="rr-card-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">››</b></button></div>'
   +'<div class="card-bottom card-purchase rr-card-purchase"><strong class="card-price rr-card-price">'+money(p.price)+'</strong>'+controls+'</div>'
   +'</div></article>';
