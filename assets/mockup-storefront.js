@@ -11,7 +11,7 @@ const tg=()=>window.Telegram?.WebApp||null;
 const find=id=>state.products.find(p=>p.id===id);
 const qty=id=>Number(state.cart[id]||0);
 const stock=p=>p?.stock==null?null:Math.max(0,Number(p.stock)||0);
-const photo=p=>p?.photo||'./assets/set-party.webp';
+const photo=p=>p?.id==='asian_hotdog_salmon'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/97a9ac28-fa86-4ad3-98c5-b8ca0b7d5b0e.webp':(p?.photo||'./assets/set-party.webp');
 const productTotal=()=>state.products.reduce((sum,p)=>sum+p.price*qty(p.id),0);
 const cartCount=()=>Object.values(state.cart).reduce((sum,n)=>sum+Number(n||0),0);
 const setPrice=s=>(s.items||[]).reduce((sum,i)=>sum+(find(i.id)?.price||0)*Number(i.qty||0),0);
@@ -195,7 +195,7 @@ function card(p){
  return '<article class="product-card rr-card '+(hit?'rr-card-is-hit ':'')+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
   +'<div class="rr-card-photo '+(artPhoto?'rr-card-photo-art':'')+'"><img class="rr-card-image" src="'+image+'" alt="'+esc(p.name)+'" loading="'+(artPhoto?'eager':'lazy')+'" decoding="async">'+badge+heart+'</div>'
   +'<div class="rr-card-info">'
-  +'<h3 class="rr-card-title"><span>'+esc(p.name)+'</span></h3>'
+  +'<h3 class="rr-card-title" aria-label="'+esc(p.name)+'">'+(p.id==='asian_hotdog_salmon'?'<span class="rr-salmon-title"><span>Азиатский Хот-Дог</span><b>Лосось</b></span>':'<span>'+esc(p.name)+'</span>')+'</h3>'
   +'<p class="rr-card-description">'+esc(desc)+'</p>'
   +'<div class="rr-card-meta-row"><div class="rr-card-meta"><span><i aria-hidden="true">🍣</i>'+Number(p.pieces||8)+' шт.</span><span><i aria-hidden="true">⚖</i>'+esc(p.weight||'280 г')+'</span></div>'
   +'<button class="rr-card-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">››</b></button></div>'
