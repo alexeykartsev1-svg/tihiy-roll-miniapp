@@ -3915,3 +3915,27 @@
  outline:0!important;
  pointer-events:auto!important;
 }
+
+
+/* v33: Philadelphia HIT keeps the printed white heart when inactive.
+   When saved, show one red heart over it; the button remains the only click target. */
+.rr-card .rr-card-photo-art .rr-card-heart-art{
+ opacity:.001!important;
+ color:transparent!important;
+ background:transparent!important;
+ border:0!important;
+ box-shadow:none!important;
+ pointer-events:auto!important;
+}
+.rr-card .rr-card-photo-art .rr-card-heart-art.active{
+ display:grid!important;
+ place-items:center!important;
+ opacity:1!important;
+ color:#ff514b!important;
+ background:rgba(0,0,0,.82)!important;
+ border:1px solid rgba(255,255,255,.48)!important;
+ border-radius:50%!important;
+ font-size:clamp(19px,9cqw,34px)!important;
+ line-height:1!important;
+ text-shadow:0 1px 4px rgba(0,0,0,.5)!important;
+}
