@@ -2774,3 +2774,57 @@
  .product-card.hit-template.hit-art-card .card-purchase.hit-art-purchase{min-height:54px!important;padding:5px 6px 5px 9px!important;}
  .product-card.hit-template.hit-art-card .card-quantity.hit-art-quantity{flex-basis:96px!important;width:96px!important;min-width:96px!important;height:42px!important;min-height:42px!important;}
 }
+
+
+/* Narrow-phone layout correction: never force details, composition and purchase controls onto one row. */
+.product-card.hit-template.hit-art-card{container-type:inline-size!important;min-width:0!important;}
+.product-card.hit-template.hit-art-card .hit-art-info .hit-title{overflow:visible!important;text-overflow:clip!important;}
+.product-card.hit-template.hit-art-card .hit-art-info .hit-description{
+ -webkit-line-clamp:4!important;max-height:5.5em!important;overflow-wrap:anywhere!important;
+}
+.product-card.hit-template.hit-art-card .hit-meta-row{
+ display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;
+ gap:8px!important;width:100%!important;min-width:0!important;overflow:visible!important;
+}
+.product-card.hit-template.hit-art-card .hit-meta{
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;
+ gap:7px!important;width:100%!important;min-width:0!important;white-space:normal!important;
+}
+.product-card.hit-template.hit-art-card .hit-meta span{
+ min-height:29px!important;padding:4px 9px!important;border:1px solid rgba(225,182,81,.34)!important;
+ border-radius:999px!important;background:linear-gradient(145deg,#15191d,#090c10)!important;
+}
+.product-card.hit-template.hit-art-card .card-composition.hit-art-composition{
+ align-self:flex-start!important;min-width:122px!important;width:auto!important;height:42px!important;min-height:42px!important;
+ padding:0 15px!important;font-size:14px!important;white-space:nowrap!important;
+}
+.product-card.hit-template.hit-art-card .card-purchase.hit-art-purchase{
+ box-sizing:border-box!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;
+ gap:6px!important;padding:6px 6px 6px 9px!important;
+}
+.product-card.hit-template.hit-art-card .hit-art-live-price{
+ flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;text-overflow:clip!important;
+ font-size:clamp(17px,5.7cqw,24px)!important;letter-spacing:-.3px!important;
+}
+.product-card.hit-template.hit-art-card .card-quantity.hit-art-quantity{
+ flex:0 0 43%!important;width:43%!important;min-width:76px!important;max-width:104px!important;
+ height:43px!important;min-height:43px!important;
+}
+.product-card.hit-template.hit-art-card .hit-art-quantity button{font-size:23px!important;}
+.product-card.hit-template.hit-art-card .hit-art-quantity span{font-size:15px!important;}
+@media(max-width:390px){
+ .product-card.hit-template.hit-art-card .card-info.hit-art-info{gap:8px!important;padding:9px 8px 10px!important;}
+ .product-card.hit-template.hit-art-card .hit-art-info .hit-title{font-size:clamp(16px,4.8vw,19px)!important;}
+ .product-card.hit-template.hit-art-card .hit-art-info .hit-description{font-size:clamp(10.5px,2.9vw,12px)!important;line-height:1.32!important;}
+ .product-card.hit-template.hit-art-card .hit-meta{gap:5px!important;font-size:10px!important;}
+ .product-card.hit-template.hit-art-card .hit-meta span{min-height:26px!important;padding:3px 7px!important;}
+ .product-card.hit-template.hit-art-card .card-composition.hit-art-composition{height:38px!important;min-height:38px!important;font-size:12px!important;}
+ .product-card.hit-template.hit-art-card .card-purchase.hit-art-purchase{min-height:50px!important;gap:5px!important;padding:5px 5px 5px 7px!important;}
+ .product-card.hit-template.hit-art-card .hit-art-live-price{font-size:17px!important;}
+ .product-card.hit-template.hit-art-card .card-quantity.hit-art-quantity{
+  flex-basis:76px!important;width:76px!important;min-width:76px!important;max-width:76px!important;
+  height:39px!important;min-height:39px!important;
+ }
+ .product-card.hit-template.hit-art-card .hit-art-quantity button{font-size:21px!important;}
+ .product-card.hit-template.hit-art-card .hit-art-quantity span{font-size:14px!important;}
+}
