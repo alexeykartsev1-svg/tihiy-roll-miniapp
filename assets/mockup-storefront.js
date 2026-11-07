@@ -170,42 +170,32 @@ function allRows(){
  if(state.sort==='name')a.sort((x,y)=>x.name.localeCompare(y.name,'ru'));
  return a;
 }
-function cardControlsMarkup(p,alwaysStepper=false){
+function cardControlsMarkup(p){
  const id=esc(p.id),isSet=!!p.set,limit=isSet?p.set.stock:stock(p),available=limit==null||Number(limit)>0;
  const selected=isSet?Number(state.setCounts[p.set.id]||0):qty(p.id);
  const reachedLimit=limit!=null&&selected>=Number(limit);
- if(alwaysStepper||selected>0){
-  return '<div class="card-quantity '+(alwaysStepper?'hit-art-quantity':'')+'" aria-label="Количество в корзине"><button type="button" data-card-qty="-1" data-id="'+id+'" '+(selected<=0?'disabled':'')+' aria-label="Уменьшить количество">−</button><span>'+selected+'</span><button type="button" data-card-qty="1" data-id="'+id+'" '+(!available||reachedLimit?'disabled':'')+' aria-label="Увеличить количество">+</button></div>';
+ if(selected>0){
+  return '<div class="card-quantity rr-card-stepper" aria-label="Количество в корзине"><button type="button" data-card-qty="-1" data-id="'+id+'" aria-label="Уменьшить количество">−</button><span>'+selected+'</span><button type="button" data-card-qty="1" data-id="'+id+'" '+(!available||reachedLimit?'disabled':'')+' aria-label="Увеличить количество">+</button></div>';
  }
- return '<button class="card-add" type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Добавить в корзину">+</button>';
+ return '<button class="card-add rr-card-add" type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Добавить в корзину">+</button>';
 }
 function card(p){
- const id=esc(p.id),isSet=!!p.set,limit=isSet?p.set.stock:stock(p),available=limit==null||Number(limit)>0,fav=state.favorites.has(p.id);
- const controls=cardControlsMarkup(p);
- const desc=productDescription(p),hit=!isSet&&p.hit_template===true;
- const heart='<button class="card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-label="Избранное">'+(fav?'♥':'♡')+'</button>';
- if(hit && p.id==='philadelphia'){
-  const artHeart=heart.replace('class="card-heart ','class="card-heart hit-art-heart ');
-  const artControls=cardControlsMarkup(p,true);
-  return '<article class="product-card hit-template hit-art-card '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
-   +'<div class="hit-art-photo"><img class="hit-art-image" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4b0c216f-14e7-401e-8a04-a2652e7ad801.webp" alt="'+esc(p.name)+'" loading="eager" decoding="async">'+artHeart+'</div>'
-   +'<div class="card-info hit-info hit-art-info"><h3 class="card-title hit-title">'+esc(p.name)+'</h3>'
-   +'<p class="card-description hit-description">'+esc(desc)+'</p>'
-   +'<div class="hit-meta-row"><div class="card-meta hit-meta"><span><i aria-hidden="true">◉</i>'+Number(p.pieces||8)+' шт.</span><span><i aria-hidden="true">◈</i>'+esc(p.weight||'280 г')+'</span></div>'
-   +'<button class="card-composition hit-composition hit-art-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">›</b></button></div>'
-   +'<div class="card-bottom card-purchase hit-art-purchase"><strong class="card-price hit-art-live-price">'+money(p.price)+'</strong>'+artControls+'</div></div></article>';
- }
- if(hit){
-  return '<article class="product-card hit-template '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
-   +'<div class="card-photo hit-photo"><img class="hit-food" src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy"><div class="hit-chef" aria-hidden="true"></div>'
-   +'<span class="hit-kicker">♛ ХИТ</span><div class="hit-promo-tags"><span class="hit-order-tag">Готовим под заказ</span><span class="hit-fresh-tag">Свежая сборка</span></div>'+heart+'</div>'
-   +'<div class="card-info hit-info"><h3 class="card-title hit-title">'+esc(p.name)+'</h3>'
-   +'<p class="card-description hit-description">'+esc(desc)+'</p>'
-   +'<div class="hit-meta-row"><div class="card-meta hit-meta"><span><i aria-hidden="true">◉</i>'+Number(p.pieces||8)+' шт.</span><span><i aria-hidden="true">◈</i>'+esc(p.weight||'280 г')+'</span></div>'
-   +'<button class="card-composition hit-composition" type="button" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">››</b></button></div>'
-   +'<div class="card-bottom card-purchase"><strong class="card-price">'+money(p.price)+'</strong>'+controls+'</div></div></article>';
- }
- return '<article class="product-card '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'"><div class="card-photo"><img src="'+photo(p)+'" alt="'+esc(p.name)+'" loading="lazy">'+(p.badge?'<span class="card-ribbon">'+esc(p.badge)+'</span>':'')+heart+'</div><div class="card-info"><h3 class="card-title">'+esc(p.name)+'</h3><p class="card-description">'+esc(desc)+'</p><div class="card-meta"><span>'+Number(p.pieces||8)+' шт.</span><span>'+esc(p.weight||'280 г')+'</span></div><button class="card-composition" type="button" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав</button><div class="card-bottom card-purchase"><strong class="card-price">'+money(p.price)+'</strong>'+controls+'</div></div></article>';
+ const id=esc(p.id),isSet=!!p.set,limit=isSet?p.set.stock:stock(p),available=limit==null||Number(limit)>0;
+ const fav=state.favorites.has(p.id),hit=!isSet&&p.hit_template===true;
+ const desc=productDescription(p),controls=cardControlsMarkup(p);
+ const artPhoto=hit&&p.id==='philadelphia';
+ const image=artPhoto?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4b0c216f-14e7-401e-8a04-a2652e7ad801.webp':photo(p);
+ const heart='<button class="rr-card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-label="Избранное">'+(fav?'♥':'♡')+'</button>';
+ const badge=hit&&!artPhoto?'<span class="rr-card-hit-badge">♛ ХИТ</span>':(!hit&&p.badge?'<span class="rr-card-badge">'+esc(p.badge)+'</span>':'');
+ return '<article class="product-card rr-card '+(hit?'rr-card-is-hit ':'')+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
+  +'<div class="rr-card-photo '+(artPhoto?'rr-card-photo-art':'')+'"><img class="rr-card-image" src="'+image+'" alt="'+esc(p.name)+'" loading="'+(artPhoto?'eager':'lazy')+'" decoding="async">'+badge+heart+'</div>'
+  +'<div class="rr-card-info">'
+  +'<h3 class="rr-card-title"><span>'+esc(p.name)+'</span></h3>'
+  +'<p class="rr-card-description">'+esc(desc)+'</p>'
+  +'<div class="rr-card-meta-row"><div class="rr-card-meta"><span><i aria-hidden="true">◉</i>'+Number(p.pieces||8)+' шт.</span><span><i aria-hidden="true">◇</i>'+esc(p.weight||'280 г')+'</span></div>'
+  +'<button class="rr-card-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">››</b></button></div>'
+  +'<div class="card-bottom card-purchase rr-card-purchase"><strong class="card-price rr-card-price">'+money(p.price)+'</strong>'+controls+'</div>'
+  +'</div></article>';
 }
 function renderHomeContent(){
  const hero=$('#homeHeroPhoto');
@@ -364,15 +354,6 @@ function refreshCartViews(){
   const set=setsById.get(cardId);
   const p=set?{id:cardId,set}:find(cardId);
   if(!p)return;
-  if(cardNode.classList.contains('hit-art-card')){
-   const count=cardNode.querySelector('.hit-art-quantity span');
-   const minus=cardNode.querySelector('.hit-art-quantity [data-card-qty="-1"]');
-   const plus=cardNode.querySelector('.hit-art-quantity [data-card-qty="1"]');
-   if(count)count.textContent=String(qty(p.id));
-   if(minus)minus.disabled=qty(p.id)<=0;
-   const limit=stock(p);if(plus)plus.disabled=limit!==null&&qty(p)>=limit;
-   return;
-  }
   const host=cardNode.querySelector('.card-bottom');
   const current=host?.querySelector('.card-add,.card-quantity');
   if(current)current.outerHTML=cardControlsMarkup(p);
