@@ -188,7 +188,7 @@ function card(p){
  const fav=state.favorites.has(p.id),hit=!isSet&&(p.hit_template===true||/хит/i.test(String(p.badge||'')));
  const desc=productCardDescription(p),controls=cardControlsMarkup(p);
  const artPhoto=hit&&p.id==='philadelphia';
- const image=artPhoto?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/e3f4c8e1-84e9-4f94-9ac5-43616fdae41b.webp':photo(p);
+ const image=artPhoto?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4f0ca39-9e57-4852-a2be-008127afba9f.webp':photo(p);
  const heart='<button class="rr-card-heart '+(artPhoto?'rr-card-heart-art ':'')+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-pressed="'+(fav?'true':'false')+'" aria-label="'+(fav?'Удалить из избранного':'Добавить в избранное')+'">'+(artPhoto?(fav?'♥':''):(fav?'♥':'♡'))+'</button>';
  const cleanBadge=String(p.badge||'').trim();
  const badge=hit&&!artPhoto?'<span class="rr-card-hit-badge">♛ ХИТ</span>':(!hit&&cleanBadge&&!/хит/i.test(cleanBadge)?'<span class="rr-card-badge">'+esc(cleanBadge)+'</span>':'');
