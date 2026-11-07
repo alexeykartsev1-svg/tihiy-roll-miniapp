@@ -521,6 +521,59 @@ def read_products() -> list[dict[str, Any]]:
         except OSError:
             logger.warning("Could not create Asian hot dog shrimp seed marker at %s", shrimp_marker)
 
+    # Owner-requested Asian hot dog with chicken. Update the existing placeholder once;
+    # all catalogue interactions remain native storefront controls.
+    chicken_marker = PRODUCTS_FILE + ".asian-hotdog-chicken-v1"
+    if not os.path.exists(chicken_marker):
+        def _chicken_name_key(value: Any) -> str:
+            return re.sub(r"[^a-zа-яё0-9]", "", str(value or "").lower())
+
+        chicken_existing = next(
+            (
+                item for item in data
+                if str(item.get("id", "")) == "asian_hotdog_chicken"
+                or (
+                    "азиатский" in _chicken_name_key(item.get("name"))
+                    and "куриц" in _chicken_name_key(item.get("name"))
+                    and "хотдог" in _chicken_name_key(item.get("name"))
+                )
+            ),
+            None,
+        )
+        chicken_card = {
+            "id": "asian_hotdog_chicken",
+            "name": "Азиатский Хот-Дог Курица",
+            "price": 490,
+            "cost": 0,
+            "weight": "280 г",
+            "pieces": 1,
+            "cat": "classic",
+            "badge": "",
+            "desc": "Сочная курица, сливочный сыр, свежий огурец, хрустящий панко, соус терияки и спайси.",
+            "card_description": "Сочная курица, сливочный сыр, свежий огурец, хрустящий панко, соус терияки и спайси.",
+            "details": "Курица, свежий огурец, сливочный сыр, хрустящий панко, соус терияки, соус спайси.",
+            "photo": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/77b66bf7-aeed-43e9-9dc8-102499c0f0ef.webp",
+            "gallery": [],
+            "stock": None,
+            "hit_template": False,
+            "active": True,
+            "sort_order": 8,
+        }
+        if chicken_existing is not None:
+            chicken_card["id"] = str(chicken_existing.get("id") or "asian_hotdog_chicken")
+            chicken_existing.update(chicken_card)
+        else:
+            data.append(chicken_card)
+        write_products(data)
+        try:
+            marker_dir = os.path.dirname(chicken_marker)
+            if marker_dir:
+                os.makedirs(marker_dir, exist_ok=True)
+            with open(chicken_marker, "w", encoding="utf-8") as handle:
+                handle.write("seeded\\n")
+        except OSError:
+            logger.warning("Could not create Asian hot dog chicken seed marker at %s", chicken_marker)
+
     return data
 
 def write_products(products: list[dict[str, Any]]) -> None:
