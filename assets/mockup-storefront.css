@@ -2792,7 +2792,7 @@
 }
 .product-card.hit-template .hit-chef{
  left:0!important;bottom:0!important;width:50%!important;max-width:50%!important;height:100%!important;
- background-image:url("./hit-chef-target-pose.webp?v=20261107-chinpose3")!important;
+ background-image:url("./hit-chef-target-pose.webp?v=20261107-hq1")!important;
  background-repeat:no-repeat!important;background-size:contain!important;background-position:left bottom!important;
  -webkit-mask-image:none!important;mask-image:none!important;
  filter:drop-shadow(2px 0 8px rgba(0,0,0,.38))!important;
@@ -2878,4 +2878,96 @@
 @media(max-width:370px){
   .product-card.hit-template .hit-promo-tags{left:42%!important;right:14%!important}
   .product-card.hit-template .hit-promo-tags span{max-width:72px!important}
+}
+
+
+/* HIT reference refinement: clearer chef, typography and non-overlapping meta. */
+.product-card.hit-template .hit-chef{
+ left:0!important;bottom:0!important;width:54%!important;max-width:54%!important;height:100%!important;
+ background-image:url("./hit-chef-target-pose.webp?v=20261107-hq1")!important;
+ background-repeat:no-repeat!important;background-size:contain!important;background-position:left bottom!important;
+ -webkit-mask-image:none!important;mask-image:none!important;
+ filter:drop-shadow(3px 1px 7px rgba(0,0,0,.48))!important;
+}
+.product-card.hit-template .hit-food{object-fit:cover!important;object-position:76% center!important}
+.product-card.hit-template .hit-promo-tags{
+ top:18%!important;left:45%!important;right:12%!important;
+ display:grid!important;justify-items:start!important;gap:7px!important;
+}
+.product-card.hit-template .hit-promo-tags span{
+ display:block!important;width:max-content!important;max-width:95px!important;
+ min-height:24px!important;padding:5px 9px!important;
+ font-size:clamp(8px,2.55vw,11px)!important;font-weight:950!important;
+ line-height:1.12!important;letter-spacing:.05px!important;text-align:center!important;
+ white-space:normal!important;border:0!important;border-radius:2px!important;
+ color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.6)!important;
+ box-shadow:0 3px 8px rgba(0,0,0,.35)!important;
+ clip-path:polygon(2% 8%,9% 0,94% 4%,100% 18%,96% 88%,87% 100%,4% 93%,0 78%)!important;
+}
+.product-card.hit-template .hit-order-tag{
+ background:linear-gradient(100deg,#fa2825,#bd141b)!important;
+ rotate:-7deg!important;translate:0 0!important;
+}
+.product-card.hit-template .hit-fresh-tag{
+ background:linear-gradient(100deg,#32a32c,#145e20)!important;
+ rotate:-4deg!important;translate:7px 0!important;
+}
+.product-card.hit-template .hit-kicker{
+ min-height:32px!important;padding:5px 12px!important;
+ font-size:clamp(11px,3vw,14px)!important;letter-spacing:.4px!important;
+ box-shadow:0 0 9px rgba(255,190,55,.5),inset 0 0 8px rgba(255,206,93,.12)!important;
+}
+.product-card.hit-template .hit-title{
+ position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:8px!important;min-height:38px!important;padding:6px 9px!important;
+ border:1.5px solid #e7a92b!important;border-radius:999px!important;
+ background:linear-gradient(180deg,rgba(33,25,13,.97),rgba(8,9,12,.98))!important;
+ color:#fff!important;font-size:clamp(16px,4.2vw,21px)!important;
+ font-weight:900!important;letter-spacing:.1px!important;
+ box-shadow:0 0 7px rgba(255,190,48,.62),inset 0 0 10px rgba(255,177,42,.11)!important;
+ text-shadow:0 1px 2px rgba(0,0,0,.8)!important;
+}
+.product-card.hit-template .hit-title:before,
+.product-card.hit-template .hit-title:after{
+ content:""!important;display:block!important;flex:0 0 14px!important;
+ width:14px!important;height:10px!important;
+ border:1.5px solid #f3b52c!important;border-radius:100% 0 100% 0!important;
+ box-shadow:0 0 5px rgba(255,188,48,.6)!important;
+}
+.product-card.hit-template .hit-title:before{transform:rotate(-18deg)!important}
+.product-card.hit-template .hit-title:after{transform:rotate(162deg)!important}
+.product-card.hit-template .hit-description{
+ font-size:clamp(10.5px,2.85vw,13px)!important;line-height:1.22!important;padding:7px 8px!important;
+}
+.product-card.hit-template .hit-meta-row{
+ display:grid!important;grid-template-columns:minmax(0,1fr) 40%!important;
+ align-items:stretch!important;gap:5px!important;width:100%!important;min-width:0!important;
+}
+.product-card.hit-template .hit-meta{
+ display:flex!important;align-items:center!important;justify-content:space-around!important;
+ gap:3px!important;min-width:0!important;overflow:hidden!important;white-space:nowrap!important;
+ font-size:clamp(7.5px,2.15vw,10px)!important;padding:5px 4px!important;
+}
+.product-card.hit-template .hit-meta span{
+ display:inline-flex!important;align-items:center!important;gap:2px!important;
+ min-width:0!important;white-space:nowrap!important;flex:0 1 auto!important;
+}
+.product-card.hit-template .hit-meta i{font-size:.95em!important;flex:0 0 auto!important}
+.product-card.hit-template .card-composition.hit-composition{
+ display:flex!important;align-items:center!important;justify-content:center!important;gap:3px!important;
+ width:100%!important;min-width:0!important;padding:5px 4px!important;white-space:nowrap!important;
+ font-size:clamp(8px,2.25vw,11px)!important;
+}
+@media(max-width:600px){
+ .product-card.hit-template .hit-chef{width:54%!important;max-width:54%!important;height:100%!important;background-size:contain!important;background-position:left bottom!important}
+ .product-card.hit-template .hit-promo-tags{top:18%!important;left:45%!important;right:10%!important;gap:7px!important}
+ .product-card.hit-template .hit-promo-tags span{max-width:95px!important;min-height:23px!important;padding:5px 8px!important;font-size:clamp(8px,2.6vw,11px)!important}
+ .product-card.hit-template .hit-title{min-height:36px!important;font-size:clamp(15px,4.3vw,20px)!important}
+}
+@media(max-width:370px){
+ .product-card.hit-template .hit-promo-tags{left:43%!important;right:8%!important}
+ .product-card.hit-template .hit-promo-tags span{max-width:84px!important;padding:4px 6px!important}
+ .product-card.hit-template .hit-meta-row{grid-template-columns:minmax(0,1fr) 39%!important;gap:4px!important}
+ .product-card.hit-template .hit-meta{font-size:7px!important;padding:4px 2px!important}
+ .product-card.hit-template .card-composition.hit-composition{font-size:7.5px!important}
 }
