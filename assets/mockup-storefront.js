@@ -189,7 +189,7 @@ function card(p){
  const desc=productCardDescription(p),controls=cardControlsMarkup(p);
  const artPhoto=hit&&p.id==='philadelphia';
  const image=artPhoto?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4b0c216f-14e7-401e-8a04-a2652e7ad801.webp':photo(p);
- const heart='<button class="rr-card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-pressed="'+(fav?'true':'false')+'" aria-label="'+(fav?'Удалить из избранного':'Добавить в избранное')+'">'+(fav?'♥':'♡')+'</button>';
+ const heart='<button class="rr-card-heart '+(artPhoto?'rr-card-heart-art ':'')+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-pressed="'+(fav?'true':'false')+'" aria-label="'+(fav?'Удалить из избранного':'Добавить в избранное')+'">'+(fav?'♥':'♡')+'</button>';
  const cleanBadge=String(p.badge||'').trim();
  const badge=hit&&!artPhoto?'<span class="rr-card-hit-badge">♛ ХИТ</span>':(!hit&&cleanBadge&&!/хит/i.test(cleanBadge)?'<span class="rr-card-badge">'+esc(cleanBadge)+'</span>':'');
  return '<article class="product-card rr-card '+(hit?'rr-card-is-hit ':'')+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
@@ -305,7 +305,7 @@ function syncFavoriteButtons(id){
   button.classList.toggle('active',active);
   button.setAttribute('aria-pressed',active?'true':'false');
   button.setAttribute('aria-label',active?'Удалить из избранного':'Добавить в избранное');
-  if(!button.classList.contains('rr-card-heart-art'))button.textContent=active?'♥':'♡';
+  button.textContent=active?'♥':'♡';
  });
 }
 function renderFavorites(){
