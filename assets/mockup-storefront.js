@@ -47,6 +47,10 @@ function compositionValue(value){
  if(value&&typeof value==='object')return value.name||value.title||value.ingredient||value.label||'';
  return String(value||'').trim();
 }
+function productCardDescription(p){
+ if(Object.prototype.hasOwnProperty.call(p||{},'card_description'))return compositionValue(p.card_description);
+ return compositionValue(p?.desc)||compositionValue(p?.description)||productDescription(p);
+}
 function productDescription(p){
  const details=compositionValue(p?.details)||compositionValue(p?.composition)||compositionValue(p?.ingredients);
  const desc=compositionValue(p?.short_description)||compositionValue(p?.shortDescription)||compositionValue(p?.short_desc)||compositionValue(p?.desc)||compositionValue(p?.description);
@@ -164,7 +168,7 @@ function allRows(){
   state.filter==='dogs'?state.products.filter(p=>productCategory(p)==='dogs'):
   state.filter==='snacks'?state.products.filter(p=>productCategory(p)==='snacks'):
   [...sets,...state.products];
- if(state.search)a=a.filter(p=>(p.name+' '+(p.desc||'')).toLowerCase().includes(state.search));
+ if(state.search)a=a.filter(p=>(p.name+' '+(p.card_description||'')+' '+(p.desc||'')).toLowerCase().includes(state.search));
  if(state.sort==='price-asc')a.sort((x,y)=>x.price-y.price);
  if(state.sort==='price-desc')a.sort((x,y)=>y.price-x.price);
  if(state.sort==='name')a.sort((x,y)=>x.name.localeCompare(y.name,'ru'));
@@ -182,7 +186,7 @@ function cardControlsMarkup(p){
 function card(p){
  const id=esc(p.id),isSet=!!p.set,limit=isSet?p.set.stock:stock(p),available=limit==null||Number(limit)>0;
  const fav=state.favorites.has(p.id),hit=!isSet&&p.hit_template===true;
- const desc=productDescription(p),controls=cardControlsMarkup(p);
+ const desc=productCardDescription(p),controls=cardControlsMarkup(p);
  const artPhoto=hit&&p.id==='philadelphia';
  const image=artPhoto?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4b0c216f-14e7-401e-8a04-a2652e7ad801.webp':photo(p);
  const heart='<button class="rr-card-heart '+(artPhoto?'rr-card-heart-art ':'')+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-pressed="'+(fav?'true':'false')+'" aria-label="'+(fav?'Удалить из избранного':'Добавить в избранное')+'">'+(artPhoto?'':(fav?'♥':'♡'))+'</button>';
