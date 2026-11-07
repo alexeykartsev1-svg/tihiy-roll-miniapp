@@ -3461,3 +3461,76 @@
   padding:.7cqw 2cqw!important;
  }
 }
+
+
+/* 2026-11-07: taller product cards, protected price row and working HIT heart. */
+.rr-card.product-card{
+ aspect-ratio:994 / 1720!important;
+ grid-template-rows:minmax(0,51fr) minmax(0,49fr)!important;
+ height:auto!important;
+ min-height:0!important;
+}
+.rr-card .rr-card-info{
+ grid-template-rows:minmax(0,.85fr) minmax(0,2fr) minmax(0,.95fr) minmax(0,1.35fr)!important;
+ gap:clamp(3px,1cqw,6px)!important;
+ padding:clamp(6px,2cqw,11px) clamp(7px,2.8cqw,13px) clamp(8px,2.8cqw,13px)!important;
+ overflow:hidden!important;
+}
+.rr-card .rr-card-title{
+ min-width:0!important;
+}
+.rr-card .rr-card-description{
+ -webkit-line-clamp:5!important;
+ font-size:clamp(9px,3.65cqw,14.5px)!important;
+ line-height:1.13!important;
+ min-width:0!important;
+ padding:1cqw 2.4cqw!important;
+}
+.rr-card .rr-card-meta-row{
+ min-height:0!important;
+}
+.rr-card .rr-card-meta,
+.rr-card .rr-card-composition{
+ min-height:0!important;
+}
+.rr-card .rr-card-purchase{
+ grid-template-columns:minmax(0,1fr) 20cqw!important;
+ min-width:0!important;
+ min-height:0!important;
+ padding:1.2cqw 2.2cqw 1.2cqw 3.2cqw!important;
+ overflow:visible!important;
+}
+.rr-card .rr-card-price{
+ font-size:clamp(13px,8.4cqw,26px)!important;
+ letter-spacing:-.08cqw!important;
+ overflow:visible!important;
+ text-overflow:clip!important;
+}
+.rr-card .rr-card-add,
+.rr-card .rr-card-stepper{
+ width:100%!important;
+ min-width:0!important;
+ max-width:none!important;
+ height:82%!important;
+ min-height:0!important;
+}
+.rr-card .rr-card-heart-art{
+ top:4.2%!important;
+ right:3.4%!important;
+ width:15%!important;
+ height:10%!important;
+ opacity:.001!important;
+ pointer-events:auto!important;
+ cursor:pointer!important;
+}
+.rr-card .rr-card-heart-art.active{
+ display:grid!important;
+ place-items:center!important;
+ opacity:1!important;
+ border:1px solid rgba(255,255,255,.48)!important;
+ border-radius:50%!important;
+ background:rgba(0,0,0,.68)!important;
+ color:#ff514b!important;
+ font-size:clamp(19px,9cqw,34px)!important;
+ box-shadow:0 0 8px rgba(255,65,65,.36)!important;
+}
