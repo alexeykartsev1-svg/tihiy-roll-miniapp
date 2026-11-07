@@ -415,6 +415,59 @@ def read_products() -> list[dict[str, Any]]:
     if migrated_card_descriptions:
         write_products(data)
 
+    # Owner-requested Asian hot dog with salmon. Its photo is artwork only;
+    # all catalogue controls continue to be rendered by the normal product card.
+    salmon_marker = PRODUCTS_FILE + ".asian-hotdog-salmon-v1"
+    if not os.path.exists(salmon_marker):
+        def _salmon_name_key(value: Any) -> str:
+            return re.sub(r"[^a-zа-яё0-9]", "", str(value or "").lower())
+
+        salmon_existing = next(
+            (
+                item for item in data
+                if str(item.get("id", "")) == "asian_hotdog_salmon"
+                or (
+                    "азиатский" in _salmon_name_key(item.get("name"))
+                    and "лосос" in _salmon_name_key(item.get("name"))
+                    and "хотдог" in _salmon_name_key(item.get("name"))
+                )
+            ),
+            None,
+        )
+        salmon_card = {
+            "id": "asian_hotdog_salmon",
+            "name": "Азиатский Хот-Дог Лосось",
+            "price": 490,
+            "cost": 0,
+            "weight": "280 г",
+            "pieces": 1,
+            "cat": "classic",
+            "badge": "",
+            "desc": "Сочный лосось, свежий огурец, сливочный сыр, хрустящий панко, соус терияки и спайси.",
+            "card_description": "Сочный лосось, свежий огурец, сливочный сыр, хрустящий панко, соус терияки и спайси.",
+            "details": "Лосось, свежий огурец, сливочный сыр, хрустящий панко, соус терияки, соус спайси.",
+            "photo": "./assets/asian-hotdog-salmon-card.webp?v=20261107",
+            "gallery": [],
+            "stock": None,
+            "hit_template": False,
+            "active": True,
+            "sort_order": 6,
+        }
+        if salmon_existing is not None:
+            salmon_card["id"] = str(salmon_existing.get("id") or "asian_hotdog_salmon")
+            salmon_existing.update(salmon_card)
+        else:
+            data.append(salmon_card)
+        write_products(data)
+        try:
+            marker_dir = os.path.dirname(salmon_marker)
+            if marker_dir:
+                os.makedirs(marker_dir, exist_ok=True)
+            with open(salmon_marker, "w", encoding="utf-8") as handle:
+                handle.write("seeded\\n")
+        except OSError:
+            logger.warning("Could not create Asian hot dog salmon seed marker at %s", salmon_marker)
+
     return data
 
 def write_products(products: list[dict[str, Any]]) -> None:
