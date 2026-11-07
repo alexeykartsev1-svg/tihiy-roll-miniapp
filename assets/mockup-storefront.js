@@ -49,7 +49,7 @@ function compositionValue(value){
 }
 function productDescription(p){
  const details=compositionValue(p?.details)||compositionValue(p?.composition)||compositionValue(p?.ingredients);
- const desc=compositionValue(p?.desc)||compositionValue(p?.description);
+ const desc=compositionValue(p?.short_description)||compositionValue(p?.shortDescription)||compositionValue(p?.short_desc)||compositionValue(p?.desc)||compositionValue(p?.description);
  if(desc&&/временная карточка-образец/i.test(desc)&&details)return details;
  if(desc)return desc;
  if(details)return details;
@@ -170,21 +170,30 @@ function allRows(){
  if(state.sort==='name')a.sort((x,y)=>x.name.localeCompare(y.name,'ru'));
  return a;
 }
+function cardControlsMarkup(p,alwaysStepper=false){
+ const id=esc(p.id),isSet=!!p.set,limit=isSet?p.set.stock:stock(p),available=limit==null||Number(limit)>0;
+ const selected=isSet?Number(state.setCounts[p.set.id]||0):qty(p.id);
+ if(alwaysStepper||selected>0){
+  return '<div class="card-quantity '+(alwaysStepper?'hit-art-quantity':'')+'" aria-label="Количество в корзине"><button type="button" data-card-qty="-1" data-id="'+id+'" '+(selected<=0?'disabled':'')+' aria-label="Уменьшить количество">−</button><span>'+selected+'</span><button type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Увеличить количество">+</button></div>';
+ }
+ return '<button class="card-add" type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Добавить в корзину">+</button>';
+}
 function card(p){
  const id=esc(p.id),isSet=!!p.set,limit=isSet?p.set.stock:stock(p),available=limit==null||Number(limit)>0,fav=state.favorites.has(p.id);
- const selected=isSet?Number(state.setCounts[p.set.id]||0):qty(p.id);
- const controls=selected>0
-  ?'<div class="card-quantity" aria-label="Количество в корзине"><button type="button" data-card-qty="-1" data-id="'+id+'" aria-label="Уменьшить количество">−</button><span>'+selected+'</span><button type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Увеличить количество">+</button></div>'
-  :'<button class="card-add" type="button" data-card-qty="1" data-id="'+id+'" '+(!available?'disabled':'')+' aria-label="Добавить в корзину">+</button>';
+ const controls=cardControlsMarkup(p);
  const desc=productDescription(p),hit=!isSet&&p.hit_template===true;
  const heart='<button class="card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-label="Избранное">'+(fav?'♥':'♡')+'</button>';
  if(hit && p.id==='philadelphia'){
   const artHeart=heart.replace('class="card-heart ','class="card-heart hit-art-heart ');
+  const artControls=cardControlsMarkup(p,true);
   return '<article class="product-card hit-template hit-art-card '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
    +'<div class="hit-art-frame"><img class="hit-art-image" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4b0c216f-14e7-401e-8a04-a2652e7ad801.webp" alt="'+esc(p.name)+'" loading="eager" decoding="async">'
    +artHeart
-   +'<button class="card-composition hit-composition hit-art-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"></button>'
-   +'<div class="hit-art-purchase">'+controls+'</div></div></article>';
+   +'<h3 class="hit-art-live-title">'+esc(p.name)+'</h3>'
+   +'<p class="hit-art-live-description">'+esc(desc)+'</p>'
+   +'<div class="hit-art-live-meta"><span><i aria-hidden="true">◉</i>'+Number(p.pieces||8)+' шт.</span><span><i aria-hidden="true">◇</i>'+esc(p.weight||'280 г')+'</span></div>'
+   +'<button class="card-composition hit-composition hit-art-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">››</b></button>'
+   +'<div class="hit-art-purchase"><strong class="card-price hit-art-live-price">'+money(p.price)+'</strong>'+artControls+'</div></div></article>';
  }
  if(hit){
   return '<article class="product-card hit-template '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
@@ -316,13 +325,13 @@ function showGalleryPhoto(index){
 }
 function detail(p,openOnMobile=true){
  if(!p)return;
- state.selected=p;state.detailQty=1;
+ state.selected=p;state.detailQty=0;
  const ownGallery=Array.isArray(p.gallery)?p.gallery.filter(Boolean):[];const legacyGallery=state.products.filter(item=>item.id!==p.id).map(photo);state.photos=p.set?setGallery(p.set):Array.from(new Set([photo(p),...(ownGallery.length?ownGallery:legacyGallery)])).filter(Boolean).slice(0,5);
  state.photos=Array.from(new Set(state.photos)).slice(0,5);state.photoIndex=0;
  $('#detailHero').src=state.photos[0]||photo(p);$('#detailHero').alt=p.name;
- $('#detailName').textContent=p.name;$('#detailDescription').textContent=p.desc||'Свежеприготовленное блюдо.';
+ $('#detailName').textContent=p.name;$('#detailDescription').textContent=productDescription(p);
  $('#detailPieces').textContent=(p.pieces||8)+' шт.';$('#detailWeight').textContent=p.weight||'280 г';
- $('#detailPrice').textContent=money(p.price);$('#detailQty').textContent='1';
+ $('#detailPrice').textContent=money(p.price);$('#detailQty').textContent='0';
  const detailExtra=$('#detailExtra');if(detailExtra){detailExtra.textContent='';detailExtra.hidden=true;}
  $('#detailFavorite').textContent=state.favorites.has(p.id)?'♥':'♡';
  $('#detailCompositionTitle').textContent=p.set?'Состав сета':'Состав';
@@ -348,11 +357,66 @@ function openSetFromHome(id){
  const set=state.sets.find(row=>row.id===id&&row.active!==false);
  if(set)setDetail(set);else toast('Этот сет пока не добавлен в каталог.');
 }
-function addProduct(p,n){if(!p)return;const next=qty(p.id)+(n||1),limit=stock(p);if(limit!==null&&next>limit){toast(limit===0?'Нет в наличии':'Осталось '+Math.max(0,limit-qty(p.id))+' шт.');return;}state.cart[p.id]=next;state.setCounts={};save();renderAll();toast(productKind(p)+' добавлен в корзину');}
-function addSet(s,n){if(!s)return;const amount=n||1,old=Number(state.setCounts[s.id]||0);if(s.stock!=null&&old+amount>Number(s.stock)){toast('Сет закончился.');return;}for(const item of s.items||[]){const p=find(item.id),limit=stock(p);if(!p||(limit!==null&&qty(p.id)+Number(item.qty)*amount>limit)){toast('Недостаточно ингредиентов для этого сета.');return;}}for(const item of s.items||[])state.cart[item.id]=qty(item.id)+Number(item.qty)*amount;state.setCounts[s.id]=old+amount;save();renderAll();toast('Сет добавлен в корзину');}
-function addSelected(){if(!state.selected)return;if(state.selected.set)addSet(state.selected.set,state.detailQty);else addProduct(state.selected,state.detailQty);}
-function changeDetail(d){const p=state.selected;let max=99;if(p){if(p.set&&p.set.stock!=null)max=Math.max(0,Number(p.set.stock)||0);else if(!p.set&&stock(p)!==null)max=stock(p);}if(max===0){state.detailQty=0;}else{state.detailQty=Math.min(max,Math.max(1,state.detailQty+d));}$('#detailQty').textContent=state.detailQty;$('#detailAdd').disabled=max===0||state.detailQty===0;}
-function changeCart(id,d){const p=find(id),previous=qty(id),n=previous+d;if(!p)return;if(n<=0)delete state.cart[id];else if(stock(p)!==null&&n>stock(p)){toast('Больше нет в наличии.');return;}else state.cart[id]=n;state.setCounts={};save();renderAll();toast(d>0?productKind(p)+' добавлен в корзину':productKind(p)+' убран из корзины');}
+function refreshCartViews(){
+ const setsById=new Map(state.sets.map(row=>['set:'+row.id,row]));
+ $('[data-card]').forEach(cardNode=>{
+  const cardId=cardNode.dataset.card;
+  const set=setsById.get(cardId);
+  const p=set?{id:cardId,set}:find(cardId);
+  if(!p)return;
+  if(cardNode.classList.contains('hit-art-card')){
+   const count=cardNode.querySelector('.hit-art-quantity span');
+   const minus=cardNode.querySelector('.hit-art-quantity [data-card-qty="-1"]');
+   const plus=cardNode.querySelector('.hit-art-quantity [data-card-qty="1"]');
+   if(count)count.textContent=String(qty(p.id));
+   if(minus)minus.disabled=qty(p.id)<=0;
+   if(plus)plus.disabled=stock(p)===0;
+   return;
+  }
+  const host=cardNode.querySelector('.card-bottom');
+  const current=host?.querySelector('.card-add,.card-quantity');
+  if(current)current.outerHTML=cardControlsMarkup(p);
+ });
+ renderBadges();
+ renderCart();
+}
+function addProduct(p,n){
+ if(!p)return false;
+ const next=qty(p.id)+(n||1),limit=stock(p);
+ if(limit!==null&&next>limit){toast(limit===0?'Нет в наличии':'Осталось '+Math.max(0,limit-qty(p.id))+' шт.');return false;}
+ state.cart[p.id]=next;state.setCounts={};save();refreshCartViews();toast(productKind(p)+' добавлен в корзину');return true;
+}
+function addSet(s,n){
+ if(!s)return false;
+ const amount=n||1,old=Number(state.setCounts[s.id]||0);
+ if(s.stock!=null&&old+amount>Number(s.stock)){toast('Сет закончился.');return false;}
+ for(const item of s.items||[]){const p=find(item.id),limit=stock(p);if(!p||(limit!==null&&qty(p.id)+Number(item.qty)*amount>limit)){toast('Недостаточно ингредиентов для этого сета.');return false;}}
+ for(const item of s.items||[])state.cart[item.id]=qty(item.id)+Number(item.qty)*amount;
+ state.setCounts[s.id]=old+amount;save();refreshCartViews();toast('Сет добавлен в корзину');return true;
+}
+function addSelected(){
+ if(!state.selected)return;
+ if(Number(state.detailQty)<1){toast('Добавьте товар');return;}
+ const added=state.selected.set?addSet(state.selected.set,state.detailQty):addProduct(state.selected,state.detailQty);
+ if(added){state.detailQty=0;$('#detailQty').textContent='0';}
+}
+function changeDetail(d){
+ const p=state.selected;let max=99;
+ if(p){if(p.set&&p.set.stock!=null)max=Math.max(0,Number(p.set.stock)||0);else if(!p.set&&stock(p)!==null)max=stock(p);}
+ state.detailQty=Math.max(0,Math.min(max,Number(state.detailQty||0)+(Number(d)||0)));
+ $('#detailQty').textContent=String(state.detailQty);
+ $('#detailAdd').disabled=max===0;
+}
+function changeCart(id,d){
+ const p=find(id);if(!p)return;
+ const previous=qty(id),n=Math.max(0,previous+(Number(d)||0));
+ if(n===previous)return;
+ if(n===0)delete state.cart[id];
+ else if(stock(p)!==null&&n>stock(p)){toast('Больше нет в наличии.');return;}
+ else state.cart[id]=n;
+ state.setCounts={};save();refreshCartViews();
+ toast((Number(d)>0?productKind(p)+' добавлен в корзину':productKind(p)+' убран из корзины'));
+}
 function changeSetCart(id,delta){
  const s=state.sets.find(row=>row.id===id);if(!s)return;
  const current=Number(state.setCounts[id]||0);
@@ -363,7 +427,7 @@ function changeSetCart(id,delta){
   if(next)state.cart[productId]=next;else delete state.cart[productId];
  }
  const remaining=current-remove;if(remaining)state.setCounts[id]=remaining;else delete state.setCounts[id];
- save();renderAll();toast('Сет убран из корзины');
+ save();refreshCartViews();toast('Сет убран из корзины');
 }
 const DAYS=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
 function storeNow(){
