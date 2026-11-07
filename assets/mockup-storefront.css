@@ -2736,3 +2736,20 @@
     left:43%!important;right:29px!important;top:37px!important;
   }
 }
+
+
+/* Fit the complete transparent mascot inside its column without clipping. */
+.product-card.hit-template .hit-chef{
+  left:0!important;bottom:0!important;width:66%!important;max-width:66%!important;
+  height:100%!important;
+  background-image:url("./hit-chef-template.webp")!important;
+  background-repeat:no-repeat!important;background-size:contain!important;
+  background-position:left bottom!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+}
+@media(max-width:600px){
+  .product-card.hit-template .hit-chef{
+    width:66%!important;max-width:66%!important;height:100%!important;
+    background-size:contain!important;background-position:left bottom!important;
+  }
+}
