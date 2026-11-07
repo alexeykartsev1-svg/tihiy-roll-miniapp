@@ -2911,3 +2911,160 @@
  .product-card.hit-template:not(.hit-art-card) .card-purchase .card-quantity button{font-size:21px!important;}
  .product-card.hit-template:not(.hit-art-card) .card-purchase .card-quantity span{font-size:14px!important;}
 }
+
+
+/* Unified premium card layout (all menu categories, popular and favourites). */
+.rr-card.product-card{
+ display:flex!important;flex-direction:column!important;align-self:stretch!important;
+ width:100%!important;min-width:0!important;max-width:100%!important;height:100%!important;
+ overflow:hidden!important;border:1.5px solid rgba(237,183,69,.82)!important;border-radius:18px!important;
+ background:linear-gradient(165deg,#17130d 0%,#090b0e 42%,#04080c 100%)!important;
+ box-shadow:0 0 12px rgba(255,183,54,.17),inset 0 0 0 1px rgba(255,255,255,.035)!important;
+ opacity:1!important;
+}
+.rr-card.product-card.is-unavailable{opacity:.62!important;}
+.rr-card .rr-card-photo{
+ position:relative!important;display:block!important;flex:0 0 auto!important;width:100%!important;
+ height:auto!important;aspect-ratio:1.12/1!important;overflow:hidden!important;background:#090c10!important;
+}
+.rr-card .rr-card-image{
+ position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;
+ object-fit:cover!important;object-position:center!important;
+}
+.rr-card .rr-card-photo-art .rr-card-image{object-fit:cover!important;object-position:center top!important;}
+.rr-card .rr-card-heart{
+ position:absolute!important;z-index:8!important;top:8px!important;right:8px!important;
+ display:grid!important;place-items:center!important;width:36px!important;height:36px!important;
+ margin:0!important;padding:0!important;border:1px solid rgba(255,255,255,.35)!important;border-radius:50%!important;
+ background:rgba(0,0,0,.48)!important;color:#fff!important;font-size:24px!important;line-height:1!important;
+ opacity:1!important;pointer-events:auto!important;
+}
+.rr-card .rr-card-heart.active{color:#ff514b!important;background:rgba(0,0,0,.7)!important;}
+.rr-card .rr-card-hit-badge,.rr-card .rr-card-badge{
+ position:absolute!important;z-index:5!important;top:9px!important;left:9px!important;
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ min-height:34px!important;padding:5px 13px!important;border:1.5px solid #ffd45c!important;border-radius:999px!important;
+ background:linear-gradient(145deg,#251807,#08090b)!important;color:#ffd34e!important;
+ font-size:15px!important;font-weight:950!important;line-height:1!important;
+ box-shadow:0 0 11px rgba(255,195,46,.6),inset 0 0 9px rgba(255,205,76,.13)!important;
+}
+.rr-card .rr-card-badge{border-color:rgba(242,196,104,.7)!important;color:#ffe8ad!important;font-size:12px!important;}
+.rr-card .rr-card-info{
+ display:flex!important;flex:1 1 auto!important;flex-direction:column!important;align-items:stretch!important;
+ gap:8px!important;min-width:0!important;height:auto!important;padding:10px 9px 10px!important;
+ background:linear-gradient(160deg,#12100c 0%,#080b10 44%,#05090d 100%)!important;
+}
+.rr-card .rr-card-title{
+ position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:5px!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;min-height:39px!important;
+ margin:0!important;padding:5px 23px!important;overflow:hidden!important;
+ border:1.5px solid #efba3d!important;border-radius:999px!important;
+ background:linear-gradient(180deg,#1d160b 0%,#07090c 78%,#151006 100%)!important;color:#fff!important;
+ font-size:clamp(14px,4.1vw,21px)!important;font-weight:950!important;line-height:1.08!important;text-align:center!important;
+ text-shadow:0 1px 3px rgba(0,0,0,.85)!important;white-space:normal!important;
+ box-shadow:0 0 9px rgba(255,185,44,.43),inset 0 0 9px rgba(255,190,66,.09)!important;
+}
+.rr-card .rr-card-title:before,.rr-card .rr-card-title:after{
+ position:absolute!important;top:50%!important;transform:translateY(-50%)!important;
+ color:#f5c13f!important;font-size:1.05em!important;line-height:1!important;text-shadow:0 0 7px rgba(255,194,48,.72)!important;
+}
+.rr-card .rr-card-title:before{content:"❧"!important;left:7px!important;transform:translateY(-50%) rotate(-22deg)!important;}
+.rr-card .rr-card-title:after{content:"❧"!important;right:7px!important;transform:translateY(-50%) rotate(158deg)!important;}
+.rr-card .rr-card-title span{
+ display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;
+ min-width:0!important;overflow:hidden!important;overflow-wrap:anywhere!important;
+}
+.rr-card .rr-card-description{
+ display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:3!important;
+ box-sizing:border-box!important;width:100%!important;min-height:56px!important;max-height:5.3em!important;
+ margin:0!important;padding:7px 8px!important;overflow:hidden!important;
+ border:1.5px solid #e6b545!important;border-radius:13px!important;
+ background:linear-gradient(145deg,#101114 0%,#07090c 100%)!important;color:#f6f5f2!important;
+ font-size:clamp(11px,3.15vw,15px)!important;font-weight:600!important;line-height:1.27!important;text-align:center!important;
+ box-shadow:0 0 7px rgba(245,187,57,.25),inset 0 0 10px rgba(255,190,46,.055)!important;
+}
+.rr-card .rr-card-meta-row{
+ display:grid!important;grid-template-columns:minmax(0,1fr) minmax(76px,42%)!important;
+ align-items:stretch!important;gap:5px!important;width:100%!important;min-width:0!important;margin:0!important;
+}
+.rr-card .rr-card-meta{
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:space-evenly!important;
+ gap:4px!important;min-width:0!important;min-height:42px!important;padding:4px 5px!important;
+ border:1.5px solid #e6b545!important;border-radius:13px!important;
+ background:linear-gradient(155deg,#1b160c,#07090c)!important;color:#fff0c5!important;
+ font-size:clamp(9px,2.55vw,13px)!important;font-weight:900!important;line-height:1!important;
+ box-shadow:0 0 7px rgba(245,187,57,.2)!important;
+}
+.rr-card .rr-card-meta span{display:inline-flex!important;align-items:center!important;gap:3px!important;white-space:nowrap!important;}
+.rr-card .rr-card-meta i{color:#ffd14c!important;font-size:1.18em!important;font-style:normal!important;}
+.rr-card .rr-card-composition{
+ display:flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;
+ box-sizing:border-box!important;width:100%!important;min-width:0!important;min-height:42px!important;height:auto!important;
+ margin:0!important;padding:4px 5px!important;border:1.5px solid #ffc94b!important;border-radius:999px!important;
+ background:linear-gradient(180deg,#332009 0%,#0d0a07 70%,#211303 100%)!important;
+ color:#ffdf80!important;font-size:clamp(10px,2.8vw,14px)!important;font-weight:950!important;line-height:1!important;
+ white-space:nowrap!important;box-shadow:0 0 10px rgba(255,178,37,.62),inset 0 1px 4px rgba(255,255,255,.14)!important;
+ opacity:1!important;pointer-events:auto!important;cursor:pointer!important;
+}
+.rr-card .rr-card-composition span,.rr-card .rr-card-composition b{
+ display:inline!important;margin:0!important;color:#ffd13f!important;font-size:1.15em!important;line-height:1!important;
+}
+.rr-card .rr-card-purchase{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;
+ box-sizing:border-box!important;width:100%!important;min-width:0!important;min-height:68px!important;
+ margin:auto 0 0!important;padding:7px 8px 7px 11px!important;border:1.5px solid #777071!important;border-radius:16px!important;
+ background:linear-gradient(115deg,#1c1d21 0%,#080a0d 72%,#171014 100%)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 8px rgba(255,57,48,.1)!important;
+}
+.rr-card .rr-card-price{
+ display:block!important;flex:1 1 auto!important;min-width:0!important;margin:0!important;
+ color:#fff!important;font-size:clamp(20px,5.8vw,31px)!important;font-weight:950!important;
+ line-height:1!important;letter-spacing:-.5px!important;white-space:nowrap!important;
+}
+.rr-card .rr-card-add,.rr-card .rr-card-stepper{
+ box-sizing:border-box!important;flex:0 0 44%!important;width:44%!important;min-width:68px!important;max-width:116px!important;
+ height:52px!important;min-height:52px!important;margin:0!important;padding:0!important;
+ border:1px solid rgba(255,255,255,.16)!important;border-radius:13px!important;overflow:hidden!important;
+ background:#080b10!important;box-shadow:none!important;
+}
+.rr-card .rr-card-add{
+ display:grid!important;place-items:center!important;border:0!important;
+ background:linear-gradient(145deg,#ff5b50 0%,#f3292c 74%,#d91d25 100%)!important;
+ color:#fff!important;font-size:38px!important;font-weight:700!important;line-height:1!important;
+ box-shadow:0 4px 11px rgba(245,35,35,.25)!important;cursor:pointer!important;
+}
+.rr-card .rr-card-add:disabled{opacity:.38!important;cursor:not-allowed!important;}
+.rr-card .rr-card-stepper{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:stretch!important;
+}
+.rr-card .rr-card-stepper button{
+ display:grid!important;place-items:center!important;width:100%!important;height:100%!important;min-width:0!important;
+ margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+ background:linear-gradient(145deg,#ff5b50,#e5242b)!important;color:#fff!important;
+ font-size:clamp(20px,5.6vw,27px)!important;font-weight:950!important;line-height:1!important;cursor:pointer!important;
+}
+.rr-card .rr-card-stepper button:disabled{opacity:.38!important;cursor:not-allowed!important;}
+.rr-card .rr-card-stepper span{
+ display:grid!important;place-items:center!important;min-width:0!important;height:100%!important;
+ background:#080b10!important;color:#fff!important;font-size:17px!important;font-weight:950!important;
+}
+.rr-card .rr-card-add:active,.rr-card .rr-card-stepper button:active,.rr-card .rr-card-composition:active{
+ filter:brightness(1.15)!important;transform:scale(.97)!important;
+}
+@media(max-width:390px){
+ .rr-card .rr-card-info{gap:7px!important;padding:8px 7px 8px!important;}
+ .rr-card .rr-card-title{min-height:34px!important;padding:4px 18px!important;font-size:clamp(12px,3.8vw,17px)!important;}
+ .rr-card .rr-card-title:before{left:5px!important}.rr-card .rr-card-title:after{right:5px!important}
+ .rr-card .rr-card-description{min-height:50px!important;padding:6px 6px!important;font-size:clamp(10px,2.8vw,12px)!important;}
+ .rr-card .rr-card-meta-row{grid-template-columns:minmax(0,1fr) minmax(70px,42%)!important;gap:4px!important;}
+ .rr-card .rr-card-meta{min-height:38px!important;gap:2px!important;padding:3px 3px!important;font-size:clamp(8px,2.25vw,10px)!important;}
+ .rr-card .rr-card-composition{min-height:38px!important;padding:3px!important;font-size:clamp(9px,2.5vw,11px)!important;}
+ .rr-card .rr-card-purchase{min-height:58px!important;padding:5px 6px 5px 8px!important;gap:5px!important;}
+ .rr-card .rr-card-price{font-size:clamp(17px,5vw,21px)!important;}
+ .rr-card .rr-card-add,.rr-card .rr-card-stepper{height:44px!important;min-height:44px!important;min-width:58px!important;}
+ .rr-card .rr-card-add{font-size:31px!important;}
+ .rr-card .rr-card-stepper button{font-size:21px!important;}
+ .rr-card .rr-card-stepper span{font-size:14px!important;}
+ .rr-card .rr-card-heart{width:30px!important;height:30px!important;font-size:21px!important;top:6px!important;right:6px!important;}
+ .rr-card .rr-card-hit-badge,.rr-card .rr-card-badge{top:6px!important;left:6px!important;min-height:26px!important;padding:4px 9px!important;font-size:11px!important;}
+}
