@@ -84,17 +84,20 @@
 
       <section class="workflow-screen home-screen active" id="homeScreen" aria-label="Главная">
         <div class="workflow-scroll home-scroll">
-          <div class="workflow-topbar home-topbar">
-            <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-  <circle cx="32" cy="32" r="28" fill="#091218" stroke="#ef3936" stroke-width="3"/>
-  <path d="M16 30h32l-3.6 13.1c-6.6 5.5-18.2 5.5-24.8 0L16 30Z" fill="#101d23" stroke="#f4eee8" stroke-width="2.4" stroke-linejoin="round"/>
-  <path d="M19 30c3.5 2.7 8 4.1 13 4.1S41.5 32.7 45 30" fill="none" stroke="#ff6a55" stroke-width="2" stroke-linecap="round"/>
-  <path d="M22 25c4.5-2.3 15.5-2.3 20 0" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
-  <path d="M26 22c-2.4-3.3-2-5.8.5-8M33 20c-1.2-3.1-.6-5.2 1.7-7" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
-  <path d="M39 5 49 24M45 4 54 21" fill="none" stroke="#ff5548" stroke-width="3.1" stroke-linecap="round"/>
-  <path d="M12 24c1.3-4.6 3.9-7.1 7.8-8.1-.4 4.5-2.7 7.3-7.8 8.1Z" fill="#ef3936"/>
-</svg></a>
-            <button class="round-icon menu-trigger home-menu-trigger" type="button" aria-label="Открыть меню">☰</button>
+          <div class="workflow-topbar home-topbar home-brandbar">
+            <a class="home-brand-lockup" href="#homeScreen" aria-label="Тихий ролл — на главную">
+              <svg class="home-brand-emblem" viewBox="0 0 72 64" aria-hidden="true" focusable="false">
+                <circle cx="37" cy="29" r="25" fill="#e92732"/>
+                <path d="M7 54 27 37 37 42 50 32 68 55Z" fill="#f6f4ef"/>
+                <path d="m19 54 18-20 9 11 8-8 13 17Z" fill="#17212a"/>
+                <path d="M23 28h28M27 23h20M29 23v13m16-13v13M25 28l2-5m22 5-2-5" fill="none" stroke="#101317" stroke-width="3.3" stroke-linecap="round"/>
+                <path d="M4 10q4-5 8 0q-4 5-8 0Zm8 7q4-5 8 0q-4 5-8 0Zm-8 7q4-5 8 0q-4 5-8 0Z" fill="#ff9da6"/>
+                <path d="M3 54q12-9 20-3" fill="none" stroke="#fff" stroke-width="1.8" opacity=".8"/>
+              </svg>
+              <span class="home-brand-name">Тихий Ролл</span>
+            </a>
+            <span class="home-brand-divider" aria-hidden="true"></span>
+            <span class="home-brand-tagline">ДОСТАВКА<br>АЗИАТСКОЙ ЕДЫ</span>
           </div>
           <section class="home-hero">
             <img class="home-hero-photo" id="homeHeroPhoto" src="./assets/set-party.webp" alt="Свежие роллы" loading="eager">
