@@ -4475,3 +4475,33 @@
  color:#fff!important;
  text-shadow:0 1px 5px rgba(0,0,0,.85),0 0 7px rgba(131,255,114,.26)!important;
 }
+
+
+/* v40: use the approved shrimp-panko title plaque in the HIT title slot only.
+   Description, metadata, composition, price, favorite and cart controls stay untouched. */
+.rr-card[data-card="philadelphia"] .rr-card-title{
+ padding:0!important;
+ border:0!important;
+ border-radius:0!important;
+ background:transparent!important;
+ color:transparent!important;
+ text-shadow:none!important;
+ box-shadow:none!important;
+ overflow:hidden!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-title::before,
+.rr-card[data-card="philadelphia"] .rr-card-title::after{
+ content:none!important;
+ display:none!important;
+}
+.rr-card[data-card="philadelphia"] .rr-hit-panko-title-art{
+ display:block!important;
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ object-fit:cover!important;
+ object-position:center!important;
+ border:0!important;
+ border-radius:999px!important;
+}
