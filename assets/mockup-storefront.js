@@ -300,7 +300,7 @@ function favoriteRows(){
 }
 function syncFavoriteButtons(id){
  const active=state.favorites.has(id);
- $('[data-fav]').forEach(button=>{
+ $$('[data-fav]').forEach(button=>{
   if(button.dataset.fav!==id)return;
   button.classList.toggle('active',active);
   button.setAttribute('aria-pressed',active?'true':'false');
