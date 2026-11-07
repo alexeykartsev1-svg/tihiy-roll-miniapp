@@ -3270,3 +3270,15 @@
 .product-card.hit-template .hit-heart{width:11cqw!important;height:11cqw!important}
 .product-card.hit-template .card-heart{width:11cqw!important;height:11cqw!important;font-size:9cqw!important;top:4.5cqw!important;right:4.5cqw!important}
 .product-card.hit-template .hit-kicker{width:29cqw!important;height:9.5cqw!important;font-size:6cqw!important}
+
+
+/* HIT card keeps its reference aspect ratio. Masonry prevents a tall neighbor
+   from leaving a large empty hole beneath this shorter reference card. */
+.catalogue-grid.masonry-layout{
+  grid-auto-rows:1px!important;
+  align-items:start!important;
+  grid-auto-flow:row!important;
+}
+.catalogue-grid.masonry-layout > .product-card{
+  align-self:start!important;
+}

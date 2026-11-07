@@ -245,10 +245,30 @@ function renderHomeContent(){
   popular.innerHTML=[...ordered,...rest].slice(0,4).map(card).join('');
  }
 }
+function layoutCatalogueMasonry(){
+ const grid=$('#catalogueGrid');
+ if(!grid)return;
+ const cards=Array.from(grid.children).filter(node=>node.classList.contains('product-card'));
+ if(!cards.length){
+  grid.classList.remove('masonry-layout');
+  return;
+ }
+ grid.classList.add('masonry-layout');
+ const styles=getComputedStyle(grid);
+ const rowGap=parseFloat(styles.rowGap)||0;
+ const rowSize=1;
+ cards.forEach(node=>{
+  const height=node.getBoundingClientRect().height;
+  const span=Math.max(1,Math.ceil((height+rowGap)/(rowSize+rowGap)));
+  node.style.gridRowEnd='span '+span;
+  node.style.alignSelf='start';
+ });
+}
 function renderCatalog(){
  const rows=allRows();
  $('#catalogueGrid').innerHTML=rows.length?rows.map(card).join(''):'<div class="loading-state">В этой категории пока нет блюд.</div>';
  $('#emptyState').hidden=rows.length>0;
+ layoutCatalogueMasonry();
 }
 function renderBadges(){
  const cart=cartCount(),favorites=state.favorites.size;
@@ -728,6 +748,7 @@ deliveryAddress.addEventListener('input',updateDeliveryMap);
 deliveryAddress.addEventListener('change',updateDeliveryMap);
 $('#checkoutForm').addEventListener('submit',sendOrder);
 $$('.modal-layer').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
+window.addEventListener('resize',()=>layoutCatalogueMasonry());
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){['cartModal','favoritesModal','filtersModal','builderInfoModal'].forEach(closeModal);$('#detailDevice').classList.remove('mobile-active');}});
 // Refresh seasonal banner visibility when the customer returns to an already-open shop.
 async function refreshSeasonalBannerVisibility(){
