@@ -3861,9 +3861,10 @@
 }
 
 
-/* v29: remove the warm yellow backing/glow from cards in Catalogue and Favourites only. */
+/* v30: use the same neutral dark backing for Popular cards on the home screen. */
 #catalogueGrid .rr-card.product-card,
-#favoritesGrid .rr-card.product-card{
+#favoritesGrid .rr-card.product-card,
+#homePopularGrid .rr-card.product-card{
  border:1.2px solid rgba(151,171,184,.28)!important;
  background:#05090d!important;
  box-shadow:0 5px 15px rgba(0,0,0,.24)!important;
