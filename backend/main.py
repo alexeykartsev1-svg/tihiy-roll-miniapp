@@ -363,6 +363,42 @@ def read_products() -> list[dict[str, Any]]:
                 handle.write("seeded\n")
         except OSError:
             logger.warning("Could not create starter category seed marker at %s", seed_marker)
+    # One-time owner-requested restoration of the original Philadelphia HIT card.
+    # Preserve existing product data; only reactivate and re-enable its HIT artwork.
+    hit_restore_marker = PRODUCTS_FILE + ".restore-philadelphia-hit-v1"
+    if not os.path.exists(hit_restore_marker):
+        restored_hit = next((item for item in data if str(item.get("id", "")) == "philadelphia"), None)
+        if restored_hit is None:
+            restored_hit = dict(DEFAULT_PRODUCTS[0])
+            restored_hit["active"] = True
+            restored_hit["hit_template"] = True
+            restored_hit["badge"] = "ХИТ"
+            data.insert(0, restored_hit)
+            write_products(data)
+            logger.info("Restored missing Philadelphia HIT product")
+        else:
+            hit_changed = False
+            if restored_hit.get("active") is not True:
+                restored_hit["active"] = True
+                hit_changed = True
+            if restored_hit.get("hit_template") is not True:
+                restored_hit["hit_template"] = True
+                hit_changed = True
+            if not re.search(r"хит", str(restored_hit.get("badge", "")), re.IGNORECASE):
+                restored_hit["badge"] = "ХИТ"
+                hit_changed = True
+            if hit_changed:
+                write_products(data)
+                logger.info("Restored Philadelphia HIT product visibility and artwork")
+        try:
+            marker_dir = os.path.dirname(hit_restore_marker)
+            if marker_dir:
+                os.makedirs(marker_dir, exist_ok=True)
+            with open(hit_restore_marker, "w", encoding="utf-8") as handle:
+                handle.write("restored\\n")
+        except OSError:
+            logger.warning("Could not create Philadelphia HIT restore marker at %s", hit_restore_marker)
+
     # One-time compatibility migration: copy the former card text into its own field.
     # Existing products keep the same visible catalogue copy until the owner edits it.
     migrated_card_descriptions = False
