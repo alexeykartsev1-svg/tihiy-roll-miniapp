@@ -3534,3 +3534,75 @@
  font-size:clamp(19px,9cqw,34px)!important;
  box-shadow:0 0 8px rgba(255,65,65,.36)!important;
 }
+
+
+/* 2026-11-07 v18: genuinely taller cards with a larger readable information area. */
+.rr-card.product-card{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:minmax(0,48fr) minmax(0,52fr)!important;
+ width:100%!important;
+ height:auto!important;
+ min-height:0!important;
+ aspect-ratio:994 / 1840!important;
+ overflow:hidden!important;
+ align-self:start!important;
+}
+.rr-card.product-card .rr-card-photo{
+ min-height:0!important;
+ height:100%!important;
+ overflow:hidden!important;
+}
+.rr-card.product-card .rr-card-info{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:minmax(0,.85fr) minmax(0,2.15fr) minmax(0,.85fr) minmax(0,1.15fr)!important;
+ gap:clamp(4px,1.1cqw,7px)!important;
+ min-height:0!important;
+ height:100%!important;
+ padding:clamp(7px,2.2cqw,13px) clamp(8px,2.8cqw,14px) clamp(9px,2.8cqw,15px)!important;
+ overflow:hidden!important;
+}
+.rr-card.product-card .rr-card-title,
+.rr-card.product-card .rr-card-description,
+.rr-card.product-card .rr-card-meta-row,
+.rr-card.product-card .rr-card-purchase{
+ min-height:0!important;
+ height:100%!important;
+ max-height:none!important;
+ margin:0!important;
+}
+.rr-card.product-card .rr-card-description{
+ display:-webkit-box!important;
+ -webkit-box-orient:vertical!important;
+ -webkit-line-clamp:5!important;
+ white-space:normal!important;
+ overflow:hidden!important;
+ line-height:1.18!important;
+ font-size:clamp(10px,3.8cqw,15px)!important;
+ padding:1.2cqw 2.6cqw!important;
+}
+.rr-card.product-card .rr-card-meta-row{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,.72fr)!important;
+ gap:1.2cqw!important;
+}
+.rr-card.product-card .rr-card-purchase{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) 20cqw!important;
+ align-items:center!important;
+ overflow:visible!important;
+ padding:1cqw 2.2cqw 1cqw 3cqw!important;
+}
+.rr-card.product-card .rr-card-price{
+ min-width:0!important;
+ max-width:100%!important;
+ white-space:nowrap!important;
+ overflow:visible!important;
+ font-size:clamp(14px,8.8cqw,28px)!important;
+}
+.rr-card.product-card .rr-card-add,
+.rr-card.product-card .rr-card-stepper{
+ height:84%!important;
+ min-height:0!important;
+}
