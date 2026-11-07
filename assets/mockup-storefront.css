@@ -3806,3 +3806,12 @@
  .home-brand-tagline{font-size:7px!important;letter-spacing:.2px!important}
  .home-brand-divider{height:29px!important}
 }
+
+
+/* v26: subtle warm dusk grade across the real mountain, with a dark lower field for legibility */
+.home-screen .home-topbar.home-brandbar::after{
+ background:
+  radial-gradient(ellipse at 54% 0%,rgba(255,122,67,.26) 0%,rgba(245,103,56,.12) 40%,transparent 72%),
+  linear-gradient(180deg,rgba(16,13,15,.04) 0%,rgba(5,7,10,.18) 39%,rgba(2,5,8,.96) 100%),
+  linear-gradient(90deg,rgba(0,0,0,.24) 0%,transparent 20%,transparent 82%,rgba(0,0,0,.32) 100%)!important;
+}
