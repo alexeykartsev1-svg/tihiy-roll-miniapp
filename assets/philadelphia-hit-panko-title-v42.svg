@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="250" viewBox="0 0 1200 250" role="img" aria-labelledby="t d">
+<title id="t">Креветка Панко</title><desc id="d">Зелёная неоновая плашка с креветкой и надписью Креветка Панко</desc>
+<defs>
+ <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#08240b"/><stop offset=".55" stop-color="#031407"/><stop offset="1" stop-color="#001006"/></linearGradient>
+ <linearGradient id="lime" x2="0" y2="1"><stop stop-color="#d6ff22"/><stop offset=".42" stop-color="#a7ff00"/><stop offset="1" stop-color="#71e900"/></linearGradient>
+ <filter id="glow" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="7" result="b"/><feColorMatrix in="b" type="matrix" values="0 0 0 0 .22 0 0 0 0 1 0 0 0 0 .05 0 0 0 1 0" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="soft" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="2.2"/></filter>
+</defs>
+<rect x="10" y="12" width="1180" height="226" rx="113" fill="#39ff21" opacity=".5" filter="url(#soft)"/>
+<rect x="13" y="12" width="1174" height="226" rx="113" fill="url(#bg)" stroke="#67ff24" stroke-width="7" filter="url(#glow)"/>
+<rect x="25" y="24" width="1150" height="202" rx="101" fill="none" stroke="#b1ff53" stroke-opacity=".55" stroke-width="2"/>
+<!-- lime brush stroke behind the lower word -->
+<path d="M390 145 Q465 131 546 142 L1024 148 1093 166 1058 182 1114 189 1035 202 1071 213 978 217 919 226 564 224 490 215 423 224 365 214 397 198 348 192 414 179 369 169 430 159Z" fill="url(#lime)"/>
+<path d="M391 145 460 141 425 154 384 158M1004 146l80-7-58 16 77 3M378 211l75 7-53 8" fill="none" stroke="#dfff52" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+<!-- stylised shrimp icon, drawn as vector paths -->
+<g transform="translate(54 36)" fill="url(#lime)" stroke="#73ef13" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M29 93C40 51 81 22 126 27c27 3 47 18 52 39 5 22-12 43-36 52-32 15-74 4-91-19-8-10-15-12-22-6Z"/>
+ <path d="M31 91 8 75 22 111 40 112Z"/>
+ <path d="M42 79c15-11 28-16 43-17M51 91c13-9 29-12 43-12M69 103c10-7 23-9 35-8" fill="none" stroke="#184b0b" stroke-width="5"/>
+ <path d="M125 31c14-18 28-22 44-19M123 39c18-7 34-7 49-1" fill="none" stroke="#9aff35" stroke-width="4"/>
+ <path d="M166 66c20-2 28-10 38-20M165 74c22 5 30 13 38 23" fill="none" stroke="#a9ff3d" stroke-width="4"/>
+ <circle cx="139" cy="46" r="6" fill="#07190a" stroke="none"/>
+ <path d="M146 86q-13 11-25 13" fill="none" stroke="#173f08" stroke-width="4"/>
+</g>
+<!-- main word -->
+<text x="704" y="105" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="94" font-weight="900" font-style="italic" letter-spacing="-3" fill="#061008" stroke="#031006" stroke-width="4" paint-order="stroke">Креветка</text>
+<text x="704" y="105" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="94" font-weight="900" font-style="italic" letter-spacing="-3" fill="#fff" stroke="#fff" stroke-width="1">Креветка</text>
+<!-- second word -->
+<text x="713" y="211" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="89" font-weight="900" font-style="italic" letter-spacing="-2" fill="#092008" stroke="#092008" stroke-width="2" paint-order="stroke">Панко</text>
+<!-- decorative strokes -->
+<path d="M1073 68l62-20M1082 88l50-15" stroke="#8eff13" stroke-width="10" stroke-linecap="round"/>
+</svg>

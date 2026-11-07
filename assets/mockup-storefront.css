@@ -4515,3 +4515,26 @@
  object-fit:contain!important;
  object-position:center center!important;
 }
+
+
+/* v42: crisp vector title badge and metadata icons for the Philadelphia HIT card. */
+.rr-card[data-card="philadelphia"] .rr-hit-panko-title-art{
+ image-rendering:auto!important;
+ object-fit:contain!important;
+ object-position:center center!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-meta-svg{
+ display:block!important;
+ width:1.55em!important;
+ height:1.55em!important;
+ flex:0 0 1.55em!important;
+ min-width:1.55em!important;
+ min-height:1.55em!important;
+ overflow:visible!important;
+ color:#d9ffbd!important;
+ filter:drop-shadow(0 0 2px rgba(117,255,91,.6))!important;
+ shape-rendering:geometricPrecision!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-meta span{
+ gap:.65cqw!important;
+}
