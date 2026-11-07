@@ -3083,3 +3083,22 @@
   .product-card.hit-template .hit-meta{font-size:7px!important;padding:4px 2px!important;}
   .product-card.hit-template .card-composition.hit-composition{font-size:7px!important;}
 }
+
+
+/* Raise selector specificity so the reference brush labels visibly lean. */
+.product-card.hit-template .hit-promo-tags .hit-order-tag{
+  rotate:-7deg!important;
+  translate:0 0!important;
+  transform:skewX(-3deg)!important;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.055) 0 1px,transparent 1px 4px),
+    linear-gradient(100deg,#fb2928 0%,#e71920 72%,#c7111a 100%)!important;
+}
+.product-card.hit-template .hit-promo-tags .hit-fresh-tag{
+  rotate:-4deg!important;
+  translate:7px 0!important;
+  transform:skewX(-2deg)!important;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 4px),
+    linear-gradient(100deg,#35a52d 0%,#238326 70%,#145d1c 100%)!important;
+}
