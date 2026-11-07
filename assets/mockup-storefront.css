@@ -4505,3 +4505,13 @@
  border:0!important;
  border-radius:999px!important;
 }
+
+
+/* v41: fit the full shrimp-panko title plaque without disturbing other live card controls. */
+.rr-card[data-card="philadelphia"] .rr-card-info{
+ grid-template-rows:minmax(20cqw,1.35fr) minmax(0,1.55fr) minmax(0,.88fr) minmax(0,1.32fr)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-hit-panko-title-art{
+ object-fit:contain!important;
+ object-position:center center!important;
+}
