@@ -3413,3 +3413,51 @@
  .rr-card .rr-card-price{font-size:clamp(14px,8.8cqw,25px)!important;}
  .rr-card .rr-card-add,.rr-card .rr-card-stepper{height:78%!important;}
 }
+
+
+/* Final tidy-up: five-line descriptions, quiet outlines and fixed alignment. */
+.rr-card .rr-card-info{
+ grid-template-rows:minmax(0,.95fr) minmax(0,1.85fr) minmax(0,.88fr) minmax(0,1.32fr)!important;
+}
+.rr-card .rr-card-description{
+ -webkit-line-clamp:5!important;
+ min-height:0!important;
+ max-height:none!important;
+ height:100%!important;
+ padding:1cqw 2.4cqw!important;
+ border:1px solid rgba(235,190,91,.48)!important;
+ background:linear-gradient(145deg,rgba(10,12,14,.72),rgba(5,7,9,.78))!important;
+ box-shadow:inset 0 0 8px rgba(255,194,67,.045)!important;
+ font-size:clamp(8px,3.65cqw,15px)!important;
+ line-height:1.12!important;
+ overflow:hidden!important;
+}
+.rr-card .rr-card-meta{
+ border:1px solid rgba(235,190,91,.48)!important;
+ box-shadow:inset 0 0 7px rgba(255,194,67,.035)!important;
+ background:linear-gradient(155deg,rgba(22,18,9,.82),rgba(5,7,9,.88))!important;
+}
+.rr-card .rr-card-meta i{
+ color:rgba(255,207,91,.92)!important;
+}
+.rr-card .rr-card-heart-art,
+.rr-card .rr-card-heart-art.active{
+ opacity:0!important;
+ color:transparent!important;
+ background:transparent!important;
+ border:0!important;
+ box-shadow:none!important;
+ pointer-events:auto!important;
+}
+.rr-card .rr-card-heart-art:focus-visible{
+ opacity:1!important;
+ outline:2px solid rgba(255,220,125,.75)!important;
+ outline-offset:2px!important;
+}
+@media(max-width:390px){
+ .rr-card .rr-card-description{
+  font-size:clamp(8px,3.55cqw,13.5px)!important;
+  line-height:1.1!important;
+  padding:.7cqw 2cqw!important;
+ }
+}
