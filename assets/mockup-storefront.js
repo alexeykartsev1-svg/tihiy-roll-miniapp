@@ -185,7 +185,7 @@ function cardControlsMarkup(p){
 }
 function card(p){
  const id=esc(p.id),isSet=!!p.set,limit=isSet?p.set.stock:stock(p),available=limit==null||Number(limit)>0;
- const fav=state.favorites.has(p.id),hit=!isSet&&p.hit_template===true;
+ const fav=state.favorites.has(p.id),hit=!isSet&&(p.hit_template===true||/хит/i.test(String(p.badge||'')));
  const desc=productCardDescription(p),controls=cardControlsMarkup(p);
  const artPhoto=hit&&p.id==='philadelphia';
  const image=artPhoto?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4b0c216f-14e7-401e-8a04-a2652e7ad801.webp':photo(p);
