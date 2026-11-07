@@ -2753,3 +2753,29 @@
     background-size:contain!important;background-position:left bottom!important;
   }
 }
+
+
+/* Use the clean, transparent Tihiy Roll chef mascot artwork. */
+.product-card.hit-template .hit-chef{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  position:absolute!important;z-index:3!important;
+  left:0!important;bottom:0!important;
+  width:66%!important;max-width:66%!important;height:100%!important;
+  margin:0!important;padding:0!important;
+  border:0!important;border-radius:0!important;
+  background-color:transparent!important;
+  background-image:url("./hit-chef-mascot.webp")!important;
+  background-repeat:no-repeat!important;
+  background-size:contain!important;
+  background-position:left bottom!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+  box-shadow:none!important;
+  filter:drop-shadow(2px 0 7px rgba(0,0,0,.48))!important;
+  pointer-events:none!important;
+}
+@media(max-width:600px){
+  .product-card.hit-template .hit-chef{
+    width:66%!important;max-width:66%!important;height:100%!important;
+    background-size:contain!important;background-position:left bottom!important;
+  }
+}
