@@ -3712,3 +3712,19 @@
   height:78px!important;min-height:78px!important;padding:26px 8px 4px!important;
  }
 }
+
+
+/* 2026-11-07 v24: pixel-stable panoramic mountain brand header only */
+.home-screen .home-topbar.home-brandbar{
+ display:block!important;position:relative!important;z-index:8!important;
+ width:auto!important;height:clamp(76px,19.5vw,86px)!important;
+ min-height:76px!important;max-height:86px!important;
+ margin:0 -12px 8px!important;padding:0!important;
+ overflow:hidden!important;border:0!important;border-radius:0 0 16px 16px!important;
+ background:#05080d!important;box-shadow:0 8px 18px rgba(0,0,0,.26)!important;
+}
+.home-brand-image-link{display:block!important;width:100%!important;height:100%!important;line-height:0!important}
+.home-brand-image{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important}
+@media(max-width:360px){
+ .home-screen .home-topbar.home-brandbar{height:72px!important;min-height:72px!important;margin-bottom:7px!important}
+}
