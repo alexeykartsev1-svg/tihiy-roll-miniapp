@@ -468,6 +468,59 @@ def read_products() -> list[dict[str, Any]]:
         except OSError:
             logger.warning("Could not create Asian hot dog salmon seed marker at %s", salmon_marker)
 
+    # Owner-requested Asian hot dog with shrimp. Update the pre-existing starter placeholder
+    # exactly once; keep all catalogue controls as native storefront elements.
+    shrimp_marker = PRODUCTS_FILE + ".asian-hotdog-shrimp-v1"
+    if not os.path.exists(shrimp_marker):
+        def _shrimp_name_key(value: Any) -> str:
+            return re.sub(r"[^a-zа-яё0-9]", "", str(value or "").lower())
+
+        shrimp_existing = next(
+            (
+                item for item in data
+                if str(item.get("id", "")) == "asian_hotdog_shrimp"
+                or (
+                    "азиатский" in _shrimp_name_key(item.get("name"))
+                    and "кревет" in _shrimp_name_key(item.get("name"))
+                    and "хотдог" in _shrimp_name_key(item.get("name"))
+                )
+            ),
+            None,
+        )
+        shrimp_card = {
+            "id": "asian_hotdog_shrimp",
+            "name": "Азиатский Хот-Дог Креветка",
+            "price": 490,
+            "cost": 0,
+            "weight": "280 г",
+            "pieces": 1,
+            "cat": "classic",
+            "badge": "",
+            "desc": "Сочные креветки, сливочный сыр, свежий огурец, хрустящий панко, соус терияки и спайси.",
+            "card_description": "Сочные креветки, сливочный сыр, свежий огурец, хрустящий панко, соус терияки и спайси.",
+            "details": "Креветки, свежий огурец, сливочный сыр, хрустящий панко, соус терияки, соус спайси.",
+            "photo": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/782d8c4d-7e39-444d-9429-f775d5ab704e.webp",
+            "gallery": [],
+            "stock": None,
+            "hit_template": False,
+            "active": True,
+            "sort_order": 7,
+        }
+        if shrimp_existing is not None:
+            shrimp_card["id"] = str(shrimp_existing.get("id") or "asian_hotdog_shrimp")
+            shrimp_existing.update(shrimp_card)
+        else:
+            data.append(shrimp_card)
+        write_products(data)
+        try:
+            marker_dir = os.path.dirname(shrimp_marker)
+            if marker_dir:
+                os.makedirs(marker_dir, exist_ok=True)
+            with open(shrimp_marker, "w", encoding="utf-8") as handle:
+                handle.write("seeded\\n")
+        except OSError:
+            logger.warning("Could not create Asian hot dog shrimp seed marker at %s", shrimp_marker)
+
     return data
 
 def write_products(products: list[dict[str, Any]]) -> None:
