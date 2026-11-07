@@ -2779,3 +2779,66 @@
     background-size:contain!important;background-position:left bottom!important;
   }
 }
+
+
+/* HIT card: match the approved reference composition on narrow screens. */
+.product-card.hit-template .card-photo.hit-photo{
+ width:100%!important;height:auto!important;aspect-ratio:1.52/1!important;
+ min-height:0!important;max-height:none!important;overflow:hidden!important;isolation:isolate!important;
+}
+.product-card.hit-template .hit-food{
+ inset:0!important;width:100%!important;height:100%!important;
+ object-fit:cover!important;object-position:72% center!important;
+}
+.product-card.hit-template .hit-chef{
+ left:0!important;bottom:0!important;width:50%!important;max-width:50%!important;height:100%!important;
+ background-image:url("./hit-chef-target-pose.webp?v=20261107-chinpose1")!important;
+ background-repeat:no-repeat!important;background-size:contain!important;background-position:left bottom!important;
+ -webkit-mask-image:none!important;mask-image:none!important;
+ filter:drop-shadow(2px 0 8px rgba(0,0,0,.38))!important;
+}
+.product-card.hit-template .hit-promo-tags{
+ top:11%!important;left:45%!important;right:11%!important;
+ display:grid!important;justify-items:start!important;gap:5px!important;
+}
+.product-card.hit-template .hit-promo-tags span{
+ position:relative!important;display:block!important;width:max-content!important;max-width:100%!important;
+ padding:5px 8px!important;border:0!important;border-radius:2px!important;color:#fff!important;
+ font-size:clamp(7px,2.1vw,11px)!important;font-weight:950!important;line-height:1.08!important;
+ white-space:normal!important;text-shadow:0 1px 2px rgba(0,0,0,.55)!important;
+ box-shadow:0 3px 8px rgba(0,0,0,.34)!important;
+ clip-path:polygon(2% 7%,9% 0,94% 4%,100% 17%,96% 89%,87% 100%,4% 93%,0 78%)!important;
+}
+.product-card.hit-template .hit-order-tag{
+ background:linear-gradient(100deg,#fa2023,#c9151c)!important;
+ transform:rotate(-5deg) skewX(-4deg)!important;
+}
+.product-card.hit-template .hit-fresh-tag{
+ background:linear-gradient(100deg,#278d24,#155a1c)!important;
+ transform:rotate(-3deg) translateX(7px)!important;
+}
+.product-card.hit-template .hit-kicker{
+ z-index:6!important;min-height:28px!important;padding:4px 11px!important;
+ border-width:1.5px!important;font-size:clamp(10px,2.7vw,13px)!important;
+}
+.product-card.hit-template .card-heart{z-index:7!important}
+.product-card.hit-template .card-info.hit-info{gap:7px!important}
+.product-card.hit-template .hit-title{font-size:clamp(14px,3.8vw,19px)!important;padding:7px 5px!important}
+.product-card.hit-template .hit-description{padding:7px 8px!important;font-size:clamp(10px,2.7vw,13px)!important}
+.product-card.hit-template .hit-meta-row{gap:5px!important}
+.product-card.hit-template .hit-meta{gap:4px!important;font-size:clamp(8px,2.3vw,11px)!important}
+.product-card.hit-template .card-composition.hit-composition{
+ min-width:0!important;padding-left:8px!important;padding-right:8px!important;
+ font-size:clamp(9px,2.4vw,12px)!important;
+}
+.product-card.hit-template .card-bottom.card-purchase{min-height:48px!important;padding:5px 6px 5px 10px!important}
+@media(max-width:600px){
+ .product-card.hit-template .card-photo.hit-photo{aspect-ratio:1.52/1!important}
+ .product-card.hit-template .hit-chef{width:50%!important;max-width:50%!important;height:100%!important;background-size:contain!important;background-position:left bottom!important}
+ .product-card.hit-template .hit-promo-tags{top:10%!important;left:45%!important;right:8%!important;gap:5px!important}
+ .product-card.hit-template .hit-promo-tags span{padding:4px 6px!important}
+}
+@media(max-width:370px){
+ .product-card.hit-template .hit-promo-tags{left:43%!important;right:6px!important}
+ .product-card.hit-template .hit-order-tag,.product-card.hit-template .hit-fresh-tag{font-size:6.5px!important}
+}
