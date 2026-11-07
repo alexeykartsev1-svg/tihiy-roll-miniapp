@@ -2582,7 +2582,7 @@
  box-shadow:inset 0 0 1.6cqw rgba(255,195,81,.08),0 0 1cqw rgba(255,183,54,.3)!important;
 }
 .product-card.hit-template.hit-art-card .hit-art-live-meta{
- position:absolute!important;z-index:4!important;left:4.2%!important;top:76.35%!important;width:50.7%!important;height:7.6%!important;
+ position:absolute!important;z-index:4!important;left:4.2%!important;top:76.35%!important;width:48.2%!important;height:7.6%!important;
  display:flex!important;align-items:center!important;justify-content:space-around!important;gap:1%!important;
  overflow:hidden!important;padding:0 1.5%!important;border:1px solid #e7b63f!important;border-radius:2.2cqw!important;
  background:linear-gradient(180deg,#18120a,#08090b)!important;color:#ffe9b5!important;
@@ -2596,7 +2596,7 @@
  color:#ffd34e!important;font-style:normal!important;font-size:1.12em!important;
 }
 .product-card.hit-template.hit-art-card .card-composition.hit-art-composition{
- position:absolute!important;z-index:6!important;left:56.6%!important;top:75.55%!important;width:39.4%!important;height:9.75%!important;
+ position:absolute!important;z-index:6!important;left:53.5%!important;top:75.0%!important;width:44.2%!important;height:9.75%!important;
  min-width:0!important;min-height:0!important;margin:0!important;padding:0 1%!important;
  display:flex!important;align-items:center!important;justify-content:center!important;gap:1.3cqw!important;
  border:1px solid #f2bc46!important;border-radius:999px!important;
@@ -2651,4 +2651,33 @@
  .product-card.hit-template.hit-art-card .hit-art-live-meta{font-size:8px!important;}
  .product-card.hit-template.hit-art-card .card-composition.hit-art-composition{font-size:9px!important;}
  .product-card.hit-template.hit-art-card .hit-art-live-price{font-size:18px!important;}
+}
+
+
+/* Override the legacy transparent PNG hotspots: these are now real, visible controls. */
+.product-card.hit-template.hit-art-card .hit-art-purchase .hit-art-live-price{
+ display:block!important;visibility:visible!important;opacity:1!important;
+ color:#fff!important;font-size:clamp(18px,9.6cqw,23px)!important;
+}
+.product-card.hit-template.hit-art-card .hit-art-purchase .card-quantity.hit-art-quantity{
+ position:relative!important;inset:auto!important;opacity:1!important;visibility:visible!important;
+ flex:0 0 34%!important;width:34%!important;height:78%!important;min-width:0!important;min-height:0!important;
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ border:1px solid rgba(220,186,132,.36)!important;border-radius:2cqw!important;overflow:hidden!important;
+ background:#090b10!important;pointer-events:auto!important;
+}
+.product-card.hit-template.hit-art-card .hit-art-purchase .card-quantity.hit-art-quantity button{
+ position:static!important;display:grid!important;place-items:center!important;opacity:1!important;visibility:visible!important;
+ width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;inset:auto!important;
+ border:0!important;border-radius:0!important;margin:0!important;padding:0!important;
+ background:linear-gradient(145deg,#ff5348,#e82228)!important;color:#fff!important;
+ font-size:clamp(15px,8.2cqw,19px)!important;line-height:1!important;font-weight:850!important;
+}
+.product-card.hit-template.hit-art-card .hit-art-purchase .card-quantity.hit-art-quantity span{
+ position:static!important;display:grid!important;place-items:center!important;opacity:1!important;visibility:visible!important;
+ width:100%!important;height:100%!important;min-width:0!important;padding:0!important;
+ background:#090b10!important;color:#fff!important;font-size:clamp(10px,5.6cqw,13px)!important;
+}
+.product-card.hit-template.hit-art-card .card-composition.hit-art-composition{
+ left:53.5%!important;width:44.2%!important;top:75%!important;height:9.75%!important;
 }
