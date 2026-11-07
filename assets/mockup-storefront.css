@@ -2681,3 +2681,12 @@
 .product-card.hit-template.hit-art-card .card-composition.hit-art-composition{
  left:53.5%!important;width:44.2%!important;top:75%!important;height:9.75%!important;
 }
+
+
+/* Slightly larger ingredient-description plaque and more readable short text. */
+.product-card.hit-template.hit-art-card .hit-art-live-description{
+ top:65.2%!important;height:10.1%!important;
+ font-size:clamp(10px,5.65cqw,12px)!important;
+ line-height:1.13!important;
+ padding:1.4% 3.2%!important;
+}
