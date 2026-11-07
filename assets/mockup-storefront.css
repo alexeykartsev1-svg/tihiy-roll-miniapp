@@ -4397,3 +4397,81 @@
  color:#fff!important;
  text-shadow:0 1px 5px rgba(0,0,0,.8),0 0 5px rgba(230,175,255,.26)!important;
 }
+
+
+/* v38: Philadelphia HIT green-neon artwork and live lower-card skin.
+   Only appearance changes; image is the top artwork crop, all card controls stay live. */
+.rr-card[data-card="philadelphia"]{
+ border:1.5px solid rgba(61,255,54,.96)!important;
+ border-radius:18px!important;
+ background:#020c04!important;
+ box-shadow:0 0 2px rgba(84,255,66,.98),0 0 10px rgba(44,255,36,.58),0 0 22px rgba(13,180,24,.28)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-photo{
+ border-bottom:1px solid rgba(76,255,59,.9)!important;
+ box-shadow:0 3px 14px rgba(52,255,42,.3)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-image{
+ object-fit:cover!important;
+ object-position:center top!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-info{
+ background:
+  radial-gradient(ellipse at 50% 0%,rgba(25,180,26,.22),transparent 62%),
+  linear-gradient(180deg,#061a09 0%,#061108 48%,#030805 100%)!important;
+ border-top:1px solid rgba(76,255,63,.86)!important;
+ box-shadow:inset 0 0 16px rgba(45,255,43,.17)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-title{
+ border:1px solid #4dff43!important;
+ border-radius:999px!important;
+ background:linear-gradient(180deg,#0a300d 0%,#031107 76%,#071e09 100%)!important;
+ color:#fff!important;
+ text-shadow:0 1px 4px rgba(0,0,0,.96),0 0 7px rgba(102,255,91,.25)!important;
+ box-shadow:0 0 3px rgba(72,255,56,.92),0 0 11px rgba(35,235,33,.48),inset 0 0 10px rgba(81,255,69,.13)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-title:before,
+.rr-card[data-card="philadelphia"] .rr-card-title:after{
+ color:#71ff45!important;
+ text-shadow:0 0 6px rgba(85,255,59,.92)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-description{
+ border:1px solid rgba(134,255,113,.9)!important;
+ border-radius:12px!important;
+ background:linear-gradient(145deg,rgba(6,27,10,.99),rgba(3,10,6,.99))!important;
+ color:#fff!important;
+ box-shadow:0 0 7px rgba(67,255,53,.28),inset 0 0 8px rgba(74,255,58,.09)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-meta{
+ border:1px solid rgba(83,255,66,.95)!important;
+ border-radius:11px!important;
+ background:linear-gradient(150deg,#09210b,#030906)!important;
+ color:#fff!important;
+ box-shadow:0 0 7px rgba(67,255,53,.4),inset 0 0 8px rgba(74,255,58,.1)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-meta i{
+ color:#7aff51!important;
+ text-shadow:0 0 5px rgba(103,255,64,.7)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-composition{
+ border:1px solid #5aff4a!important;
+ border-radius:999px!important;
+ background:linear-gradient(145deg,#0c3a10,#031107)!important;
+ color:#fff!important;
+ box-shadow:0 0 3px #61ff4b,0 0 10px rgba(44,255,37,.6),inset 0 0 8px rgba(111,255,90,.15)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-composition span,
+.rr-card[data-card="philadelphia"] .rr-card-composition b{
+ color:#8cff55!important;
+ text-shadow:0 0 6px rgba(92,255,58,.8)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-purchase{
+ border:1px solid rgba(105,255,87,.9)!important;
+ border-radius:13px!important;
+ background:linear-gradient(160deg,#0a1f0c,#030806)!important;
+ box-shadow:0 0 8px rgba(46,255,43,.38),inset 0 0 9px rgba(92,255,72,.12)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-price{
+ color:#fff!important;
+ text-shadow:0 1px 5px rgba(0,0,0,.85),0 0 7px rgba(131,255,114,.26)!important;
+}
