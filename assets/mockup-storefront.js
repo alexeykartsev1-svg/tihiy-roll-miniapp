@@ -359,7 +359,7 @@ function openSetFromHome(id){
 }
 function refreshCartViews(){
  const setsById=new Map(state.sets.map(row=>['set:'+row.id,row]));
- $('[data-card]').forEach(cardNode=>{
+ Array.from(document.querySelectorAll('[data-card]')).forEach(cardNode=>{
   const cardId=cardNode.dataset.card;
   const set=setsById.get(cardId);
   const p=set?{id:cardId,set}:find(cardId);
