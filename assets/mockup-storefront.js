@@ -179,9 +179,10 @@ function card(p){
  const desc=productDescription(p),hit=!isSet&&p.hit_template===true;
  const heart='<button class="card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-label="Избранное">'+(fav?'♥':'♡')+'</button>';
  if(hit && p.id==='philadelphia'){
+  const artHeart=heart.replace('class="card-heart ','class="card-heart hit-art-heart ');
   return '<article class="product-card hit-template hit-art-card '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
    +'<div class="hit-art-frame"><img class="hit-art-image" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4b0c216f-14e7-401e-8a04-a2652e7ad801.webp" alt="'+esc(p.name)+'" loading="eager" decoding="async">'
-   +heart
+   +artHeart
    +'<button class="card-composition hit-composition hit-art-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"></button>'
    +'<div class="hit-art-purchase">'+controls+'</div></div></article>';
  }
