@@ -3939,3 +3939,26 @@
  line-height:1!important;
  text-shadow:0 1px 4px rgba(0,0,0,.5)!important;
 }
+
+
+/* v34: fully mask the white heart baked into the Philadelphia HIT artwork
+   before displaying the single red active heart in the same click target. */
+.rr-card .rr-card-photo-art .rr-card-heart-art.active{
+ display:grid!important;
+ place-items:center!important;
+ opacity:1!important;
+ top:3.8%!important;
+ right:3%!important;
+ width:16%!important;
+ height:11%!important;
+ padding:0!important;
+ border:1px solid rgba(255,255,255,.48)!important;
+ border-radius:50%!important;
+ background:#05090d!important;
+ color:#ff514b!important;
+ font-size:clamp(19px,9cqw,34px)!important;
+ line-height:1!important;
+ text-shadow:none!important;
+ box-shadow:0 0 8px rgba(255,65,65,.36)!important;
+ pointer-events:auto!important;
+}
