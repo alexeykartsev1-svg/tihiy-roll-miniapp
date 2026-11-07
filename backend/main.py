@@ -363,6 +363,22 @@ def read_products() -> list[dict[str, Any]]:
                 handle.write("seeded\n")
         except OSError:
             logger.warning("Could not create starter category seed marker at %s", seed_marker)
+    # One-time compatibility migration: copy the former card text into its own field.
+    # Existing products keep the same visible catalogue copy until the owner edits it.
+    migrated_card_descriptions = False
+    for item in data:
+        if "card_description" not in item:
+            legacy_card_text = str(item.get("desc", "") or "").strip()
+            details_text = str(item.get("details", "") or "").strip()
+            if legacy_card_text and "временная карточка-образец" in legacy_card_text.lower() and details_text:
+                legacy_card_text = details_text
+            elif not legacy_card_text:
+                legacy_card_text = details_text
+            item["card_description"] = legacy_card_text
+            migrated_card_descriptions = True
+    if migrated_card_descriptions:
+        write_products(data)
+
     return data
 
 def write_products(products: list[dict[str, Any]]) -> None:
@@ -434,6 +450,7 @@ class ProductPayload(BaseModel):
     cat: str = Field(default="all", max_length=30)
     badge: str = Field(default="", max_length=30)
     desc: str = Field(default="", max_length=1000)
+    card_description: str = Field(default="", max_length=1000)
     photo: str = Field(default="", max_length=1200000)
     pieces: int = Field(default=8, ge=1, le=100)
     stock: int | None = Field(default=None, ge=0, le=10000)
