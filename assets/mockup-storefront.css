@@ -3606,3 +3606,33 @@
  height:84%!important;
  min-height:0!important;
 }
+
+
+/* 2026-11-07 v19: show the HIT heart as a real visible, tappable control and match the favourites badge to the cart badge. */
+.rr-card .rr-card-heart{
+ z-index:20!important;
+ display:grid!important;
+ place-items:center!important;
+ opacity:1!important;
+ pointer-events:auto!important;
+ cursor:pointer!important;
+}
+.rr-card .rr-card-heart.active{
+ color:#ff514b!important;
+ border-color:rgba(255,255,255,.5)!important;
+ background:rgba(0,0,0,.72)!important;
+}
+.bottom-nav [data-nav="favorites"] .nav-icon i{
+ position:absolute!important;
+ top:-4px!important;
+ right:-9px!important;
+ min-width:20px!important;
+ height:20px!important;
+ padding:1px 4px!important;
+ border-radius:99px!important;
+ background:var(--red)!important;
+ color:#fff!important;
+ font-size:10px!important;
+ line-height:18px!important;
+ font-style:normal!important;
+}
