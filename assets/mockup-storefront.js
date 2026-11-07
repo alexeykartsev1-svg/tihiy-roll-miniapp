@@ -187,13 +187,12 @@ function card(p){
   const artHeart=heart.replace('class="card-heart ','class="card-heart hit-art-heart ');
   const artControls=cardControlsMarkup(p,true);
   return '<article class="product-card hit-template hit-art-card '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
-   +'<div class="hit-art-frame"><img class="hit-art-image" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4b0c216f-14e7-401e-8a04-a2652e7ad801.webp" alt="'+esc(p.name)+'" loading="eager" decoding="async">'
-   +artHeart
-   +'<h3 class="hit-art-live-title">'+esc(p.name)+'</h3>'
-   +'<p class="hit-art-live-description">'+esc(desc)+'</p>'
-   +'<div class="hit-art-live-meta"><span><i aria-hidden="true">◉</i>'+Number(p.pieces||8)+' шт.</span><span><i aria-hidden="true">◇</i>'+esc(p.weight||'280 г')+'</span></div>'
-   +'<button class="card-composition hit-composition hit-art-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">››</b></button>'
-   +'<div class="hit-art-purchase"><strong class="card-price hit-art-live-price">'+money(p.price)+'</strong>'+artControls+'</div></div></article>';
+   +'<div class="hit-art-photo"><img class="hit-art-image" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4b0c216f-14e7-401e-8a04-a2652e7ad801.webp" alt="'+esc(p.name)+'" loading="eager" decoding="async">'+artHeart+'</div>'
+   +'<div class="card-info hit-info hit-art-info"><h3 class="card-title hit-title">'+esc(p.name)+'</h3>'
+   +'<p class="card-description hit-description">'+esc(desc)+'</p>'
+   +'<div class="hit-meta-row"><div class="card-meta hit-meta"><span><i aria-hidden="true">◉</i>'+Number(p.pieces||8)+' шт.</span><span><i aria-hidden="true">◈</i>'+esc(p.weight||'280 г')+'</span></div>'
+   +'<button class="card-composition hit-composition hit-art-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">›</b></button></div>'
+   +'<div class="card-bottom card-purchase hit-art-purchase"><strong class="card-price hit-art-live-price">'+money(p.price)+'</strong>'+artControls+'</div></div></article>';
  }
  if(hit){
   return '<article class="product-card hit-template '+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
