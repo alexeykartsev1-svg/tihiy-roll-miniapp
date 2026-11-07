@@ -3240,3 +3240,176 @@
  .rr-card .rr-card-price{font-size:clamp(15px,9.3cqw,27px)!important;}
  .rr-card .rr-card-add,.rr-card .rr-card-stepper{flex-basis:18cqw!important;width:18cqw!important;height:14cqw!important;}
 }
+
+
+/* FINAL MOBILE CARD LAYOUT FIX — real grid tracks prevent the purchase bar overlapping the meta row. */
+.rr-card.product-card{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:minmax(0,55.15fr) minmax(0,44.85fr)!important;
+ align-self:start!important;
+ height:auto!important;
+ min-height:0!important;
+ aspect-ratio:994 / 1580!important;
+ overflow:hidden!important;
+ box-sizing:border-box!important;
+}
+.rr-card.product-card *,
+.rr-card.product-card *::before,
+.rr-card.product-card *::after{box-sizing:border-box!important;}
+
+.rr-card .rr-card-photo{
+ grid-row:1!important;
+ position:relative!important;
+ display:block!important;
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ margin:0!important;
+ padding:0!important;
+ flex:none!important;
+ overflow:hidden!important;
+}
+.rr-card .rr-card-info{
+ grid-row:2!important;
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:minmax(0,1.16fr) minmax(0,1.16fr) minmax(0,1fr) minmax(0,1.4fr)!important;
+ align-content:stretch!important;
+ justify-content:stretch!important;
+ align-items:stretch!important;
+ gap:clamp(3px,1cqw,6px)!important;
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ margin:0!important;
+ padding:clamp(5px,1.8cqw,10px) clamp(6px,2.8cqw,12px) clamp(6px,2.4cqw,11px)!important;
+ overflow:hidden!important;
+}
+.rr-card .rr-card-title{
+ grid-row:1!important;
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ margin:0!important;
+ padding:0 8.5cqw!important;
+ overflow:hidden!important;
+ flex:none!important;
+}
+.rr-card .rr-card-description{
+ grid-row:2!important;
+ display:-webkit-box!important;
+ -webkit-box-orient:vertical!important;
+ -webkit-line-clamp:2!important;
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ max-height:none!important;
+ margin:0!important;
+ padding:1.2cqw 2.5cqw!important;
+ overflow:hidden!important;
+ flex:none!important;
+}
+.rr-card .rr-card-meta-row{
+ grid-row:3!important;
+ display:grid!important;
+ grid-template-columns:minmax(0,1.56fr) minmax(0,1fr)!important;
+ align-items:stretch!important;
+ gap:1.8cqw!important;
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ margin:0!important;
+ padding:0!important;
+ overflow:hidden!important;
+}
+.rr-card .rr-card-meta,
+.rr-card .rr-card-composition{
+ min-width:0!important;
+ min-height:0!important;
+ width:100%!important;
+ height:100%!important;
+ margin:0!important;
+ overflow:hidden!important;
+}
+.rr-card .rr-card-meta{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:space-evenly!important;
+ flex-wrap:nowrap!important;
+ gap:1cqw!important;
+ padding:0 1cqw!important;
+}
+.rr-card .rr-card-meta span{flex:0 1 auto!important;min-width:0!important;}
+.rr-card .rr-card-composition{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ gap:1cqw!important;
+ padding:0 1cqw!important;
+ white-space:nowrap!important;
+}
+.rr-card .rr-card-purchase{
+ grid-row:4!important;
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) 18cqw!important;
+ align-items:center!important;
+ justify-content:stretch!important;
+ gap:2cqw!important;
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ margin:0!important;
+ padding:1.2cqw 2.2cqw 1.2cqw 4.2cqw!important;
+ overflow:hidden!important;
+}
+.rr-card .rr-card-price{
+ display:block!important;
+ min-width:0!important;
+ max-width:100%!important;
+ margin:0!important;
+ white-space:nowrap!important;
+ overflow:hidden!important;
+}
+.rr-card .rr-card-add,
+.rr-card .rr-card-stepper{
+ display:grid!important;
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ align-items:stretch!important;
+ justify-self:end!important;
+ width:100%!important;
+ height:78%!important;
+ min-width:0!important;
+ min-height:0!important;
+ max-width:none!important;
+ margin:0!important;
+ padding:0!important;
+ flex:none!important;
+ overflow:hidden!important;
+}
+.rr-card .rr-card-add{grid-template-columns:minmax(0,1fr)!important;}
+.rr-card .rr-card-stepper button,
+.rr-card .rr-card-stepper span{
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ margin:0!important;
+ padding:0!important;
+}
+@media(max-width:390px){
+ .rr-card .rr-card-info{gap:clamp(2px,.85cqw,4px)!important;padding:1.5cqw 2.4cqw 1.8cqw!important;}
+ .rr-card .rr-card-meta{font-size:clamp(7px,3.8cqw,11px)!important;}
+ .rr-card .rr-card-composition{font-size:clamp(8px,4.25cqw,13px)!important;}
+ .rr-card .rr-card-price{font-size:clamp(14px,8.8cqw,25px)!important;}
+ .rr-card .rr-card-add,.rr-card .rr-card-stepper{height:78%!important;}
+}
