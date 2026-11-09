@@ -4698,3 +4698,40 @@
  color:#aaff7a!important;
  text-shadow:none!important;
 }
+
+
+/* v53 final: original 2x transparent capsule crop, inset title; sharp composition border. */
+.rr-card[data-card="philadelphia"] .rr-card-title{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ overflow:hidden!important;
+ padding:0!important;
+}
+.rr-card[data-card="philadelphia"] .rr-hit-panko-title-art{
+ display:block!important;
+ width:94%!important;
+ height:90%!important;
+ max-width:none!important;
+ max-height:none!important;
+ margin:auto!important;
+ object-fit:contain!important;
+ object-position:center center!important;
+ border:0!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+ filter:none!important;
+ image-rendering:auto!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-composition{
+ background:linear-gradient(145deg,#061009 0%,#020705 100%)!important;
+ border:1px solid #76ff55!important;
+ box-shadow:none!important;
+ filter:none!important;
+ outline:0!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-composition span,
+.rr-card[data-card="philadelphia"] .rr-card-composition b{
+ color:#aaff7a!important;
+ text-shadow:none!important;
+}
