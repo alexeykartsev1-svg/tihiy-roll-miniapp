@@ -4555,3 +4555,19 @@
  min-height:16px!important;
  align-self:center!important;
 }
+
+
+/* v46: restore previously working HIT title art and make both stats SVGs legible on mobile. */
+.rr-card[data-card="philadelphia"] .rr-hit-panko-title-art{
+ object-fit:contain!important;
+ object-position:center center!important;
+ border-radius:999px!important;
+}
+.rr-card[data-card="philadelphia"] .rr-hit-meta-svg{
+ width:16px!important;
+ height:16px!important;
+ flex:0 0 16px!important;
+ min-width:16px!important;
+ min-height:16px!important;
+ align-self:center!important;
+}
