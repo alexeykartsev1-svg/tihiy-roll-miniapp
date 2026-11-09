@@ -4515,3 +4515,27 @@
  object-fit:contain!important;
  object-position:center center!important;
 }
+
+
+/* v44: clean title capsule source and crisp matching vector stats icons for the HIT card only. */
+.rr-card[data-card="philadelphia"] .rr-hit-panko-title-art{
+ object-fit:contain!important;
+ object-position:center center!important;
+ image-rendering:auto!important;
+}
+.rr-card[data-card="philadelphia"] .rr-hit-meta-svg{
+ display:block!important;
+ width:1.55em!important;
+ height:1.55em!important;
+ flex:0 0 1.55em!important;
+ min-width:1.55em!important;
+ min-height:1.55em!important;
+ overflow:visible!important;
+ shape-rendering:geometricPrecision!important;
+}
+.rr-card[data-card="philadelphia"] .rr-hit-meta-sushi{
+ filter:drop-shadow(0 0 1.3px rgba(130,255,96,.5))!important;
+}
+.rr-card[data-card="philadelphia"] .rr-hit-meta-scale{
+ filter:drop-shadow(0 0 1.3px rgba(130,255,96,.5))!important;
+}
