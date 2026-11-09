@@ -4588,3 +4588,24 @@
  min-height:16px!important;
  align-self:center!important;
 }
+
+
+/* v48: clean capsule edges and remove the green underlay/halo from HIT composition button only. */
+.rr-card[data-card="philadelphia"] .rr-hit-panko-title-art{
+ object-fit:contain!important;
+ object-position:center center!important;
+ border:0!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+ filter:none!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-composition{
+ background:linear-gradient(145deg,#061009 0%,#020705 100%)!important;
+ border:1px solid #67ff4d!important;
+ box-shadow:0 0 1.5px rgba(103,255,77,.62),inset 0 0 0 1px rgba(103,255,77,.08)!important;
+}
+.rr-card[data-card="philadelphia"] .rr-card-composition span,
+.rr-card[data-card="philadelphia"] .rr-card-composition b{
+ color:#a0ff70!important;
+ text-shadow:0 0 2px rgba(128,255,98,.24)!important;
+}
