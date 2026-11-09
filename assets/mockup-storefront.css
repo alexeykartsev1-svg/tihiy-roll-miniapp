@@ -4539,3 +4539,19 @@
 .rr-card[data-card="philadelphia"] .rr-hit-meta-scale{
  filter:drop-shadow(0 0 1.3px rgba(130,255,96,.5))!important;
 }
+
+
+/* v45: original clean title plaque restored; larger crisp SVG stats icons, HIT only. */
+.rr-card[data-card="philadelphia"] .rr-hit-panko-title-art{
+ object-fit:contain!important;
+ object-position:center center!important;
+ border-radius:0!important;
+}
+.rr-card[data-card="philadelphia"] .rr-hit-meta-svg{
+ width:16px!important;
+ height:16px!important;
+ flex:0 0 16px!important;
+ min-width:16px!important;
+ min-height:16px!important;
+ align-self:center!important;
+}
