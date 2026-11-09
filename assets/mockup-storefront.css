@@ -4571,3 +4571,20 @@
  min-height:16px!important;
  align-self:center!important;
 }
+
+
+/* v47: clean original shrimp-panko plaque with transparent rounded edges; stats icons crisp on HIT only. */
+.rr-card[data-card="philadelphia"] .rr-hit-panko-title-art{
+ object-fit:contain!important;
+ object-position:center center!important;
+ border-radius:0!important;
+ image-rendering:auto!important;
+}
+.rr-card[data-card="philadelphia"] .rr-hit-meta-svg{
+ width:16px!important;
+ height:16px!important;
+ flex:0 0 16px!important;
+ min-width:16px!important;
+ min-height:16px!important;
+ align-self:center!important;
+}
