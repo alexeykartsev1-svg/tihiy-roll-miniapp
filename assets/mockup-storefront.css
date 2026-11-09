@@ -4609,3 +4609,18 @@
  color:#a0ff70!important;
  text-shadow:0 0 2px rgba(128,255,98,.24)!important;
 }
+
+
+/* v51: use the full-resolution original title plaque with clean transparent edges, only on HIT. */
+.rr-card[data-card="philadelphia"] .rr-hit-panko-title-art{
+ display:block!important;
+ width:100%!important;
+ height:100%!important;
+ object-fit:contain!important;
+ object-position:center center!important;
+ border:0!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+ filter:none!important;
+ image-rendering:auto!important;
+}
