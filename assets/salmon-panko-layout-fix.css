@@ -339,3 +339,28 @@
   font-size: clamp(19px, 6.1cqw, 31px) !important;
   text-shadow: none !important;
 }
+
+
+/* Panko cards use the exact same favorite button markup/state as every other product.
+   The opaque disc only masks the heart artwork already printed into the source photos. */
+.rr-card[data-card="philadelphia"] .rr-card-photo .rr-card-heart,
+.rr-card[data-card="salmon_panko"] .rr-card-photo .rr-card-heart {
+  display: grid !important;
+  place-items: center !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  border: 1px solid rgba(255,255,255,.35) !important;
+  border-radius: 50% !important;
+  background: rgba(3,7,10,.96) !important;
+  color: #fff !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.rr-card[data-card="philadelphia"] .rr-card-photo .rr-card-heart.active,
+.rr-card[data-card="salmon_panko"] .rr-card-photo .rr-card-heart.active {
+  background: rgba(3,7,10,.98) !important;
+  border-color: rgba(255,255,255,.5) !important;
+  color: #ff514b !important;
+}
