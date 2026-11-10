@@ -165,3 +165,38 @@
   flex: none !important;
   margin: 0 !important;
 }
+
+
+/* The source PNG is the complete capsule from the approved reference screenshot.
+   Do not draw a second CSS capsule behind/around it. Keep the title slot transparent. */
+.rr-card.product-card.rr-card-panko .rr-card-title {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.rr-card.product-card.rr-card-panko .rr-hit-panko-title-art {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
