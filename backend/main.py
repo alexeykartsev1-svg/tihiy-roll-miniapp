@@ -574,6 +574,59 @@ def read_products() -> list[dict[str, Any]]:
         except OSError:
             logger.warning("Could not create Asian hot dog chicken seed marker at %s", chicken_marker)
 
+    # Owner-requested Asian hot dog with snow crab. It uses the existing product API,
+    # catalogue card, cart, favorites, composition modal and order flow.
+    crab_marker = PRODUCTS_FILE + ".asian-hotdog-snow-crab-v1"
+    if not os.path.exists(crab_marker):
+        def _crab_name_key(value: Any) -> str:
+            return re.sub(r"[^a-zа-яё0-9]", "", str(value or "").lower())
+
+        crab_existing = next(
+            (
+                item for item in data
+                if str(item.get("id", "")) == "asian_hotdog_crab"
+                or (
+                    "азиатский" in _crab_name_key(item.get("name"))
+                    and "краб" in _crab_name_key(item.get("name"))
+                    and "хотдог" in _crab_name_key(item.get("name"))
+                )
+            ),
+            None,
+        )
+        crab_card = {
+            "id": "asian_hotdog_crab",
+            "name": "Азиатский Хот-Дог Снежный краб",
+            "price": 490,
+            "cost": 0,
+            "weight": "280 г",
+            "pieces": 1,
+            "cat": "dogs",
+            "badge": "",
+            "desc": "Снежный краб, свежий огурец, рис, нори, соус спайси, соус унаги, кунжут.",
+            "card_description": "Снежный краб, свежий огурец, рис, нори, соус спайси, соус унаги, кунжут.",
+            "details": "Снежный краб, свежий огурец, рис, нори, соус спайси, соус унаги, кунжут.",
+            "photo": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/0b80e5a1-ac8d-42bd-833b-75811a1ba70b.webp",
+            "gallery": [],
+            "stock": None,
+            "hit_template": False,
+            "active": True,
+            "sort_order": 9,
+        }
+        if crab_existing is not None:
+            crab_card["id"] = str(crab_existing.get("id") or "asian_hotdog_crab")
+            crab_existing.update(crab_card)
+        else:
+            data.append(crab_card)
+        write_products(data)
+        try:
+            marker_dir = os.path.dirname(crab_marker)
+            if marker_dir:
+                os.makedirs(marker_dir, exist_ok=True)
+            with open(crab_marker, "w", encoding="utf-8") as handle:
+                handle.write("seeded\\n")
+        except OSError:
+            logger.warning("Could not create Asian hot dog snow crab seed marker at %s", crab_marker)
+
     # Owner-requested Salmon Panko roll. It is a real menu item so the
     # existing cart, favorites, composition and order API work without special cases.
     salmon_panko_marker = PRODUCTS_FILE + ".salmon-panko-roll-v1"
