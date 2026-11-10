@@ -4853,3 +4853,54 @@
  max-height:38.2px!important;
  flex:0 0 38.2px!important;
 }
+
+
+/* v59: mirror the Philadelphia HIT card's row proportions and green product-block styling for Salmon Panko. */
+.rr-card[data-card="salmon_panko"] .rr-card-info{
+ grid-template-rows:minmax(20cqw,1.35fr) minmax(0,1.55fr) minmax(0,.88fr) minmax(0,1.32fr)!important;
+ background:
+  radial-gradient(ellipse at 50% 0%,rgba(25,180,26,.22),transparent 62%),
+  linear-gradient(180deg,#061a09 0%,#061108 48%,#030805 100%)!important;
+ border-top:1px solid rgba(76,255,63,.86)!important;
+ box-shadow:inset 0 0 16px rgba(45,255,43,.17)!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-description{
+ border:1px solid rgba(134,255,113,.9)!important;
+ border-radius:12px!important;
+ background:linear-gradient(145deg,rgba(6,27,10,.99),rgba(3,10,6,.99))!important;
+ color:#fff!important;
+ box-shadow:0 0 7px rgba(67,255,53,.28),inset 0 0 8px rgba(74,255,58,.09)!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-meta{
+ border:1px solid rgba(83,255,66,.95)!important;
+ border-radius:11px!important;
+ background:linear-gradient(150deg,#09210b,#030906)!important;
+ color:#fff!important;
+ box-shadow:0 0 7px rgba(67,255,53,.4),inset 0 0 8px rgba(74,255,58,.1)!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-composition{
+ border:1px solid #5aff4a!important;
+ border-radius:999px!important;
+ background:linear-gradient(145deg,#0c3a10,#031107)!important;
+ color:#fff!important;
+ box-shadow:0 0 3px #61ff4b,0 0 10px rgba(44,255,37,.6),inset 0 0 8px rgba(111,255,90,.15)!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-composition span,
+.rr-card[data-card="salmon_panko"] .rr-card-composition b{
+ color:#8cff55!important;
+ text-shadow:0 0 6px rgba(92,255,58,.8)!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-purchase{
+ border:1px solid rgba(105,255,87,.9)!important;
+ border-radius:13px!important;
+ background:linear-gradient(160deg,#0a1f0c,#030806)!important;
+ box-shadow:0 0 8px rgba(46,255,43,.38),inset 0 0 9px rgba(92,255,72,.12)!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-price{
+ color:#fff!important;
+ text-shadow:0 1px 5px rgba(0,0,0,.85),0 0 7px rgba(131,255,114,.26)!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-image{
+ object-fit:contain!important;
+ object-position:center top!important;
+}
