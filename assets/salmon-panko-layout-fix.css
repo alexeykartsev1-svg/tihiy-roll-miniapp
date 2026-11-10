@@ -497,3 +497,46 @@
   object-position: center top !important;
   background: transparent !important;
 }
+
+
+/* Single Salmon Panko title plaque only.
+   The PNG already contains the green capsule; the h3 must remain a transparent holder. */
+.rr-card[data-card="salmon_panko"] .rr-card-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  text-shadow: none !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-title::before,
+.rr-card[data-card="salmon_panko"] .rr-card-title::after {
+  content: none !important;
+  display: none !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-title .rr-hit-panko-title-art {
+  display: block !important;
+  width: 94% !important;
+  height: 90% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: auto !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
