@@ -1,0 +1,72 @@
+/* Salmon Panko card: use natural image proportions and remove the duplicate blurred backdrop. */
+.rr-card[data-card="salmon_panko"] .rr-card-photo {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #041007 !important;
+  background-image: none !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-photo::before {
+  content: none !important;
+  display: none !important;
+  background-image: none !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-photo .rr-card-image {
+  position: relative !important;
+  inset: auto !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  object-position: center top !important;
+  background: transparent !important;
+}
+
+/* The title artwork must keep its own full ratio instead of being squeezed into a fixed-height h3. */
+.rr-card[data-card="salmon_panko"] .rr-card-title {
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  margin: 5px 0 7px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  line-height: 0 !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-title::before,
+.rr-card[data-card="salmon_panko"] .rr-card-title::after {
+  content: none !important;
+  display: none !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-title .rr-hit-panko-title-art {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  image-rendering: auto !important;
+}
