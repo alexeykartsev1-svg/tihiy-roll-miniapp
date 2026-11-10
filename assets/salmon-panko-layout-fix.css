@@ -200,3 +200,54 @@
   box-shadow: none !important;
   filter: none !important;
 }
+
+
+/* Salmon Panko: mirror the Shrimp Panko card's plain-on-card title state.
+   Keep the title slot, but remove the capsule, border, background and glow entirely. */
+.rr-card[data-card="salmon_panko"] .rr-card-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  color: #fff !important;
+  text-shadow: none !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-card-title::before,
+.rr-card[data-card="salmon_panko"] .rr-card-title::after {
+  content: none !important;
+  display: none !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-panko-title-plain {
+  display: inline-block !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #fff !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: inherit !important;
+  font-size: clamp(19px, 6.3cqw, 32px) !important;
+  font-style: italic !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  letter-spacing: -.025em !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,.85) !important;
+}
