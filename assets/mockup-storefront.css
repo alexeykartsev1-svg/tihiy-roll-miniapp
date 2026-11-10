@@ -4774,3 +4774,72 @@
  filter:none!important;
  image-rendering:auto!important;
 }
+
+
+/* v57: duplicate the Philadelphia HIT visual treatment for Salmon Panko; controls remain the shared native card controls. */
+.rr-card[data-card="salmon_panko"] .rr-card-title{
+ position:relative!important;
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ min-width:0!important;
+ min-height:0!important;
+ margin:0!important;
+ padding:1cqw 2cqw!important;
+ overflow:hidden!important;
+ white-space:normal!important;
+ border:1px solid #5aff4a!important;
+ border-radius:999px!important;
+ background:linear-gradient(180deg,#0a300d 0%,#031107 76%,#071e09 100%)!important;
+ box-shadow:0 0 3px rgba(72,255,56,.92),0 0 10px rgba(35,235,33,.48),inset 0 0 10px rgba(81,255,69,.13)!important;
+ text-align:center!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-title::before,
+.rr-card[data-card="salmon_panko"] .rr-card-title::after{
+ content:none!important;
+ display:none!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
+ display:block!important;
+ width:96%!important;
+ height:90%!important;
+ max-width:none!important;
+ max-height:none!important;
+ margin:auto!important;
+ object-fit:contain!important;
+ object-position:center center!important;
+ border:0!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+ filter:none!important;
+ image-rendering:auto!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-photo-art{
+ background:#020a04!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-photo-art .rr-card-image{
+ object-fit:contain!important;
+ object-position:center center!important;
+ background:#020a04!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-hit-meta-svg{
+ display:block!important;
+ width:16px!important;
+ height:16px!important;
+ flex:0 0 16px!important;
+ min-width:16px!important;
+ min-height:16px!important;
+ align-self:center!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-composition{
+ background:linear-gradient(145deg,#061009 0%,#020705 100%)!important;
+ border:1px solid #76ff55!important;
+ box-shadow:none!important;
+ filter:none!important;
+ outline:0!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-composition span,
+.rr-card[data-card="salmon_panko"] .rr-card-composition b{
+ color:#aaff7a!important;
+ text-shadow:none!important;
+}

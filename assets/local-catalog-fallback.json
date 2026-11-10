@@ -110,6 +110,25 @@
       "hit_template": false,
       "active": true,
       "sort_order": 6
+    },
+    {
+      "id": "salmon_panko",
+      "name": "Лосось Панко",
+      "price": 450,
+      "cost": 0,
+      "weight": "280 г",
+      "cat": "classic",
+      "badge": "ХИТ",
+      "desc": "Нежный лосось, сливочный сыр, свежий огурец и рис.",
+      "details": "Лосось, сливочный сыр, огурец, рис, нори",
+      "pieces": 8,
+      "stock": null,
+      "photo": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/f71f2016-5e33-44af-bc4a-846e5b5ce72b.webp",
+      "gallery": [],
+      "active": true,
+      "sort_order": 6,
+      "hit_template": true,
+      "card_description": "Нежный лосось, сливочный сыр, свежий огурец и рис."
     }
   ]
 }
