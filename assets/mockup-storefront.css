@@ -4843,3 +4843,13 @@
  color:#aaff7a!important;
  text-shadow:none!important;
 }
+
+
+/* v58: lock Salmon Panko title height to the Philadelphia HIT card grid. */
+.rr-card[data-card="salmon_panko"] .rr-card-title{
+ box-sizing:border-box!important;
+ height:38.2px!important;
+ min-height:38.2px!important;
+ max-height:38.2px!important;
+ flex:0 0 38.2px!important;
+}
