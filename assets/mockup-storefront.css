@@ -4815,12 +4815,12 @@
  image-rendering:auto!important;
 }
 .rr-card[data-card="salmon_panko"] .rr-card-photo-art{
- background:#020a04!important;
+ background:transparent!important;
 }
 .rr-card[data-card="salmon_panko"] .rr-card-photo-art .rr-card-image{
- object-fit:contain!important;
- object-position:center center!important;
- background:#020a04!important;
+ object-fit:cover!important;
+ object-position:center top!important;
+ background:transparent!important;
 }
 .rr-card[data-card="salmon_panko"] .rr-hit-meta-svg{
  display:block!important;
