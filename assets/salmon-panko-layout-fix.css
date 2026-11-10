@@ -251,3 +251,91 @@
   text-align: center !important;
   text-shadow: 0 1px 3px rgba(0,0,0,.85) !important;
 }
+
+
+/* Salmon Panko title decoration only: fish pictogram + lime Panko brush.
+   The live words remain HTML text, keeping their existing title slot and position. */
+.rr-card[data-card="salmon_panko"] .rr-panko-title-plain {
+  position: relative !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  text-shadow: none !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-panko-title-decor {
+  position: absolute !important;
+  z-index: 0 !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  pointer-events: none !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-panko-title-top,
+.rr-card[data-card="salmon_panko"] .rr-panko-title-bottom {
+  position: absolute !important;
+  z-index: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: inherit !important;
+  font-style: italic !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  letter-spacing: -.025em !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-panko-title-top {
+  top: 1% !important;
+  left: 31% !important;
+  width: 48% !important;
+  height: 45% !important;
+  color: #fff !important;
+  font-size: clamp(19px, 6.3cqw, 32px) !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,.85) !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-panko-title-bottom {
+  top: 46% !important;
+  left: 34% !important;
+  width: 47% !important;
+  height: 48% !important;
+  color: #071808 !important;
+  font-size: clamp(19px, 6.1cqw, 31px) !important;
+  text-shadow: none !important;
+}
