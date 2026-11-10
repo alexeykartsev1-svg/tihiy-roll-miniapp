@@ -70,3 +70,127 @@
   filter: none !important;
   image-rendering: auto !important;
 }
+
+
+/* v2: let the Salmon Panko card grow to the actual content height.
+   The old 51/49 fixed card tracks clipped the natural bottom of the hero image. */
+.rr-card.product-card[data-card="salmon_panko"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  grid-auto-rows: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+  overflow: hidden !important;
+  align-self: start !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-photo {
+  grid-row: 1 !important;
+  align-self: start !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+  overflow: hidden !important;
+  background: #041007 !important;
+  background-image: none !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-photo::before,
+.rr-card[data-card="salmon_panko"] .rr-card-photo::after {
+  content: none !important;
+  display: none !important;
+  background-image: none !important;
+  filter: none !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-photo .rr-card-image {
+  position: relative !important;
+  inset: auto !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  object-position: center top !important;
+  background: transparent !important;
+}
+
+/* Match the shrimp-panko title plaque inset (94% width / 90% height).
+   Keep the full source artwork visible and avoid stretching/cropping. */
+.rr-card[data-card="salmon_panko"] .rr-card-info {
+  grid-row: 2 !important;
+  align-self: start !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto auto auto auto !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-title {
+  grid-row: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  line-height: 0 !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-title::before,
+.rr-card[data-card="salmon_panko"] .rr-card-title::after {
+  content: none !important;
+  display: none !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-title .rr-hit-panko-title-art {
+  display: block !important;
+  width: 94% !important;
+  height: 90% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: auto !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  image-rendering: auto !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-description {
+  grid-row: 2 !important;
+  height: auto !important;
+  min-height: 82px !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-meta-row {
+  grid-row: 3 !important;
+  height: auto !important;
+  min-height: 52px !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-purchase {
+  grid-row: 4 !important;
+  height: auto !important;
+  min-height: 66px !important;
+}
