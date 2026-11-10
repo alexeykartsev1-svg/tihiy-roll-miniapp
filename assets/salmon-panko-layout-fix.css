@@ -224,3 +224,45 @@
   color: #ff414b !important;
   box-shadow: 0 0 8px rgba(255,65,75,.42) !important;
 }
+
+
+/* Final width match: mirror the reference Shrimp Panko's 96% × 90% image inset. */
+.rr-card[data-card="salmon_panko"] .rr-card-title .rr-hit-panko-title-art {
+  display: block !important;
+  width: 96% !important;
+  height: 90% !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: auto !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  image-rendering: auto !important;
+}
+
+/* Extend the description exactly across the information panel's 2.8cqw side gutters. */
+.rr-card[data-card="salmon_panko"] .rr-card-description {
+  width: calc(100% + 5.6cqw) !important;
+  max-width: none !important;
+  margin-left: -2.8cqw !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Match Philadelphia/Shrimp Panko composition button: crisp outline, no green haze. */
+.rr-card[data-card="salmon_panko"] .rr-card-composition {
+  background: linear-gradient(145deg, #061009 0%, #020705 100%) !important;
+  border: 1px solid #76ff55 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  outline: 0 !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-composition span,
+.rr-card[data-card="salmon_panko"] .rr-card-composition b {
+  color: #aaff7a !important;
+  text-shadow: none !important;
+}
