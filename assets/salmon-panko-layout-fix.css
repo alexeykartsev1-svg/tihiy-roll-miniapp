@@ -470,30 +470,14 @@
  image-rendering:auto!important;
 }
 
-/* Same card geometry as Philadelphia HIT. Product ID and order controls stay salmon_panko. */
-.rr-card.product-card[data-card="salmon_panko"] {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) !important;
-  grid-template-rows: minmax(0, 48fr) minmax(0, 52fr) !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  aspect-ratio: 994 / 1840 !important;
-  overflow: hidden !important;
-}
+/* Geometry reset: let Salmon Panko use the same shared catalogue card ratio and grid as Shrimp Panko.
+   Do not set a separate card aspect-ratio or grid split for this product. */
 .rr-card[data-card="salmon_panko"] .rr-card-photo {
-  grid-row: 1 !important;
-  position: relative !important;
-  display: block !important;
-  width: 100% !important;
   height: 100% !important;
-  min-width: 0 !important;
   min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  flex: none !important;
+  max-height: none !important;
   aspect-ratio: auto !important;
-  overflow: hidden !important;
+  flex: none !important;
   background: #090b0d !important;
   background-image: none !important;
 }
@@ -507,49 +491,9 @@
 .rr-card[data-card="salmon_panko"] .rr-card-photo .rr-card-image {
   position: absolute !important;
   inset: 0 !important;
-  display: block !important;
   width: 100% !important;
   height: 100% !important;
-  min-height: 0 !important;
-  max-height: none !important;
   object-fit: cover !important;
   object-position: center top !important;
   background: transparent !important;
-}
-.rr-card[data-card="salmon_panko"] .rr-card-info {
-  grid-row: 2 !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  max-height: none !important;
-}
-.rr-card[data-card="salmon_panko"] .rr-card-title {
-  grid-row: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-sizing: border-box !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  flex: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-}
-.rr-card[data-card="salmon_panko"] .rr-card-title .rr-hit-panko-title-art {
-  display: block !important;
-  width: 94% !important;
-  height: 90% !important;
-  max-width: none !important;
-  max-height: none !important;
-  margin: auto !important;
-  object-fit: contain !important;
-  object-position: center center !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  filter: none !important;
 }
