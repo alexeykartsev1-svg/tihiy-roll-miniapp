@@ -11,7 +11,7 @@ const tg=()=>window.Telegram?.WebApp||null;
 const find=id=>state.products.find(p=>p.id===id);
 const qty=id=>Number(state.cart[id]||0);
 const stock=p=>p?.stock==null?null:Math.max(0,Number(p.stock)||0);
-const photo=p=>p?.id==='salmon_panko'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/74831612-176a-489d-a0cb-6a68f139db2c.webp':(p?.id==='asian_hotdog_chicken'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/77b66bf7-aeed-43e9-9dc8-102499c0f0ef.webp':(p?.id==='asian_hotdog_shrimp'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/782d8c4d-7e39-444d-9429-f775d5ab704e.webp':(p?.id==='asian_hotdog_salmon'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/97a9ac28-fa86-4ad3-98c5-b8ca0b7d5b0e.webp':(p?.photo||'./assets/set-party.webp')));
+const photo=p=>p?.id==='salmon_panko'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/74831612-176a-489d-a0cb-6a68f139db2c.webp':(p?.id==='asian_hotdog_chicken'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/77b66bf7-aeed-43e9-9dc8-102499c0f0ef.webp':(p?.id==='asian_hotdog_shrimp'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/782d8c4d-7e39-444d-9429-f775d5ab704e.webp':(p?.id==='asian_hotdog_salmon'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/97a9ac28-fa86-4ad3-98c5-b8ca0b7d5b0e.webp':(p?.photo||'./assets/set-party.webp'))));
 const productTotal=()=>state.products.reduce((sum,p)=>sum+p.price*qty(p.id),0);
 const cartCount=()=>Object.values(state.cart).reduce((sum,n)=>sum+Number(n||0),0);
 const setPrice=s=>(s.items||[]).reduce((sum,i)=>sum+(find(i.id)?.price||0)*Number(i.qty||0),0);
