@@ -4997,3 +4997,78 @@
  clip-path:polygon(2% 22%,17% 10%,34% 21%,52% 4%,70% 18%,98% 5%,91% 80%,73% 91%,51% 82%,29% 97%,9% 79%)!important;
  transform:skewX(-7deg)!important;
 }
+
+
+/* v61: restore the approved full Salmon Panko poster, split cleanly into hero and one full title capsule. */
+.rr-card[data-card="salmon_panko"] .rr-card-photo{
+ position:relative!important;
+ aspect-ratio:1.12 / 1!important;
+ background-color:#061008!important;
+ background-image:url("https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/e549c69f-0d66-496c-afbb-7d3c6e8d303f.webp")!important;
+ background-repeat:no-repeat!important;
+ background-size:cover!important;
+ background-position:center center!important;
+ overflow:hidden!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-photo::before{
+ content:""!important;
+ position:absolute!important;
+ z-index:0!important;
+ inset:-8px!important;
+ background-image:url("https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/e549c69f-0d66-496c-afbb-7d3c6e8d303f.webp")!important;
+ background-size:cover!important;
+ background-position:center center!important;
+ background-repeat:no-repeat!important;
+ filter:blur(9px) brightness(.48)!important;
+ transform:scale(1.07)!important;
+ opacity:.88!important;
+ pointer-events:none!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-photo .rr-card-image{
+ position:absolute!important;
+ z-index:1!important;
+ inset:0!important;
+ width:100%!important;
+ height:100%!important;
+ object-fit:contain!important;
+ object-position:center center!important;
+ background:transparent!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-title{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ box-sizing:border-box!important;
+ width:calc(100% + 8px)!important;
+ height:38.2px!important;
+ min-height:38.2px!important;
+ max-height:38.2px!important;
+ flex:0 0 38.2px!important;
+ margin:0 0 0 -4px!important;
+ padding:0!important;
+ overflow:visible!important;
+ border:0!important;
+ border-radius:0!important;
+ background:transparent!important;
+ box-shadow:none!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-title::before,
+.rr-card[data-card="salmon_panko"] .rr-card-title::after{
+ content:none!important;
+ display:none!important;
+}
+.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
+ display:block!important;
+ width:100%!important;
+ height:100%!important;
+ max-width:none!important;
+ max-height:none!important;
+ margin:0!important;
+ object-fit:contain!important;
+ object-position:center center!important;
+ border:0!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+ filter:none!important;
+ image-rendering:auto!important;
+}
