@@ -159,3 +159,68 @@
   min-height: 16px !important;
   align-self: center !important;
 }
+
+
+/* Screenshot correction: same full-size title slot as Shrimp Panko, now vector-sharp. */
+.rr-card[data-card="salmon_panko"] .rr-card-title .rr-hit-panko-title-art {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: auto !important;
+  object-fit: fill !important;
+  object-position: center center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  image-rendering: auto !important;
+}
+
+/* Widen only the Salmon Panko description field, keeping it centered. */
+.rr-card[data-card="salmon_panko"] .rr-card-description {
+  width: calc(100% + 4cqw) !important;
+  max-width: none !important;
+  margin-left: -2cqw !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Mask the baked heart and show one real, tappable favorite control. */
+.rr-card[data-card="salmon_panko"] .rr-card-photo-art .rr-card-heart-art,
+.rr-card[data-card="salmon_panko"] .rr-card-photo-art .rr-card-heart-art.active {
+  position: absolute !important;
+  z-index: 15 !important;
+  top: 3.5% !important;
+  right: 2.8% !important;
+  display: grid !important;
+  place-items: center !important;
+  width: 16% !important;
+  height: 18% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  border: 1.5px solid rgba(255,255,255,.78) !important;
+  border-radius: 50% !important;
+  background: rgba(3,7,9,.98) !important;
+  color: #fff !important;
+  font-size: clamp(22px, 8.8cqw, 34px) !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  text-shadow: none !important;
+  box-shadow: 0 1px 5px rgba(0,0,0,.65) !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+.rr-card[data-card="salmon_panko"] .rr-card-photo-art .rr-card-heart-art.active {
+  border-color: rgba(255,255,255,.9) !important;
+  background: rgba(3,7,9,.99) !important;
+  color: #ff414b !important;
+  box-shadow: 0 0 8px rgba(255,65,75,.42) !important;
+}
