@@ -239,7 +239,7 @@ function renderHomeContent(){
  const sets=state.sets.filter(s=>s.active!==false);
  const set=sets.find(s=>s.id==='newyear')||sets[0];
  const heroProduct=state.products.find(p=>p.id==='philadelphia')||rolls[0]||state.products[0];
- if(hero&&heroProduct)hero.src=photo(heroProduct);
+ if(hero)hero.src=heroProduct?photo(heroProduct):'./assets/set-party.webp';
  const fav=id=>state.products.find(p=>p.id===id);
  const roll=rolls.find(p=>p.id==='philadelphia')||rolls[0]||heroProduct;
  const images={
