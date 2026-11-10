@@ -615,6 +615,44 @@ def read_products() -> list[dict[str, Any]]:
         except OSError:
             logger.warning("Could not create Salmon Panko seed marker at %s", salmon_panko_marker)
 
+    # Owner-requested Salmon Panko roll. This is a real server menu item so
+    # stock, cart orders and the server-side order validator all use the same ID.
+    salmon_panko_marker = PRODUCTS_FILE + ".salmon-panko-roll-v1"
+    if not os.path.exists(salmon_panko_marker):
+        salmon_panko = next((item for item in data if str(item.get("id", "")) == "salmon_panko"), None)
+        salmon_panko_card = {
+            "id": "salmon_panko",
+            "name": "Лосось Панко",
+            "price": 450,
+            "cost": 0,
+            "weight": "280 г",
+            "pieces": 8,
+            "cat": "classic",
+            "badge": "ХИТ",
+            "desc": "Нежный лосось, сливочный сыр, свежий огурец и рис.",
+            "card_description": "Нежный лосось, сливочный сыр, свежий огурец и рис.",
+            "details": "Лосось, сливочный сыр, огурец, рис, нори, панировка панко",
+            "photo": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/74831612-176a-489d-a0cb-6a68f139db2c.webp",
+            "gallery": [],
+            "stock": None,
+            "hit_template": True,
+            "active": True,
+            "sort_order": 9,
+        }
+        if salmon_panko is not None:
+            salmon_panko.update(salmon_panko_card)
+        else:
+            data.append(salmon_panko_card)
+        write_products(data)
+        try:
+            marker_dir = os.path.dirname(salmon_panko_marker)
+            if marker_dir:
+                os.makedirs(marker_dir, exist_ok=True)
+            with open(salmon_panko_marker, "w", encoding="utf-8") as handle:
+                handle.write("seeded\\n")
+        except OSError:
+            logger.warning("Could not create Salmon Panko seed marker at %s", salmon_panko_marker)
+
     return data
 
 def write_products(products: list[dict[str, Any]]) -> None:
