@@ -794,7 +794,7 @@ async function load(){
   if(app.initData)checkAdminEntry(app.initData);
  }
  const syncPhoneLinks=()=>{
-  const settings=state.settings,phone=settings.phone||'+7 923 000-58-57',digits=phone.replace(/\\D/g,'');
+  const settings=state.settings,phone=settings.phone||'+7 923 000-58-57',digits=phone.replace(/\D/g,'');
   $('#headerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));
   $('#footerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));
  };
