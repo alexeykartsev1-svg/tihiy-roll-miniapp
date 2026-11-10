@@ -8,6 +8,34 @@ const money=n=>Math.round(Number(n)||0).toLocaleString('ru-RU')+' ₽';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const apiGet=async path=>{const r=await fetch(API+path,{cache:'no-store'});if(!r.ok)throw Error('Сервер меню ответил '+r.status);return r.json();};
 const tg=()=>window.Telegram?.WebApp||null;
+
+let seasonalBannerObserver=null;
+function observeSeasonalBannerImages(cards){
+ const pending=cards.filter(card=>!card.hidden&&card.dataset.bannerSrc&&card.dataset.bannerLoaded!=='true');
+ if(!pending.length)return;
+ const loadBanner=card=>{
+  const src=card.dataset.bannerSrc;
+  if(!src||card.dataset.bannerLoaded==='true')return;
+  card.style.setProperty('background-image','url("'+src.replace(/"/g,'\\\"')+'")','important');
+  card.dataset.bannerLoaded='true';
+ };
+ if(!('IntersectionObserver' in window)){
+  pending.forEach(loadBanner);
+  return;
+ }
+ if(!seasonalBannerObserver){
+  const root=$('#homeScreen .home-scroll');
+  seasonalBannerObserver=new IntersectionObserver(entries=>{
+   entries.forEach(entry=>{
+    if(!entry.isIntersecting)return;
+    loadBanner(entry.target);
+    seasonalBannerObserver.unobserve(entry.target);
+   });
+  },{root,rootMargin:'520px 0px',threshold:0.01});
+ }
+ pending.forEach(card=>seasonalBannerObserver.observe(card));
+}
+
 const find=id=>state.products.find(p=>p.id===id);
 const qty=id=>Number(state.cart[id]||0);
 const stock=p=>p?.stock==null?null:Math.max(0,Number(p.stock)||0);
@@ -194,9 +222,9 @@ function card(p){
  const cleanBadge=String(p.badge||'').trim();
  const badge=hit&&!artPhoto?'<span class="rr-card-hit-badge '+(p.id==='salmon_panko'?'rr-salmon-panko-hit':'')+'">✦ ХИТ</span>':(!hit&&cleanBadge&&!/хит/i.test(cleanBadge)?'<span class="rr-card-badge">'+esc(cleanBadge)+'</span>':'');
  return '<article class="product-card rr-card '+(pankoCard?'rr-card-panko ':'')+(hit?'rr-card-is-hit ':'')+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
-  +'<div class="rr-card-photo '+(artPhoto?'rr-card-photo-art':'')+'"><img class="rr-card-image" src="'+image+'" alt="'+esc(p.name)+'" loading="'+(artPhoto?'eager':'lazy')+'" decoding="async">'+badge+heart+'</div>'
+  +'<div class="rr-card-photo '+(artPhoto?'rr-card-photo-art':'')+'"><img class="rr-card-image" src="'+image+'" alt="'+esc(p.name)+'" loading="lazy" decoding="async" fetchpriority="low">'+badge+heart+'</div>'
   +'<div class="rr-card-info">'
-  +'<h3 class="rr-card-title" aria-label="'+(p.id==='philadelphia'?'Креветка Панко':p.id==='salmon_panko'?'Лосось Панко':esc(p.name))+'">'+(p.id==='philadelphia'?'<img class="rr-hit-panko-title-art" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/fb7d8b7d-07b1-415a-b38d-364b5a6e6014.png" alt="Креветка Панко" loading="eager" decoding="async">':p.id==='salmon_panko'?'<span class="rr-panko-title-plain"><img class="rr-panko-title-decor" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/dd85965a-02fe-4f29-a2a9-39e269099767.png" alt="" aria-hidden="true" loading="eager" decoding="async"><span class="rr-panko-title-top">Лосось</span><span class="rr-panko-title-bottom">Панко</span></span>':p.id==='asian_hotdog_salmon'?'<span class="rr-salmon-title"><span>Азиатский Хот-Дог</span><b>Лосось</b></span>':p.id==='asian_hotdog_shrimp'?'<span class="rr-shrimp-title"><span>Азиатский Хот-Дог</span><b>Креветка</b></span>':p.id==='asian_hotdog_chicken'?'<span class="rr-chicken-title"><span>Азиатский Хот-Дог</span><b>Курица</b></span>':'<span>'+esc(p.name)+'</span>')+'</h3>'
+  +'<h3 class="rr-card-title" aria-label="'+(p.id==='philadelphia'?'Креветка Панко':p.id==='salmon_panko'?'Лосось Панко':esc(p.name))+'">'+(p.id==='philadelphia'?'<img class="rr-hit-panko-title-art" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/fb7d8b7d-07b1-415a-b38d-364b5a6e6014.png" alt="Креветка Панко" loading="lazy" decoding="async" fetchpriority="low">':p.id==='salmon_panko'?'<span class="rr-panko-title-plain"><img class="rr-panko-title-decor" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/dd85965a-02fe-4f29-a2a9-39e269099767.png" alt="" aria-hidden="true" loading="lazy" decoding="async" fetchpriority="low"><span class="rr-panko-title-top">Лосось</span><span class="rr-panko-title-bottom">Панко</span></span>':p.id==='asian_hotdog_salmon'?'<span class="rr-salmon-title"><span>Азиатский Хот-Дог</span><b>Лосось</b></span>':p.id==='asian_hotdog_shrimp'?'<span class="rr-shrimp-title"><span>Азиатский Хот-Дог</span><b>Креветка</b></span>':p.id==='asian_hotdog_chicken'?'<span class="rr-chicken-title"><span>Азиатский Хот-Дог</span><b>Курица</b></span>':'<span>'+esc(p.name)+'</span>')+'</h3>'
   +'<p class="rr-card-description">'+esc(desc)+'</p>'
   +'<div class="rr-card-meta-row"><div class="rr-card-meta"><span>'+(pankoCard?'<svg class="rr-hit-meta-svg rr-hit-meta-sushi" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><g stroke="#f8f5e9" stroke-width="2.2" stroke-linejoin="round"><path d="M4.5 19v15.5c0 5 16.5 5 16.5 0V19" fill="#fff"/><ellipse cx="12.75" cy="19" rx="8.25" ry="4.5" fill="#f4a07f"/><ellipse cx="12.75" cy="19" rx="2.7" ry="1.6" fill="#fff0db" stroke="none"/><path d="M26.5 11.5v20c0 5 17 5 17 0v-20" fill="#fff"/><ellipse cx="35" cy="11.5" rx="8.5" ry="4.7" fill="#f4a07f"/><ellipse cx="35" cy="11.5" rx="2.7" ry="1.6" fill="#fff0db" stroke="none"/></g><path d="M7 28q5.5 2.6 11 0M29 22q6 2.8 12 0" fill="none" stroke="#214a20" stroke-width="2.1" stroke-linecap="round"/></svg>':'<i aria-hidden="true">🍣</i>')+Number(p.pieces||8)+' шт.</span><span>'+(pankoCard?'<svg class="rr-hit-meta-svg rr-hit-meta-scale" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><g fill="none" stroke="#f4f5ed" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 7.5h28l-2.5 9H12.5z"/><path d="M24 16.5v4"/><circle cx="24" cy="28" r="10.5"/><path d="M24 28l5-5"/><path d="M20.5 28h7"/><path d="M14 40.5h20"/></g><path d="M24 26v4.8" stroke="#8dff62" stroke-width="2.2" stroke-linecap="round"/><circle cx="24" cy="28" r="1.8" fill="#8dff62"/></svg>':'<i aria-hidden="true">⚖</i>')+esc(p.weight||'280 г')+'</span></div>'
   +'<button class="rr-card-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">››</b></button></div>'
@@ -242,6 +270,7 @@ function renderHomeContent(){
   if(disabled)card.style.setProperty('display','none','important');
   else card.style.removeProperty('display');
  });
+ observeSeasonalBannerImages(seasonalCards);
  const seasonalStack=$('.home-seasonal-stack');
  const allSeasonalHidden=seasonalCards.length>0&&seasonalCards.every(card=>card.hidden);
  if(seasonalStack){
@@ -341,7 +370,7 @@ function detail(p,openOnMobile=true){
  const detailExtra=$('#detailExtra');if(detailExtra){detailExtra.textContent='';detailExtra.hidden=true;}
  $('#detailFavorite').textContent=state.favorites.has(p.id)?'♥':'♡';
  $('#detailCompositionTitle').textContent=p.set?'Состав сета':'Состав';
- $('#photoStrip').innerHTML=state.photos.map((src,i)=>'<button class="thumb '+(i===0?'active':'')+'" type="button" data-photo-index="'+i+'"><img src="'+src+'" alt="Фото '+(i+1)+'"></button>').join('')+'<button class="thumb thumb-next" type="button" data-gallery-next>›</button>';
+ $('#photoStrip').innerHTML=state.photos.map((src,i)=>'<button class="thumb '+(i===0?'active':'')+'" type="button" data-photo-index="'+i+'"><img src="'+src+'" alt="Фото '+(i+1)+'" loading="lazy" decoding="async"></button>').join('')+'<button class="thumb thumb-next" type="button" data-gallery-next>›</button>';
  const counter=$('#detailPhotoCount');if(counter){counter.textContent='1 / '+Math.max(1,state.photos.length);counter.hidden=state.photos.length<2;}
  const grid=$('#ingredientGrid');grid.classList.toggle('set-composition-grid',!!p.set);
  if(p.set){
@@ -730,8 +759,75 @@ function updateHomePhone(settings){
  if(link){link.href='tel:'+dial;link.setAttribute('aria-label','Позвонить '+display);}
  if(text)text.textContent=display;
 }
-async function load(){let fallback={products:[]};try{fallback=await (await fetch('./assets/local-catalog-fallback.json',{cache:'force-cache'})).json();}catch(e){}const results=await Promise.allSettled([apiGet('/api/menu'),apiGet('/api/site-content'),apiGet('/api/store-settings')]);const local=new Map((fallback.products||[]).map(p=>[p.id,p]));state.products=results[0].status==='fulfilled'?results[0].value.filter(p=>p.active!==false).map(p=>({...local.get(p.id),...p,photo:p.photo||local.get(p.id)?.photo||''})):fallback.products||[];state.sets=results[1].status==='fulfilled'?(results[1].value.sets||[]).filter(s=>s.active!==false):[];state.seasonalBanners=results[1].status==='fulfilled'&&Array.isArray(results[1].value.seasonal_banners)?results[1].value.seasonal_banners:[];state.settings=results[2].status==='fulfilled'?results[2].value:{};updateHomePhone(state.settings);updateStoreHours();syncHomeShortcutState();if(!window.__tihiyHoursTimer)window.__tihiyHoursTimer=setInterval(updateStoreHours,30000);const pickupHome=$('#homePickupAddress');if(pickupHome)pickupHome.textContent=state.settings.pickup_address||'Социалистическая, 26, Чарышское';loadSaved();for(const id of Object.keys(state.cart)){const p=find(id);if(!p){delete state.cart[id];continue;}if(stock(p)!==null)state.cart[id]=Math.min(stock(p),qty(id));}renderAll();const first=find('philadelphia')||state.products[0];if(first)detail(first,false);showHomeScreen();const app=tg();if(app){app.ready();app.expand();if(app.initData)checkAdminEntry(app.initData);}const settings=state.settings,phone=settings.phone||'+7 923 000-58-57',digits=phone.replace(/\D/g,'');$('#headerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));$('#footerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));}
-document.addEventListener('click',e=>{const favoriteButton=e.target.closest('[data-fav]');if(favoriteButton){e.preventDefault();e.stopPropagation();const id=favoriteButton.dataset.fav,p=id.startsWith('set:')?{set:true}:find(id),added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();syncFavoriteButtons(id);renderBadges();if(state.activeScreen==='favoritesScreen'||$('#favoritesModal')?.classList.contains('show'))renderFavorites();toast(productKind(p)+(added?' добавлен в избранное':' удалён из избранного'));return;}const seasonalCard=e.target.closest('.home-seasonal-card[data-seasonal-banner]');if(seasonalCard){openSetFromHome(seasonalCard.dataset.seasonalBanner);return;}const composition=e.target.closest('[data-composition]');if(composition){showBuilderInfo(composition.dataset.composition);return;}const b=e.target.closest('button');if(!b)return;if(b.dataset.filter){state.filter=b.dataset.filter;$$('.category-tile').forEach(x=>x.classList.toggle('active',x===b));renderCatalog();return;}if(b.dataset.cardQty){const id=b.dataset.id,delta=Number(b.dataset.cardQty)||0;if(id.startsWith('set:'))changeSetCart(id.slice(4),delta);else changeCart(id,delta);return;}if(b.dataset.add){const id=b.dataset.add;if(id.startsWith('set:'))addSet(state.sets.find(s=>s.id===id.slice(4)));else addProduct(find(id),1);return;}if(b.dataset.fav){const id=b.dataset.fav,p=id.startsWith('set:')?{set:true}:find(id),added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();syncFavoriteButtons(id);renderBadges();if(state.activeScreen==='favoritesScreen'||$('#favoritesModal')?.classList.contains('show'))renderFavorites();toast(productKind(p)+(added?' добавлен в избранное':' удалён из избранного'));return;}if(b.dataset.cartQty){changeCart(b.dataset.id,Number(b.dataset.cartQty));return;}if(b.dataset.cartRemove){changeCart(b.dataset.cartRemove,-qty(b.dataset.cartRemove));return;}if(b.dataset.builderFilter!==undefined){state.builderFilter=b.dataset.builderFilter;renderBuilder();return;}if(b.dataset.builderProduct){changeBuilderProduct(b.dataset.builderProduct,Number(b.dataset.delta)||0);return;}if(b.dataset.builderSet){changeBuilderSet(b.dataset.builderSet,Number(b.dataset.delta)||0);return;}if(b.hasAttribute('data-workflow-back')){returnToCatalogue();return;}if(b.id==='builderAddToCart'){addBuilderToCart();return;}if(b.id==='cartCheckout'){openModal('cartModal');return;}if(b.id==='cartKeepShopping'){returnToCatalogue();return;}if(b.id==='confirmationHome'){showHomeScreen();return;}if(b.hasAttribute('data-open-cart')){showCartScreen();return;}if(b.hasAttribute('data-open-favorites')){openModal('favoritesModal');return;}if(b.dataset.close){closeModal(b.dataset.close);return;}if(b.dataset.photoIndex!==undefined){showGalleryPhoto(Number(b.dataset.photoIndex));return;}if(b.hasAttribute('data-gallery-next')){showGalleryPhoto(state.photoIndex+1);return;}if(b.id==='detailBack'){document.body.classList.remove('detail-open');$('#detailDevice').classList.remove('mobile-active');return;}if(b.id==='detailMinus'){changeDetail(-1);return;}if(b.id==='detailPlus'){changeDetail(1);return;}if(b.id==='detailAdd'){addSelected();return;}if(b.id==='detailFavorite'&&state.selected){const item=state.selected,id=item.id,added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();renderBadges();b.textContent=added?'♥':'♡';toast(productKind(item)+(added?' добавлен в избранное':' удалён из избранного'));return;}if(b.id==='detailShare'){if(navigator.share)navigator.share({title:state.selected?.name||'Тихий ролл',url:location.href}).catch(()=>{});else toast('Поделись ссылкой на магазин.');return;}if(b.id==='filterOpen'||b.classList.contains('menu-trigger')){openModal('filtersModal');return;}if(b.dataset.filterOption){state.filter=b.dataset.filterOption;renderFilterOptions();return;}if(b.id==='applyFilters'){renderCatalog();closeModal('filtersModal');return;}if(b.dataset.removeFav){state.favorites.delete(b.dataset.removeFav);save();renderFavorites();renderBadges();return;}if(b.dataset.fulfillment){updateCheckoutFulfillment(b.dataset.fulfillment);return;}if(b.hasAttribute('data-home-catalog')){state.filter='all';returnToCatalogue();$$('.category-tile').forEach(x=>x.classList.remove('active'));renderCatalog();if($('#catalogue'))$('#catalogue').scrollTop=0;return;}if(b.hasAttribute('data-home-builder')){showBuilderScreen();return;}if(b.hasAttribute('data-home-newyear')){openSetFromHome('newyear');return;}if(b.dataset.homeFilter){state.filter=b.dataset.homeFilter;syncHomeShortcutState();returnToCatalogue();$$('.category-tile').forEach(x=>x.classList.toggle('active',x.dataset.filter===state.filter));renderCatalog();if($('#catalogue'))$('#catalogue').scrollTop=0;return;}if(b.dataset.nav==='home'){showHomeScreen();return;}if(b.dataset.nav==='favorites'){showFavoritesScreen();return;}if(b.dataset.nav==='catalogue'){returnToCatalogue();return;}if(b.dataset.nav==='builder'){showBuilderScreen();return;}if(b.dataset.nav==='cart'){showCartScreen();return;}});
+async function load(){
+ let fallback={products:[]};
+ try{
+  const response=await fetch('./assets/local-catalog-fallback.json',{cache:'force-cache'});
+  if(response.ok)fallback=await response.json();
+ }catch(e){}
+ state.products=Array.isArray(fallback.products)?fallback.products.filter(p=>p.active!==false):[];
+ state.sets=[];
+ state.seasonalBanners=[];
+ state.settings={};
+ const localProducts=new Map(state.products.map(p=>[p.id,p]));
+ updateHomePhone(state.settings);
+ updateStoreHours();
+ syncHomeShortcutState();
+ if(!window.__tihiyHoursTimer)window.__tihiyHoursTimer=setInterval(updateStoreHours,30000);
+ const pickupHome=$('#homePickupAddress');
+ if(pickupHome)pickupHome.textContent='Социалистическая, 26, Чарышское';
+ loadSaved();
+ for(const id of Object.keys(state.cart)){
+  const p=find(id);
+  if(!p){delete state.cart[id];continue;}
+  if(stock(p)!==null)state.cart[id]=Math.min(stock(p),qty(id));
+ }
+ // Render the local snapshot immediately; API refresh happens in the background.
+ renderAll();
+ const first=find('philadelphia')||state.products[0];
+ if(first)detail(first,false);
+ showHomeScreen();
+ const app=tg();
+ if(app){
+  app.ready();
+  app.expand();
+  if(app.initData)checkAdminEntry(app.initData);
+ }
+ const syncPhoneLinks=()=>{
+  const settings=state.settings,phone=settings.phone||'+7 923 000-58-57',digits=phone.replace(/\\D/g,'');
+  $('#headerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));
+  $('#footerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));
+ };
+ syncPhoneLinks();
+ Promise.allSettled([apiGet('/api/menu'),apiGet('/api/site-content'),apiGet('/api/store-settings')]).then(results=>{
+  if(results[0].status==='fulfilled'&&Array.isArray(results[0].value)){
+   const activeProducts=results[0].value.filter(p=>p.active!==false);
+   state.products=activeProducts.map(apiProduct=>{
+    const existing=localProducts.get(apiProduct.id)||{};
+    Object.assign(existing,apiProduct,{photo:apiProduct.photo||existing.photo||''});
+    return existing;
+   });
+  }
+  if(results[1].status==='fulfilled'){
+   const content=results[1].value||{};
+   state.sets=(content.sets||[]).filter(s=>s.active!==false);
+   state.seasonalBanners=Array.isArray(content.seasonal_banners)?content.seasonal_banners:[];
+  }
+  if(results[2].status==='fulfilled')state.settings=results[2].value||{};
+  updateHomePhone(state.settings);
+  updateStoreHours();
+  syncHomeShortcutState();
+  const address=$('#homePickupAddress');
+  if(address)address.textContent=state.settings.pickup_address||'Социалистическая, 26, Чарышское';
+  for(const id of Object.keys(state.cart)){
+   const p=find(id);
+   if(!p){delete state.cart[id];continue;}
+   if(stock(p)!==null)state.cart[id]=Math.min(stock(p),qty(id));
+  }
+  syncPhoneLinks();
+  renderAll();
+ }).catch(()=>{});
+}document.addEventListener('click',e=>{const favoriteButton=e.target.closest('[data-fav]');if(favoriteButton){e.preventDefault();e.stopPropagation();const id=favoriteButton.dataset.fav,p=id.startsWith('set:')?{set:true}:find(id),added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();syncFavoriteButtons(id);renderBadges();if(state.activeScreen==='favoritesScreen'||$('#favoritesModal')?.classList.contains('show'))renderFavorites();toast(productKind(p)+(added?' добавлен в избранное':' удалён из избранного'));return;}const seasonalCard=e.target.closest('.home-seasonal-card[data-seasonal-banner]');if(seasonalCard){openSetFromHome(seasonalCard.dataset.seasonalBanner);return;}const composition=e.target.closest('[data-composition]');if(composition){showBuilderInfo(composition.dataset.composition);return;}const b=e.target.closest('button');if(!b)return;if(b.dataset.filter){state.filter=b.dataset.filter;$$('.category-tile').forEach(x=>x.classList.toggle('active',x===b));renderCatalog();return;}if(b.dataset.cardQty){const id=b.dataset.id,delta=Number(b.dataset.cardQty)||0;if(id.startsWith('set:'))changeSetCart(id.slice(4),delta);else changeCart(id,delta);return;}if(b.dataset.add){const id=b.dataset.add;if(id.startsWith('set:'))addSet(state.sets.find(s=>s.id===id.slice(4)));else addProduct(find(id),1);return;}if(b.dataset.fav){const id=b.dataset.fav,p=id.startsWith('set:')?{set:true}:find(id),added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();syncFavoriteButtons(id);renderBadges();if(state.activeScreen==='favoritesScreen'||$('#favoritesModal')?.classList.contains('show'))renderFavorites();toast(productKind(p)+(added?' добавлен в избранное':' удалён из избранного'));return;}if(b.dataset.cartQty){changeCart(b.dataset.id,Number(b.dataset.cartQty));return;}if(b.dataset.cartRemove){changeCart(b.dataset.cartRemove,-qty(b.dataset.cartRemove));return;}if(b.dataset.builderFilter!==undefined){state.builderFilter=b.dataset.builderFilter;renderBuilder();return;}if(b.dataset.builderProduct){changeBuilderProduct(b.dataset.builderProduct,Number(b.dataset.delta)||0);return;}if(b.dataset.builderSet){changeBuilderSet(b.dataset.builderSet,Number(b.dataset.delta)||0);return;}if(b.hasAttribute('data-workflow-back')){returnToCatalogue();return;}if(b.id==='builderAddToCart'){addBuilderToCart();return;}if(b.id==='cartCheckout'){openModal('cartModal');return;}if(b.id==='cartKeepShopping'){returnToCatalogue();return;}if(b.id==='confirmationHome'){showHomeScreen();return;}if(b.hasAttribute('data-open-cart')){showCartScreen();return;}if(b.hasAttribute('data-open-favorites')){openModal('favoritesModal');return;}if(b.dataset.close){closeModal(b.dataset.close);return;}if(b.dataset.photoIndex!==undefined){showGalleryPhoto(Number(b.dataset.photoIndex));return;}if(b.hasAttribute('data-gallery-next')){showGalleryPhoto(state.photoIndex+1);return;}if(b.id==='detailBack'){document.body.classList.remove('detail-open');$('#detailDevice').classList.remove('mobile-active');return;}if(b.id==='detailMinus'){changeDetail(-1);return;}if(b.id==='detailPlus'){changeDetail(1);return;}if(b.id==='detailAdd'){addSelected();return;}if(b.id==='detailFavorite'&&state.selected){const item=state.selected,id=item.id,added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();renderBadges();b.textContent=added?'♥':'♡';toast(productKind(item)+(added?' добавлен в избранное':' удалён из избранного'));return;}if(b.id==='detailShare'){if(navigator.share)navigator.share({title:state.selected?.name||'Тихий ролл',url:location.href}).catch(()=>{});else toast('Поделись ссылкой на магазин.');return;}if(b.id==='filterOpen'||b.classList.contains('menu-trigger')){openModal('filtersModal');return;}if(b.dataset.filterOption){state.filter=b.dataset.filterOption;renderFilterOptions();return;}if(b.id==='applyFilters'){renderCatalog();closeModal('filtersModal');return;}if(b.dataset.removeFav){state.favorites.delete(b.dataset.removeFav);save();renderFavorites();renderBadges();return;}if(b.dataset.fulfillment){updateCheckoutFulfillment(b.dataset.fulfillment);return;}if(b.hasAttribute('data-home-catalog')){state.filter='all';returnToCatalogue();$$('.category-tile').forEach(x=>x.classList.remove('active'));renderCatalog();if($('#catalogue'))$('#catalogue').scrollTop=0;return;}if(b.hasAttribute('data-home-builder')){showBuilderScreen();return;}if(b.hasAttribute('data-home-newyear')){openSetFromHome('newyear');return;}if(b.dataset.homeFilter){state.filter=b.dataset.homeFilter;syncHomeShortcutState();returnToCatalogue();$$('.category-tile').forEach(x=>x.classList.toggle('active',x.dataset.filter===state.filter));renderCatalog();if($('#catalogue'))$('#catalogue').scrollTop=0;return;}if(b.dataset.nav==='home'){showHomeScreen();return;}if(b.dataset.nav==='favorites'){showFavoritesScreen();return;}if(b.dataset.nav==='catalogue'){returnToCatalogue();return;}if(b.dataset.nav==='builder'){showBuilderScreen();return;}if(b.dataset.nav==='cart'){showCartScreen();return;}});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const seasonalCard=e.target.closest('.home-seasonal-card[data-seasonal-banner]');if(!seasonalCard)return;e.preventDefault();openSetFromHome(seasonalCard.dataset.seasonalBanner);});
 const galleryStage=$('.detail-image-stage');
 let galleryTouchStart=null;
