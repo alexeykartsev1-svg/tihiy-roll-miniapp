@@ -5072,3 +5072,59 @@
  filter:none!important;
  image-rendering:auto!important;
 }
+
+
+/* v1: keep the storefront viewport fixed to the device width.
+   Only the homepage's outer scroll area loses horizontal scrolling;
+   intentional inner carousels such as customer reviews remain swipeable. */
+html,
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: clip !important;
+}
+
+#referenceBoard.reference-board.workflow-mode {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  overflow-x: clip !important;
+}
+
+.catalogue-device.workflow-mode,
+.workflow-screen {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+#homeScreen.workflow-screen {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-x: clip !important;
+  overscroll-behavior-x: none !important;
+}
+
+#homeScreen > .home-scroll {
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-x: none !important;
+}
+
+/* Prevent wide home sections from widening the page; don't clip the review carousel. */
+#homeScreen > .home-scroll > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#homeScreen .home-reviews-track {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+}
