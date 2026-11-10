@@ -7,11 +7,13 @@
   <meta name="description" content="Тихий ролл — роллы, сеты, азиатские хот-доги и закуски. Заказ к удобному времени.">
   <title>Тихий ролл — меню</title>
   <link rel="preconnect" href="https://tihiy-roll-order-api.onrender.com">
-  <link rel="stylesheet" href="./assets/mockup-storefront.css?v=home-fixed-viewport-v1">
+  <link rel="preconnect" href="https://d2ol7oe51mr4n9.cloudfront.net">
+  <link rel="dns-prefetch" href="//d2ol7oe51mr4n9.cloudfront.net">
+  <link rel="stylesheet" href="./assets/mockup-storefront.css?v=home-performance-v1">
   <link rel="stylesheet" href="./assets/salmon-panko-layout-fix.css?v=panko-standard-heart-hit-align-v23">
   <link rel="stylesheet" href="./assets/home-reviews.css?v=reviews-20261103">
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="./assets/mockup-storefront.js?v=panko-standard-heart-hit-align-v23" defer></script>
+  <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+  <script src="./assets/mockup-storefront.js?v=storefront-performance-v1" defer></script>
   <script src="./assets/home-reviews.js?v=reviews-20261103" defer></script>
 </head>
 <body>
@@ -89,7 +91,7 @@
             <img class="home-brand-exact-image" src="./assets/tihiy-roll-header-retina.webp?v=retina-852x200-v28" alt="Тихий Ролл — доставка азиатской еды" loading="eager" decoding="async">
           </div>
           <section class="home-hero">
-            <img class="home-hero-photo" id="homeHeroPhoto" src="./assets/set-party.webp" alt="Свежие роллы" loading="eager">
+            <img class="home-hero-photo" id="homeHeroPhoto" alt="Свежие роллы" loading="eager" decoding="async" fetchpriority="high">
             <div class="home-hero-shade"></div>
             <div class="home-hero-copy">
               <h2>Вкус<br>в каждой<br>детали</h2>
@@ -139,10 +141,10 @@
               </span>
             </button>
             <div class="home-seasonal-stack" aria-label="Сезонные предложения">
-              <div class="home-seasonal-card" data-seasonal-banner="autumn" role="button" tabindex="0" aria-label="Открыть Осенний сет «Хорошее настроение». Осенний сет «Хорошее настроение»: Омега 6, много рыбы" style="--season-banner-image:url('https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/750a6357-d9aa-41e4-b255-7130c9a38bf3.webp')"></div>
-              <div class="home-seasonal-card" data-seasonal-banner="winter" role="button" tabindex="0" aria-label="Открыть Зимний сет «Согревающий». Зимний сет «Согревающий»: много горячих и тёплых роллов и азиатских хот-догов" style="--season-banner-image:url('https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/b75760da-c927-4718-84ee-711abca0da51.webp')"></div>
-              <div class="home-seasonal-card" data-seasonal-banner="spring" role="button" tabindex="0" aria-label="Открыть Весенний сет «Цветение». Весенний сет «Цветение»: много витаминов, больше овощей и рыбы" style="--season-banner-image:url('https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/470cf8a2-6945-4889-a564-f394004f6013.webp')"></div>
-              <div class="home-seasonal-card" data-seasonal-banner="summer" role="button" tabindex="0" aria-label="Открыть Летний сет «Охлаждающий». Летний сет «Охлаждающий»: больше сочности" style="--season-banner-image:url('https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/db23cf4f-01a3-4842-8779-16541fb34fd7.webp')"></div>
+              <div class="home-seasonal-card" data-seasonal-banner="autumn" role="button" tabindex="0" aria-label="Открыть Осенний сет «Хорошее настроение». Осенний сет «Хорошее настроение»: Омега 6, много рыбы" data-banner-src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/750a6357-d9aa-41e4-b255-7130c9a38bf3.webp"></div>
+              <div class="home-seasonal-card" data-seasonal-banner="winter" role="button" tabindex="0" aria-label="Открыть Зимний сет «Согревающий». Зимний сет «Согревающий»: много горячих и тёплых роллов и азиатских хот-догов" data-banner-src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/b75760da-c927-4718-84ee-711abca0da51.webp"></div>
+              <div class="home-seasonal-card" data-seasonal-banner="spring" role="button" tabindex="0" aria-label="Открыть Весенний сет «Цветение». Весенний сет «Цветение»: много витаминов, больше овощей и рыбы" data-banner-src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/470cf8a2-6945-4889-a564-f394004f6013.webp"></div>
+              <div class="home-seasonal-card" data-seasonal-banner="summer" role="button" tabindex="0" aria-label="Открыть Летний сет «Охлаждающий». Летний сет «Охлаждающий»: больше сочности" data-banner-src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/db23cf4f-01a3-4842-8779-16541fb34fd7.webp"></div>
             </div>
           </section>
           <section class="home-service-panel" aria-label="Режим работы и заказ по телефону">
@@ -180,13 +182,13 @@
             <article class="home-review-slide" aria-label="Отзыв 1 из 20">
               <div class="home-review-frame">
                 <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
-                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/69d3eaf1-e4e3-4570-a263-ff6d957b97f1.jpg" alt="Оригинальный скриншот переписки с отзывом 1" loading="eager" decoding="async">
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/69d3eaf1-e4e3-4570-a263-ff6d957b97f1.jpg" alt="Оригинальный скриншот переписки с отзывом 1" loading="lazy" decoding="async">
               </div>
             </article>
             <article class="home-review-slide" aria-label="Отзыв 2 из 20">
               <div class="home-review-frame">
                 <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
-                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/5703a840-36a3-4185-a253-f37f89bf17b0.jpg" alt="Оригинальный скриншот переписки с отзывом 2" loading="eager" decoding="async">
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/5703a840-36a3-4185-a253-f37f89bf17b0.jpg" alt="Оригинальный скриншот переписки с отзывом 2" loading="lazy" decoding="async">
               </div>
             </article>
             <article class="home-review-slide" aria-label="Отзыв 3 из 20">
@@ -499,7 +501,7 @@
     <section class="device-frame detail-device" id="detailDevice" aria-label="Карточка выбранного товара">
       <div class="detail-image-stage">
         
-        <img id="detailHero" src="./assets/set-party.webp" alt="Филадельфия"><div class="detail-photo-count" id="detailPhotoCount">1 / 5</div>
+        <img id="detailHero" alt="Филадельфия" loading="lazy" decoding="async"><div class="detail-photo-count" id="detailPhotoCount">1 / 5</div>
         <div class="detail-topbar">
           <button class="round-icon detail-back" type="button" id="detailBack" aria-label="Назад">‹</button>
           <a class="brand-logo detail-brand-logo" href="#catalogue" aria-label="Тихий ролл">
@@ -519,14 +521,7 @@
         </div>
       </div>
       <div class="detail-scroll">
-        <div class="photo-strip" id="photoStrip" aria-label="Фотографии блюда">
-          <button class="thumb active" type="button"><img src="./assets/set-party.webp" alt="></button>
-          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
-          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
-          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
-          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
-          <button class="thumb thumb-next" type="button" aria-label="Следующие фото">›</button>
-        </div>
+        <div class="photo-strip" id="photoStrip" aria-label="Фотографии блюда"></div>
         <div class="detail-copy">
           <div class="detail-title-row"><h2 id="detailName">Филадельфия</h2><button class="detail-favorite-inline" type="button" id="detailFavorite" aria-label="Добавить в избранное">♡</button></div>
           <p id="detailDescription">Классический ролл с нежным лососем и сливочным сыром.</p>
