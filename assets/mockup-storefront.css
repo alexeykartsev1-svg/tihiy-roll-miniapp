@@ -5128,3 +5128,168 @@ body {
   max-width: 100%;
   overscroll-behavior-x: contain;
 }
+
+
+/* v1: Snow Crab Asian Hot Dog — same layout, neon-violet styling and native controls as Shrimp. */
+
+
+
+/* v36: Matching neon-violet catalogue card for the shrimp Asian hot dog.
+   The card controls below remain native, live storefront elements. */
+.rr-card[data-card="asian_hotdog_crab"]{
+ border:1.5px solid rgba(236,91,255,.92)!important;
+ border-radius:18px!important;
+ background:#090313!important;
+ box-shadow:0 0 2px rgba(244,92,255,.95),0 0 9px rgba(210,35,255,.52),0 0 19px rgba(160,18,255,.28)!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-photo{
+ border-bottom:1px solid rgba(248,103,255,.9)!important;
+ box-shadow:0 3px 14px rgba(196,20,255,.24)!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-image{
+ object-fit:cover!important;
+ object-position:center top!important;
+}
+
+/* One real favorite button masks the heart printed in the reference artwork. */
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-heart{
+ top:2.3%!important;
+ right:2.8%!important;
+ width:15%!important;
+ height:17%!important;
+ display:grid!important;
+ place-items:center!important;
+ padding:0!important;
+ border:1px solid rgba(235,175,255,.85)!important;
+ border-radius:50%!important;
+ background:rgba(12,4,24,.98)!important;
+ color:#fff!important;
+ font-size:clamp(18px,9cqw,33px)!important;
+ line-height:1!important;
+ text-shadow:0 0 5px rgba(255,255,255,.45)!important;
+ box-shadow:0 0 9px rgba(214,50,255,.5)!important;
+ opacity:1!important;
+ pointer-events:auto!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-heart.active{
+ color:#ff4e9c!important;
+ background:rgba(12,4,24,.99)!important;
+ border-color:#ff71db!important;
+ text-shadow:0 0 8px rgba(255,57,190,.9)!important;
+ box-shadow:0 0 12px rgba(255,43,204,.78)!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-info{
+ grid-template-rows:minmax(0,1.2fr) minmax(0,2fr) minmax(0,.95fr) minmax(0,1.35fr)!important;
+ background:
+  radial-gradient(ellipse at 50% 0%,rgba(188,39,255,.24),transparent 62%),
+  linear-gradient(180deg,#1b0829 0%,#10061c 48%,#080610 100%)!important;
+ border-top:1px solid rgba(237,91,255,.72)!important;
+ box-shadow:inset 0 0 14px rgba(194,35,255,.14)!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-title{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ min-width:0!important;
+ min-height:0!important;
+ margin:0!important;
+ padding:1cqw 2cqw!important;
+ overflow:hidden!important;
+ white-space:normal!important;
+ border:1px solid #f067ff!important;
+ border-radius:999px!important;
+ background:linear-gradient(180deg,#250b39 0%,#10061d 100%)!important;
+ box-shadow:0 0 3px #f067ff,0 0 10px rgba(223,40,255,.55),inset 0 0 11px rgba(218,58,255,.18)!important;
+ text-align:center!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-title::before,
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-title::after{
+ content:none!important;
+ display:none!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-crab-title{
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:center!important;
+ justify-content:center!important;
+ gap:.5cqw!important;
+ width:100%!important;
+ min-width:0!important;
+ line-height:1!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-crab-title>span{
+ display:block!important;
+ width:100%!important;
+ overflow:visible!important;
+ color:#fff!important;
+ font-size:clamp(10px,5.6cqw,19px)!important;
+ font-weight:900!important;
+ line-height:1.05!important;
+ letter-spacing:-.025em!important;
+ text-align:center!important;
+ white-space:nowrap!important;
+ text-shadow:0 1px 4px rgba(0,0,0,.8),0 0 6px rgba(233,149,255,.3)!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-crab-title>b{
+ display:inline-flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ max-width:86%!important;
+ padding:.8cqw 5cqw!important;
+ border-radius:999px!important;
+ background:linear-gradient(90deg,#c90080,#f000a4,#c90080)!important;
+ color:#fff!important;
+ font-size:clamp(10px,6.1cqw,21px)!important;
+ font-weight:950!important;
+ line-height:1!important;
+ box-shadow:0 0 8px rgba(243,0,173,.55)!important;
+ text-shadow:0 1px 3px rgba(74,0,48,.45)!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-description{
+ border:1px solid rgba(224,132,255,.88)!important;
+ border-radius:12px!important;
+ background:linear-gradient(145deg,rgba(22,8,33,.98),rgba(8,6,17,.98))!important;
+ color:#fff!important;
+ box-shadow:0 0 7px rgba(210,58,255,.3),inset 0 0 8px rgba(205,45,255,.08)!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-meta{
+ border:1px solid rgba(226,103,255,.88)!important;
+ border-radius:11px!important;
+ background:rgba(18,6,29,.9)!important;
+ box-shadow:0 0 6px rgba(212,54,255,.24)!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-meta i{
+ color:#f29aff!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-composition{
+ border:1px solid #ed83ff!important;
+ border-radius:999px!important;
+ background:linear-gradient(145deg,#2a0a43,#10051b)!important;
+ color:#fff!important;
+ box-shadow:0 0 3px #ea70ff,0 0 9px rgba(205,39,255,.52)!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-purchase{
+ border:1px solid rgba(228,121,255,.85)!important;
+ border-radius:13px!important;
+ background:linear-gradient(160deg,#160a23,#090711)!important;
+ box-shadow:0 0 7px rgba(195,37,255,.32),inset 0 0 8px rgba(223,64,255,.1)!important;
+}
+
+.rr-card[data-card="asian_hotdog_crab"] .rr-card-price{
+ color:#fff!important;
+ text-shadow:0 1px 5px rgba(0,0,0,.8),0 0 5px rgba(230,175,255,.26)!important;
+}
