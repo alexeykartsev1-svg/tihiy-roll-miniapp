@@ -140,3 +140,28 @@
 
 /* Do not invent a second favorite UI for Salmon: use the same clickable
    art-heart overlay and state rules as Shrimp Panko. */
+
+
+/* Reset legacy Salmon-only dimensions/backgrounds so it inherits the exact shared photo/title slots. */
+.rr-card.product-card.rr-card-panko .rr-card-photo {
+  aspect-ratio: auto !important;
+  background: #090b0d !important;
+  background-image: none !important;
+}
+.rr-card.product-card.rr-card-panko .rr-card-photo::before,
+.rr-card.product-card.rr-card-panko .rr-card-photo::after {
+  content: none !important;
+  display: none !important;
+  background-image: none !important;
+  filter: none !important;
+  transform: none !important;
+}
+.rr-card.product-card.rr-card-panko .rr-card-title {
+  box-sizing: border-box !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  flex: none !important;
+  margin: 0 !important;
+}
