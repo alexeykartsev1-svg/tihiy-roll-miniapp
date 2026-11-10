@@ -18,3 +18,591 @@
   <main class="reference-board workflow-mode" id="referenceBoard">
     <!-- Catalogue screen -->
     <section class="device-frame catalogue-device workflow-mode" aria-label="Каталог магазина">
+      
+      <div class="catalogue-header">
+        <div class="brand-row">
+          <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <circle cx="32" cy="32" r="28" fill="#091218" stroke="#ef3936" stroke-width="3"/>
+  <path d="M16 30h32l-3.6 13.1c-6.6 5.5-18.2 5.5-24.8 0L16 30Z" fill="#101d23" stroke="#f4eee8" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M19 30c3.5 2.7 8 4.1 13 4.1S41.5 32.7 45 30" fill="none" stroke="#ff6a55" stroke-width="2" stroke-linecap="round"/>
+  <path d="M22 25c4.5-2.3 15.5-2.3 20 0" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M26 22c-2.4-3.3-2-5.8.5-8M33 20c-1.2-3.1-.6-5.2 1.7-7" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M39 5 49 24M45 4 54 21" fill="none" stroke="#ff5548" stroke-width="3.1" stroke-linecap="round"/>
+  <path d="M12 24c1.3-4.6 3.9-7.1 7.8-8.1-.4 4.5-2.7 7.3-7.8 8.1Z" fill="#ef3936"/>
+</svg></a>
+          <button class="round-icon menu-trigger" type="button" aria-label="Открыть меню">☰</button>
+        </div>
+        <div class="catalogue-title">
+          <h1>Наше <span class="catalogue-menu-word">меню
+            <svg class="catalogue-butterfly" viewBox="0 0 36 30" aria-hidden="true" focusable="false">
+              <defs>
+                <linearGradient id="butterfly-gold" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#fff6d6"/>
+                  <stop offset=".48" stop-color="#f5d28b"/>
+                  <stop offset="1" stop-color="#c58a3c"/>
+                </linearGradient>
+                <linearGradient id="butterfly-inner" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#fff9e9"/>
+                  <stop offset="1" stop-color="#dfae62"/>
+                </linearGradient>
+              </defs>
+              <g class="catalogue-butterfly__wing catalogue-butterfly__wing--left">
+                <path d="M17.2 14.4C12.2 8.1 7.1 2.2 3.2 4.1C-.1 5.8 1.1 13.3 6.1 16.8C9.5 19.2 13.5 18 17.2 14.4Z" fill="url(#butterfly-gold)" stroke="#fff0c5" stroke-width=".65"/>
+                <path d="M15.9 15.2C11.3 15.3 6.4 17.1 6.3 21.3C6.3 24.7 10.4 25.6 13.2 22.5C15.1 20.5 15.8 17.9 15.9 15.2Z" fill="url(#butterfly-inner)" stroke="#e8c17d" stroke-width=".55"/>
+                <path d="M4.2 7.1C7.8 7.2 11.2 10.2 13.2 13.7" fill="none" stroke="#fff9e9" stroke-width=".7" opacity=".9"/>
+                <circle cx="6.2" cy="10.3" r="1" fill="#fff8df"/>
+              </g>
+              <g class="catalogue-butterfly__wing catalogue-butterfly__wing--right">
+                <path d="M18.8 14.4C23.8 8.1 28.9 2.2 32.8 4.1C36.1 5.8 34.9 13.3 29.9 16.8C26.5 19.2 22.5 18 18.8 14.4Z" fill="url(#butterfly-gold)" stroke="#fff0c5" stroke-width=".65"/>
+                <path d="M20.1 15.2C24.7 15.3 29.6 17.1 29.7 21.3C29.7 24.7 25.6 25.6 22.8 22.5C20.9 20.5 20.2 17.9 20.1 15.2Z" fill="url(#butterfly-inner)" stroke="#e8c17d" stroke-width=".55"/>
+                <path d="M31.8 7.1C28.2 7.2 24.8 10.2 22.8 13.7" fill="none" stroke="#fff9e9" stroke-width=".7" opacity=".9"/>
+                <circle cx="29.8" cy="10.3" r="1" fill="#fff8df"/>
+              </g>
+              <path d="M18 10.2C16.8 7.2 16 5.3 14.7 4.1M18 10.2C19.2 7.2 20 5.3 21.3 4.1" fill="none" stroke="#ead09c" stroke-width=".8" stroke-linecap="round"/>
+              <path d="M17.1 10.1Q18 8.8 18.9 10.1L19.6 19.8Q18 22 16.4 19.8Z" fill="#8e632d" stroke="#f9e7b8" stroke-width=".55"/>
+              <ellipse cx="18" cy="10.7" rx="1.2" ry="1.5" fill="#fff1c9"/>
+            </svg>
+          </span></h1>
+          <p>Выберите любимые блюда</p>
+        </div>
+      </div>
+
+      <div class="catalogue-scroll" id="catalogue">
+        <div class="category-tiles" id="categoryTiles">
+          <button class="category-tile active" type="button" data-filter="sets"><span class="category-emoji">🍱</span><span>Сеты</span></button>
+          <button class="category-tile" type="button" data-filter="rolls"><span class="category-emoji">🍣</span><span>Роллы</span></button>
+          <button class="category-tile" type="button" data-filter="dogs"><span class="category-emoji">🌭</span><span>Азиатские<br>хот-доги</span></button>
+          <button class="category-tile" type="button" data-filter="snacks"><span class="category-emoji">🍤</span><span>Закуски</span></button>
+        </div>
+        <div class="catalogue-controls">
+          <label class="sort-control"><select id="sortSelect" aria-label="Сортировка"><option value="popular">Сначала популярные</option><option value="price-asc">Сначала дешевле</option><option value="price-desc">Сначала дороже</option><option value="name">По названию</option></select><span>⌄</span></label>
+          <button class="filter-control" type="button" id="filterOpen"><span>☷</span> Фильтры</button>
+        </div>
+        <div class="search-wrap"><input id="catalogSearch" type="search" placeholder="Поиск по меню" aria-label="Поиск по меню"></div>
+        <div class="catalogue-grid" id="catalogueGrid"><div class="loading-state">Загружаем меню…</div></div>
+        <div class="empty-state" id="emptyState" hidden>В этой категории пока нет блюд.</div>
+      </div>
+
+      <section class="workflow-screen home-screen active" id="homeScreen" aria-label="Главная">
+        <div class="workflow-scroll home-scroll">
+          <div class="workflow-topbar home-topbar home-brandbar home-brand-exact">
+            <img class="home-brand-exact-image" src="./assets/tihiy-roll-header-retina.webp?v=retina-852x200-v28" alt="Тихий Ролл — доставка азиатской еды" loading="eager" decoding="async">
+          </div>
+          <section class="home-hero">
+            <img class="home-hero-photo" id="homeHeroPhoto" src="./assets/set-party.webp" alt="Свежие роллы" loading="eager">
+            <div class="home-hero-shade"></div>
+            <div class="home-hero-copy">
+              <h2>Вкус<br>в каждой<br>детали</h2>
+              <p>Роллы · Сеты · Хот-доги · Закуски</p>
+            </div>
+          </section>
+          <div class="home-actions home-actions-cards">
+            <button class="home-action-card home-action-catalog" type="button" data-home-catalog>
+              <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="15" height="15" rx="3"/><rect x="28" y="5" width="15" height="15" rx="3"/><rect x="5" y="28" width="15" height="15" rx="3"/><rect x="28" y="28" width="15" height="15" rx="3"/></svg>
+              <span>Открыть<br>каталог</span><i>›</i>
+            </button>
+            <button class="home-action-card home-action-builder" type="button" data-home-builder>
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5c-6 0-10 4-11 9-5 0-8 4-8 9 0 5 3 9 8 10v9h22v-9c5-2 8-6 8-11 0-5-4-9-9-9-2-5-5-8-10-8Z"/><path d="M17 36h14"/></svg>
+              <span>Собрать<br>свой сет</span><i>›</i>
+            </button>
+          </div>
+          <section class="home-quick-categories" aria-label="Категории меню">
+            <div class="home-quick-category-grid">
+              <button class="home-category-card active" type="button" data-home-filter="sets" aria-pressed="true" aria-label="Сеты">
+                <img data-home-category-image="sets" src="./assets/set-party.webp" alt="Сеты" loading="lazy">
+                <span><b>Сеты</b><i>›</i></span>
+              </button>
+              <button class="home-category-card" type="button" data-home-filter="rolls" aria-pressed="false" aria-label="Роллы">
+                <img data-home-category-image="rolls" src="./assets/set-duo.webp" alt="Роллы" loading="lazy">
+                <span><b>Роллы</b><i>›</i></span>
+              </button>
+              <button class="home-category-card" type="button" data-home-filter="dogs" aria-pressed="false" aria-label="Азиатские хот-доги">
+                <img data-home-category-image="dogs" src="./assets/set-solo.webp" alt="Хот-доги" loading="lazy">
+                <span><b>Хот-доги</b><i>›</i></span>
+              </button>
+              <button class="home-category-card" type="button" data-home-filter="snacks" aria-pressed="false" aria-label="Закуски">
+                <img data-home-category-image="snacks" src="./assets/set-duo.webp" alt="Закуски" loading="lazy">
+                <span><b>Закуски</b><i>›</i></span>
+              </button>
+            </div>
+          </section>
+          <section class="home-promo-section" aria-label="Горячее предложение">
+            <div class="home-promo-kicker"><span>✦</span> ГОРЯЧЕЕ ПРЕДЛОЖЕНИЕ</div>
+            <button class="home-newyear-card" type="button" data-home-newyear data-seasonal-banner="newyear">
+              <img id="homeNewYearImage" src="./assets/set-party.webp" alt="Новогодний сет" loading="lazy">
+              <span class="home-newyear-shade"></span>
+              <span class="home-newyear-copy">
+                <small>СУПЕРПРЕДЛОЖЕНИЕ</small>
+                <b id="homeNewYearTitle">Новогодний сет</b>
+                <span id="homeNewYearText">Праздничный набор для особенного вечера</span>
+                <strong><span id="homeNewYearPrice">— ₽</span><i>Посмотреть сет&nbsp; ›</i></strong>
+              </span>
+            </button>
+            <div class="home-seasonal-stack" aria-label="Сезонные предложения">
+              <div class="home-seasonal-card" data-seasonal-banner="autumn" role="button" tabindex="0" aria-label="Открыть Осенний сет «Хорошее настроение». Осенний сет «Хорошее настроение»: Омега 6, много рыбы" style="--season-banner-image:url('https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/750a6357-d9aa-41e4-b255-7130c9a38bf3.webp')"></div>
+              <div class="home-seasonal-card" data-seasonal-banner="winter" role="button" tabindex="0" aria-label="Открыть Зимний сет «Согревающий». Зимний сет «Согревающий»: много горячих и тёплых роллов и азиатских хот-догов" style="--season-banner-image:url('https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/b75760da-c927-4718-84ee-711abca0da51.webp')"></div>
+              <div class="home-seasonal-card" data-seasonal-banner="spring" role="button" tabindex="0" aria-label="Открыть Весенний сет «Цветение». Весенний сет «Цветение»: много витаминов, больше овощей и рыбы" style="--season-banner-image:url('https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/470cf8a2-6945-4889-a564-f394004f6013.webp')"></div>
+              <div class="home-seasonal-card" data-seasonal-banner="summer" role="button" tabindex="0" aria-label="Открыть Летний сет «Охлаждающий». Летний сет «Охлаждающий»: больше сочности" style="--season-banner-image:url('https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/db23cf4f-01a3-4842-8779-16541fb34fd7.webp')"></div>
+            </div>
+          </section>
+          <section class="home-service-panel" aria-label="Режим работы и заказ по телефону">
+            <div class="home-hours-card">
+              <div class="home-hours-state"><i id="homeHoursDot" class="hours-dot is-closed"></i><b id="homeHoursStatus">Проверяем режим работы…</b></div>
+              <div class="home-hours-days" aria-label="Рабочие и выходные дни">
+                <span class="day-chip day-working" aria-label="Понедельник">Пн</span>
+                <span class="day-chip day-working" aria-label="Вторник">Вт</span>
+                <span class="day-chip day-closed" aria-label="Среда">Ср</span>
+                <span class="day-chip day-working" aria-label="Четверг">Чт</span>
+                <span class="day-chip day-working" aria-label="Пятница">Пт</span>
+                <span class="day-chip day-working" aria-label="Суббота">Сб</span>
+                <span class="day-chip day-closed" aria-label="Воскресенье">Вс</span>
+              </div>
+              <div class="home-hours-pills">
+                <div class="home-hours-pill hours-pill-open"><small>ВРЕМЯ РАБОТЫ</small><strong>С 12:00 до 20:00</strong></div>
+                <div class="home-hours-pill hours-pill-closed"><small>ВЫХОДНОЙ</small><strong>Среда и воскресенье</strong></div>
+              </div>
+              <small class="home-hours-note">Время по Чарышскому · Алтайский край</small>
+            </div>
+          </section>
+          <a class="home-phone-button" id="homePhoneOrder" href="tel:+79230005857" aria-label="Позвонить в Тихий ролл">
+            <span class="home-phone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M6.6 3.8 9.2 3a1.5 1.5 0 0 1 1.7.7l1.5 2.8a1.5 1.5 0 0 1-.2 1.8L10.7 9.8a14.4 14.4 0 0 0 3.5 3.5l1.5-1.5a1.5 1.5 0 0 1 1.8-.2l2.8 1.5a1.5 1.5 0 0 1 .7 1.7l-.8 2.6a2 2 0 0 1-2 1.4A16.2 16.2 0 0 1 5.2 5.8a2 2 0 0 1 1.4-2Z"/></svg></span>
+            <span class="home-phone-copy"><b>Заказать по телефону</b><small id="homePhoneText">+7 923 000-58-57</small></span>
+            <span class="home-phone-arrow" aria-hidden="true">↗</span>
+          </a>
+          <section class="home-reviews-section" aria-label="Отзывы наших гостей">
+            <header class="home-reviews-heading">
+              <h3>Отзывы наших гостей</h3>
+              <span class="home-reviews-heart" aria-hidden="true">♥</span>
+            </header>
+            <p class="home-reviews-subtitle">Спасибо, что выбираете «Тихий ролл»</p>
+            <div class="home-reviews-carousel">
+              <div class="home-reviews-track" id="homeReviewsTrack" aria-label="Карусель оригинальных отзывов">
+            <article class="home-review-slide" aria-label="Отзыв 1 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/69d3eaf1-e4e3-4570-a263-ff6d957b97f1.jpg" alt="Оригинальный скриншот переписки с отзывом 1" loading="eager" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 2 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/5703a840-36a3-4185-a253-f37f89bf17b0.jpg" alt="Оригинальный скриншот переписки с отзывом 2" loading="eager" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 3 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/8c45afff-9946-45a6-833a-2bc2bc79a6c6.jpg" alt="Оригинальный скриншот переписки с отзывом 3" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 4 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/b721ca66-9060-4b76-a1f0-a97c52f51596.jpg" alt="Оригинальный скриншот переписки с отзывом 4" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 5 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/1dbff53a-46cc-49bb-94f7-edbb921b1a73.jpg" alt="Оригинальный скриншот переписки с отзывом 5" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 6 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/185cfb94-bffb-4d43-b86e-39f98319f7e5.jpg" alt="Оригинальный скриншот переписки с отзывом 6" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 7 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/ae55b9e7-2d1a-48bb-9028-cc5ebe824e2e.jpg" alt="Оригинальный скриншот переписки с отзывом 7" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 8 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/19af1bc0-776f-4a1f-9ee6-e40781f7bc58.jpg" alt="Оригинальный скриншот переписки с отзывом 8" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 9 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/bc45e3b7-6dc1-4ed9-991d-e3679205c4cb.jpg" alt="Оригинальный скриншот переписки с отзывом 9" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 10 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/de94a823-87fe-41a2-9e6a-ad2c6c704a28.jpg" alt="Оригинальный скриншот переписки с отзывом 10" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 11 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/ab178221-2809-4e58-aa63-489e542efdd3.jpg" alt="Оригинальный скриншот переписки с отзывом 11" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 12 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/6f4d8403-6fe3-42f8-a20c-a628f0904e14.jpg" alt="Оригинальный скриншот переписки с отзывом 12" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 13 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/094929ac-d9fb-430f-88ff-33570cd83196.jpg" alt="Оригинальный скриншот переписки с отзывом 13" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 14 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/f4d872c9-7aa6-4ff3-ada9-1cada11b402d.jpg" alt="Оригинальный скриншот переписки с отзывом 14" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 15 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4256ffc5-163c-4d11-b2ea-fd5ea33f1ce9.jpg" alt="Оригинальный скриншот переписки с отзывом 15" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 16 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/585b6250-b9ae-4ad7-9f84-1f5a05fc53a1.jpg" alt="Оригинальный скриншот переписки с отзывом 16" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 17 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/8fab3692-8415-4d73-9f8e-ed212434f628.jpg" alt="Оригинальный скриншот переписки с отзывом 17" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 18 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/c890f14f-3ae7-45fe-88fb-afd2abea7301.jpg" alt="Оригинальный скриншот переписки с отзывом 18" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 19 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/5be1f6a3-784b-4013-b182-f0251cf1af07.jpg" alt="Оригинальный скриншот переписки с отзывом 19" loading="lazy" decoding="async">
+              </div>
+            </article>
+            <article class="home-review-slide" aria-label="Отзыв 20 из 20">
+              <div class="home-review-frame">
+                <span class="home-review-badge">СКРИНШОТ ОТЗЫВА</span>
+                <img class="home-review-shot" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/5af1586c-c78a-4893-a580-af850c4b2d57.jpg" alt="Оригинальный скриншот переписки с отзывом 20" loading="lazy" decoding="async">
+              </div>
+            </article>
+              </div>
+              <div class="home-reviews-controls">
+                <button class="home-review-arrow" id="homeReviewPrev" type="button" aria-label="Предыдущий отзыв">‹</button>
+                <div class="home-review-dots" id="homeReviewDots" aria-label="Выбор отзыва">
+            <button class="home-review-dot is-active" type="button" data-review-dot="0" aria-label="Показать отзыв 1" aria-current="true"></button>
+            <button class="home-review-dot" type="button" data-review-dot="1" aria-label="Показать отзыв 2" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="2" aria-label="Показать отзыв 3" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="3" aria-label="Показать отзыв 4" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="4" aria-label="Показать отзыв 5" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="5" aria-label="Показать отзыв 6" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="6" aria-label="Показать отзыв 7" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="7" aria-label="Показать отзыв 8" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="8" aria-label="Показать отзыв 9" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="9" aria-label="Показать отзыв 10" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="10" aria-label="Показать отзыв 11" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="11" aria-label="Показать отзыв 12" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="12" aria-label="Показать отзыв 13" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="13" aria-label="Показать отзыв 14" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="14" aria-label="Показать отзыв 15" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="15" aria-label="Показать отзыв 16" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="16" aria-label="Показать отзыв 17" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="17" aria-label="Показать отзыв 18" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="18" aria-label="Показать отзыв 19" aria-current="false"></button>
+            <button class="home-review-dot" type="button" data-review-dot="19" aria-label="Показать отзыв 20" aria-current="false"></button>
+                </div>
+                <button class="home-review-arrow" id="homeReviewNext" type="button" aria-label="Следующий отзыв">›</button>
+              </div>
+            </div>
+            <p class="home-reviews-hint">Листайте отзывы вбок</p>
+          </section>
+          <section class="home-popular-section">
+            <header class="home-popular-heading"><h3>Популярное</h3><button type="button" data-home-catalog>Смотреть все <span>›</span></button></header>
+            <div class="catalogue-grid home-popular-grid" id="homePopularGrid"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="workflow-screen favorites-screen" id="favoritesScreen" aria-label="Избранное">
+        <div class="workflow-scroll favorites-scroll">
+          <div class="workflow-topbar">
+            <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <circle cx="32" cy="32" r="28" fill="#091218" stroke="#ef3936" stroke-width="3"/>
+  <path d="M16 30h32l-3.6 13.1c-6.6 5.5-18.2 5.5-24.8 0L16 30Z" fill="#101d23" stroke="#f4eee8" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M19 30c3.5 2.7 8 4.1 13 4.1S41.5 32.7 45 30" fill="none" stroke="#ff6a55" stroke-width="2" stroke-linecap="round"/>
+  <path d="M22 25c4.5-2.3 15.5-2.3 20 0" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M26 22c-2.4-3.3-2-5.8.5-8M33 20c-1.2-3.1-.6-5.2 1.7-7" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M39 5 49 24M45 4 54 21" fill="none" stroke="#ff5548" stroke-width="3.1" stroke-linecap="round"/>
+  <path d="M12 24c1.3-4.6 3.9-7.1 7.8-8.1-.4 4.5-2.7 7.3-7.8 8.1Z" fill="#ef3936"/>
+</svg></a>
+            <button class="round-icon menu-trigger" type="button" aria-label="Открыть меню">☰</button>
+          </div>
+          <header class="favorites-page-heading">
+            <h2>Избранное</h2>
+            <p>Ваши любимые блюда</p>
+          </header>
+          <div class="catalogue-grid favorites-grid" id="favoritesGrid"></div>
+          <div class="empty-state favorites-empty" id="favoritesEmpty" hidden>Пока нет избранных блюд. Нажмите на сердечко в карточке, чтобы сохранить понравившееся.</div>
+        </div>
+      </section>
+
+      <section class="workflow-screen" id="builderScreen" aria-label="Конструктор сета">
+        <div class="workflow-scroll">
+          <div class="workflow-topbar">
+            <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <circle cx="32" cy="32" r="28" fill="#091218" stroke="#ef3936" stroke-width="3"/>
+  <path d="M16 30h32l-3.6 13.1c-6.6 5.5-18.2 5.5-24.8 0L16 30Z" fill="#101d23" stroke="#f4eee8" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M19 30c3.5 2.7 8 4.1 13 4.1S41.5 32.7 45 30" fill="none" stroke="#ff6a55" stroke-width="2" stroke-linecap="round"/>
+  <path d="M22 25c4.5-2.3 15.5-2.3 20 0" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M26 22c-2.4-3.3-2-5.8.5-8M33 20c-1.2-3.1-.6-5.2 1.7-7" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M39 5 49 24M45 4 54 21" fill="none" stroke="#ff5548" stroke-width="3.1" stroke-linecap="round"/>
+  <path d="M12 24c1.3-4.6 3.9-7.1 7.8-8.1-.4 4.5-2.7 7.3-7.8 8.1Z" fill="#ef3936"/>
+</svg></a>
+            <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
+          </div>
+          <div class="workflow-steps">
+            <div class="workflow-step current"><i>1</i><span>Выбор роллов</span></div>
+            <div class="workflow-step"><i>2</i><span>Ваш сет</span></div>
+            <div class="workflow-step"><i>3</i><span>Оформление</span></div>
+          </div>
+          <header class="workflow-title">
+            <h2>Собери свой сет</h2>
+            <p>Выбирай любимые роллы и создавай свой уникальный сет</p>
+          </header>
+          <div class="builder-filters" id="builderFilters">
+            <button class="builder-filter active" type="button" data-builder-filter="all">Все</button>
+            <button class="builder-filter" type="button" data-builder-filter="rolls">Роллы</button>
+            <button class="builder-filter" type="button" data-builder-filter="sets">Сеты</button>
+            <button class="builder-filter" type="button" data-builder-filter="dogs">Хот-доги</button>
+            <button class="builder-filter" type="button" data-builder-filter="snacks">Закуски</button>
+          </div>
+          <div class="builder-grid" id="builderGrid">
+            <div class="builder-empty"><span>🍣</span><b>Загружаем меню…</b></div>
+          </div>
+        </div>
+        <div class="builder-summary">
+          <div class="builder-summary-copy">
+            <span>Выбрано: <b id="builderPositions">0 поз.</b></span>
+            <small><span id="builderPieces">0 шт.</span> · <span id="builderWeight">0 г</span></small>
+          </div>
+          <div class="builder-summary-total"><span>Стоимость</span><strong id="builderTotal">0 ₽</strong></div>
+          <button class="add-cart-button" type="button" id="builderAddToCart" disabled>Добавить в корзину <span>›</span></button>
+        </div>
+      </section>
+
+      <section class="workflow-screen" id="basketScreen" aria-label="Корзина">
+        <div class="workflow-scroll">
+          <div class="workflow-topbar">
+            <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <circle cx="32" cy="32" r="28" fill="#091218" stroke="#ef3936" stroke-width="3"/>
+  <path d="M16 30h32l-3.6 13.1c-6.6 5.5-18.2 5.5-24.8 0L16 30Z" fill="#101d23" stroke="#f4eee8" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M19 30c3.5 2.7 8 4.1 13 4.1S41.5 32.7 45 30" fill="none" stroke="#ff6a55" stroke-width="2" stroke-linecap="round"/>
+  <path d="M22 25c4.5-2.3 15.5-2.3 20 0" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M26 22c-2.4-3.3-2-5.8.5-8M33 20c-1.2-3.1-.6-5.2 1.7-7" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M39 5 49 24M45 4 54 21" fill="none" stroke="#ff5548" stroke-width="3.1" stroke-linecap="round"/>
+  <path d="M12 24c1.3-4.6 3.9-7.1 7.8-8.1-.4 4.5-2.7 7.3-7.8 8.1Z" fill="#ef3936"/>
+</svg></a>
+            <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
+          </div>
+          <div class="workflow-steps">
+            <div class="workflow-step"><i>1</i><span>Выбор роллов</span></div>
+            <div class="workflow-step current"><i>2</i><span>Ваш сет</span></div>
+            <div class="workflow-step"><i>3</i><span>Оформление</span></div>
+          </div>
+          <header class="workflow-title basket-title">
+            <h2>Ваша корзина</h2>
+            <p>Выбранные блюда</p>
+          </header>
+          <div class="basket-lines" id="basketLines">
+            <div class="empty-state">Корзина пока пуста.</div>
+          </div>
+          <div id="basketSetNotes"></div>
+          <section class="basket-totals">
+            <h3>Итого</h3>
+            <div class="basket-metrics">
+              <div><span>Количество роллов</span><b id="basketPieces">0 шт.</b></div>
+              <div><span>Общий вес</span><b id="basketWeight">0 г</b></div>
+            </div>
+            <div class="basket-cost"><span>Стоимость</span><strong id="basketTotal">0 ₽</strong></div>
+          </section>
+          <div class="basket-actions">
+            <button class="add-cart-button" type="button" id="cartCheckout" disabled>Перейти к оформлению <span>›</span></button>
+            <button class="basket-continue" type="button" id="cartKeepShopping">Продолжить выбор</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="workflow-screen" id="confirmationScreen" aria-label="Подтверждение заказа">
+        <div class="workflow-scroll">
+          <div class="workflow-topbar">
+            <a class="brand-logo" href="#catalogue" aria-label="Тихий ролл — на главную"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <circle cx="32" cy="32" r="28" fill="#091218" stroke="#ef3936" stroke-width="3"/>
+  <path d="M16 30h32l-3.6 13.1c-6.6 5.5-18.2 5.5-24.8 0L16 30Z" fill="#101d23" stroke="#f4eee8" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M19 30c3.5 2.7 8 4.1 13 4.1S41.5 32.7 45 30" fill="none" stroke="#ff6a55" stroke-width="2" stroke-linecap="round"/>
+  <path d="M22 25c4.5-2.3 15.5-2.3 20 0" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M26 22c-2.4-3.3-2-5.8.5-8M33 20c-1.2-3.1-.6-5.2 1.7-7" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M39 5 49 24M45 4 54 21" fill="none" stroke="#ff5548" stroke-width="3.1" stroke-linecap="round"/>
+  <path d="M12 24c1.3-4.6 3.9-7.1 7.8-8.1-.4 4.5-2.7 7.3-7.8 8.1Z" fill="#ef3936"/>
+</svg></a>
+            <button class="round-icon" type="button" data-workflow-back aria-label="Назад">‹</button>
+          </div>
+          <div class="workflow-steps">
+            <div class="workflow-step current"><i>1</i><span>Заказ принят</span></div>
+            <div class="workflow-step"><i>2</i><span>Готовим</span></div>
+            <div class="workflow-step"><i>3</i><span>Готов к выдаче</span></div>
+            <div class="workflow-step"><i>4</i><span>Завершён</span></div>
+          </div>
+          <div class="confirmation-hero">
+            <div class="confirmation-check">✓</div>
+            <h2>Заказ принят!</h2>
+            <p>Спасибо, что выбрали «Тихий ролл». Мы получили ваш заказ.</p>
+          </div>
+          <section class="confirmation-order">
+            <div class="confirmation-order-meta">
+              <div><small>Номер заказа</small><b id="confirmedOrderCode">—</b></div>
+              <div><small>Время получения</small><b id="confirmedWhen">—</b></div>
+            </div>
+            <div class="confirmation-status">
+              <span class="status-current">✓</span><b>Принят</b>
+              <span>Дальше сообщим, когда заказ будет готов.</span>
+            </div>
+            <h3>Состав заказа</h3>
+            <div id="confirmedLines"></div>
+            <div class="confirmation-total"><span>Итого</span><strong id="confirmedTotal">0 ₽</strong></div>
+          </section>
+          <p class="confirmation-note">Время выдачи будет подтверждено отдельно. Онлайн-оплата не подключена.</p>
+          <button class="add-cart-button confirmation-home" type="button" id="confirmationHome">На главную <span>›</span></button>
+        </div>
+      </section>
+
+      <nav class="bottom-nav" aria-label="Навигация магазина">
+        <button class="active" type="button" data-nav="home"><span class="nav-icon">⌂</span>Главная</button>
+        <button type="button" data-nav="catalogue"><span class="nav-icon grid-icon">▦</span>Каталог</button>
+        <button type="button" data-nav="builder"><span class="nav-icon">♧</span>Конструктор</button>
+        <button type="button" data-nav="favorites"><span class="nav-icon">♡<i id="navFavCount">0</i></span>Избранное</button>
+        <button type="button" data-nav="cart"><span class="nav-icon">🛒<i id="navCartCount">0</i></span>Корзина</button>
+      </nav>
+    </section>
+
+    <!-- Product detail screen: always visible alongside the catalogue on desktop; opens as a full-screen view on mobile. -->
+    <section class="device-frame detail-device" id="detailDevice" aria-label="Карточка выбранного товара">
+      <div class="detail-image-stage">
+        
+        <img id="detailHero" src="./assets/set-party.webp" alt="Филадельфия"><div class="detail-photo-count" id="detailPhotoCount">1 / 5</div>
+        <div class="detail-topbar">
+          <button class="round-icon detail-back" type="button" id="detailBack" aria-label="Назад">‹</button>
+          <a class="brand-logo detail-brand-logo" href="#catalogue" aria-label="Тихий ролл">
+            <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <circle cx="32" cy="32" r="28" fill="#091218" stroke="#ef3936" stroke-width="3"/>
+  <path d="M16 30h32l-3.6 13.1c-6.6 5.5-18.2 5.5-24.8 0L16 30Z" fill="#101d23" stroke="#f4eee8" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M19 30c3.5 2.7 8 4.1 13 4.1S41.5 32.7 45 30" fill="none" stroke="#ff6a55" stroke-width="2" stroke-linecap="round"/>
+  <path d="M22 25c4.5-2.3 15.5-2.3 20 0" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M26 22c-2.4-3.3-2-5.8.5-8M33 20c-1.2-3.1-.6-5.2 1.7-7" fill="none" stroke="#fff0e8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M39 5 49 24M45 4 54 21" fill="none" stroke="#ff5548" stroke-width="3.1" stroke-linecap="round"/>
+  <path d="M12 24c1.3-4.6 3.9-7.1 7.8-8.1-.4 4.5-2.7 7.3-7.8 8.1Z" fill="#ef3936"/>
+</svg>
+          </a>
+          <div class="detail-top-actions">
+            <button class="round-icon" type="button" id="detailShare" aria-label="Поделиться">⇧</button>
+          </div>
+        </div>
+      </div>
+      <div class="detail-scroll">
+        <div class="photo-strip" id="photoStrip" aria-label="Фотографии блюда">
+          <button class="thumb active" type="button"><img src="./assets/set-party.webp" alt="></button>
+          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
+          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
+          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
+          <button class="thumb" type="button"><img src="./assets/set-party.webp" alt="></button>
+          <button class="thumb thumb-next" type="button" aria-label="Следующие фото">›</button>
+        </div>
+        <div class="detail-copy">
+          <div class="detail-title-row"><h2 id="detailName">Филадельфия</h2><button class="detail-favorite-inline" type="button" id="detailFavorite" aria-label="Добавить в избранное">♡</button></div>
+          <p id="detailDescription">Классический ролл с нежным лососем и сливочным сыром.</p>
+          <div class="product-facts">
+            <div class="product-fact"><strong id="detailPieces">8 шт.</strong><span>Количество</span></div>
+            <div class="product-fact"><strong id="detailWeight">260 г</strong><span>Вес</span></div>
+            <div class="product-fact product-fact-price"><strong class="detail-price" id="detailPrice">450 ₽</strong><span>Стоимость</span></div>
+          </div>
+          <div class="composition-block">
+            <h3 id="detailCompositionTitle">Состав</h3>
+            <div class="ingredient-grid" id="ingredientGrid">
+              <div><strong class="ingredient-emoji">🐟</strong><span>Лосось</span></div>
+              <div><strong class="ingredient-emoji">🧀</strong><span>Сливочный<br>сыр</span></div>
+              <div><strong class="ingredient-emoji">🥒</strong><span>Огурец</span></div>
+              <div><strong class="ingredient-emoji">🍚</strong><span>Рис</span></div>
+              <div><strong class="ingredient-emoji">🌿</strong><span>Нори</span></div>
+            </div>
+          </div>
+          <div class="detail-buy-row">
+            <div class="detail-quantity"><button type="button" id="detailMinus" aria-label="Уменьшить">−</button><output id="detailQty">0</output><button type="button" id="detailPlus" aria-label="Увеличить">＋</button></div>
+            <button type="button" class="add-cart-button" id="detailAdd">🛒 <span>Добавить в корзину</span></button>
+          </div>
+          <div class="detail-extra" id="detailExtra"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Functional overlays -->
+  <div class="modal-layer" id="cartModal" aria-hidden="true"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="cartTitle"><header class="sheet-head"><div><small>ВАШ ВЫБОР</small><h2 id="cartTitle">Корзина</h2></div><button type="button" class="sheet-close" data-close="cartModal">×</button></header><div class="cart-lines" id="cartLines"><div class="empty-state">Корзина пока пуста.</div></div><form id="checkoutForm" class="checkout-form" novalidate>
+          <h3>Детали заказа</h3>
+          <label class="checkout-field identity-field">Ваше имя<input id="checkoutName" name="name" maxlength="100" minlength="2" required autocomplete="name" placeholder="Как к вам обращаться" aria-describedby="checkoutNameError"><span class="field-error" id="checkoutNameError" hidden>Введите корректное имя — минимум две буквы, без цифр.</span></label>
+          <label class="checkout-field identity-field">Телефон<input id="checkoutPhone" name="phone" type="tel" inputmode="tel" maxlength="18" required autocomplete="tel" value="+7 " placeholder="+7 900 000-00-00" aria-describedby="checkoutPhoneError"><span class="field-error" id="checkoutPhoneError" hidden>Введите 10 цифр номера после +7.</span></label>
+          <div class="form-row">
+            <label class="checkout-field">Дата<input name="pickup_date" id="pickupDate" type="date" required></label>
+            <label class="checkout-field">Время<select name="pickup_time" id="pickupTime" required><option value="">Выбрать время</option></select></label>
+          </div>
+          <section class="fulfillment-block">
+            <div class="field-label">Способ получения</div>
+            <div class="fulfillment-options" role="group" aria-label="Способ получения">
+              <button type="button" class="fulfillment-option active" data-fulfillment="Самовывоз" aria-pressed="true">Самовывоз</button>
+              <button type="button" class="fulfillment-option" data-fulfillment="Доставка" aria-pressed="false">Доставка</button>
+            </div>
+            <input type="hidden" name="fulfillment" id="fulfillment" value="Самовывоз">
+            <label class="checkout-field" id="deliveryAddressField" hidden>Адрес доставки<input id="deliveryAddress" name="delivery_address" maxlength="300" autocomplete="street-address" value="Чарышское, Алтайский край, " placeholder="Чарышское, Алтайский край, улица, дом" data-city-prefix="Чарышское, Алтайский край, "></label>
+            <div class="checkout-location-card" id="checkoutMapField">
+              <div class="checkout-location-copy"><span id="checkoutMapLabel">АДРЕС САМОВЫВОЗА</span><b id="checkoutMapAddress">Загружаем адрес…</b></div>
+              <iframe id="checkoutMap" title="Карта адреса получения заказа" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="about:blank"></iframe>
+              <a id="checkoutMapLink" href="https://yandex.ru/maps/" target="_blank" rel="noopener">Открыть в Яндекс Картах ↗</a>
+            </div>
+          </section>
+          <label class="checkout-field">Комментарий<textarea name="notes" rows="3" maxlength="700" placeholder="Пожелания к заказу"></textarea></label>
+          <p id="checkoutNote">Время выдачи подтвердим отдельно.</p>
+          <div id="checkoutError" role="alert"></div>
+          <div class="cart-total"><span>Итого к оплате</span><strong id="cartTotal">0 ₽</strong></div>
+          <button class="add-cart-button submit-order" type="submit" id="submitOrder">Отправить заказ ↗</button>
+        </form></section></div>
+  <div class="modal-layer" id="favoritesModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>СОХРАНЁННЫЕ БЛЮДА</small><h2>Избранное</h2></div><button type="button" class="sheet-close" data-close="favoritesModal">×</button></header><div id="favoritesList"></div></section></div>
+  <div class="modal-layer" id="filtersModal" aria-hidden="true"><section class="sheet compact-sheet" role="dialog" aria-modal="true"><header class="sheet-head"><div><small>МЕНЮ МАГАЗИНА</small><h2>Разделы и фильтры</h2></div><button type="button" class="sheet-close" data-close="filtersModal">×</button></header><div class="filter-options" id="filterOptions"></div><a class="admin-panel-entry" id="adminPanelEntry" href="./admin.html"><span class="admin-panel-entry-icon">⚙</span><span class="admin-panel-entry-copy"><b>Админ-панель</b><small>Управление заказами и магазином</small></span><span class="admin-panel-entry-arrow">↗</span></a><button class="add-cart-button" id="applyFilters">Показать блюда</button></section></div>
+    <div class="modal-layer builder-info-modal" id="builderInfoModal" aria-hidden="true">
+    <section class="sheet builder-info-sheet" role="dialog" aria-modal="true" aria-labelledby="builderInfoName">
+      <header class="sheet-head">
+        <div><small>СОСТАВ БЛЮДА</small><h2 id="builderInfoName">Состав</h2></div>
+        <button type="button" class="sheet-close" data-close="builderInfoModal" aria-label="Закрыть">×</button>
+      </header>
+      <p class="builder-info-description" id="builderInfoDescription"></p>
+      <div class="builder-info-facts">
+        <div><strong id="builderInfoPieces">8 шт.</strong><span>Количество</span></div>
+        <div><strong id="builderInfoWeight">280 г</strong><span>Вес</span></div>
+        <div><strong id="builderInfoPrice">0 ₽</strong><span>Цена</span></div>
+      </div>
+      <h3>Что внутри</h3>
+      <div class="builder-info-ingredients" id="builderInfoIngredients"></div>
+      <button type="button" class="add-cart-button builder-info-close" data-close="builderInfoModal">Понятно</button>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
