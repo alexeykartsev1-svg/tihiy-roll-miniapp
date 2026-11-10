@@ -441,7 +441,7 @@ def read_products() -> list[dict[str, Any]]:
             "cost": 0,
             "weight": "280 г",
             "pieces": 1,
-            "cat": "classic",
+            "cat": "dogs",
             "badge": "",
             "desc": "Сочный лосось, свежий огурец, сливочный сыр, хрустящий панко, соус терияки и спайси.",
             "card_description": "Сочный лосось, свежий огурец, сливочный сыр, хрустящий панко, соус терияки и спайси.",
@@ -494,7 +494,7 @@ def read_products() -> list[dict[str, Any]]:
             "cost": 0,
             "weight": "280 г",
             "pieces": 1,
-            "cat": "classic",
+            "cat": "dogs",
             "badge": "",
             "desc": "Сочные креветки, сливочный сыр, свежий огурец, хрустящий панко, соус терияки и спайси.",
             "card_description": "Сочные креветки, сливочный сыр, свежий огурец, хрустящий панко, соус терияки и спайси.",
@@ -547,7 +547,7 @@ def read_products() -> list[dict[str, Any]]:
             "cost": 0,
             "weight": "280 г",
             "pieces": 1,
-            "cat": "classic",
+            "cat": "dogs",
             "badge": "",
             "desc": "Сочная курица, сливочный сыр, свежий огурец, хрустящий панко, соус терияки и спайси.",
             "card_description": "Сочная курица, сливочный сыр, свежий огурец, хрустящий панко, соус терияки и спайси.",
@@ -689,6 +689,22 @@ def read_products() -> list[dict[str, Any]]:
                 handle.write("updated\\n")
         except OSError:
             logger.warning("Could not create Salmon Panko visual marker at %s", salmon_panko_visual_marker)
+
+    # Keep all Asian hot dogs in the dedicated catalogue category. This also
+    # migrates products already stored on the persistent Render disk.
+    asian_hotdog_ids = {
+        "asian_hotdog_salmon",
+        "asian_hotdog_shrimp",
+        "asian_hotdog_chicken",
+        "asian_hotdog_crab",
+    }
+    asian_hotdogs_migrated = False
+    for product in data:
+        if str(product.get("id") or "") in asian_hotdog_ids and product.get("cat") != "dogs":
+            product["cat"] = "dogs"
+            asian_hotdogs_migrated = True
+    if asian_hotdogs_migrated:
+        write_products(data)
 
     return data
 
