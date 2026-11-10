@@ -1,486 +1,25 @@
-/* Salmon Panko now reuses the exact Philadelphia / Shrimp Panko card visual template. */
+/*
+ * Salmon Panko visual skin.
+ * Uses the shared product-card geometry from mockup-storefront.css.
+ * The title artwork already contains its green capsule: no second CSS button.
+ */
 
-
-
-/* v38: Philadelphia HIT green-neon artwork and live lower-card skin.
-   Only appearance changes; image is the top artwork crop, all card controls stay live. */
-.rr-card[data-card="salmon_panko"]{
- border:1.5px solid rgba(61,255,54,.96)!important;
- border-radius:18px!important;
- background:#020c04!important;
- box-shadow:0 0 2px rgba(84,255,66,.98),0 0 10px rgba(44,255,36,.58),0 0 22px rgba(13,180,24,.28)!important;
+.rr-card[data-card="salmon_panko"] {
+  border: 1.5px solid rgba(61, 255, 54, .96) !important;
+  border-radius: 18px !important;
+  background: #020c04 !important;
+  box-shadow: 0 0 2px rgba(84,255,66,.98),
+              0 0 10px rgba(44,255,36,.58),
+              0 0 22px rgba(13,180,24,.28) !important;
 }
 
-
-.rr-card[data-card="salmon_panko"] .rr-card-photo{
- border-bottom:1px solid rgba(76,255,59,.9)!important;
- box-shadow:0 3px 14px rgba(52,255,42,.3)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-image{
- object-fit:cover!important;
- object-position:center top!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-info{
- background:
-  radial-gradient(ellipse at 50% 0%,rgba(25,180,26,.22),transparent 62%),
-  linear-gradient(180deg,#061a09 0%,#061108 48%,#030805 100%)!important;
- border-top:1px solid rgba(76,255,63,.86)!important;
- box-shadow:inset 0 0 16px rgba(45,255,43,.17)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-title{
- border:1px solid #4dff43!important;
- border-radius:999px!important;
- background:linear-gradient(180deg,#0a300d 0%,#031107 76%,#071e09 100%)!important;
- color:#fff!important;
- text-shadow:0 1px 4px rgba(0,0,0,.96),0 0 7px rgba(102,255,91,.25)!important;
- box-shadow:0 0 3px rgba(72,255,56,.92),0 0 11px rgba(35,235,33,.48),inset 0 0 10px rgba(81,255,69,.13)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-title:before,
-.rr-card[data-card="salmon_panko"] .rr-card-title:after{
- color:#71ff45!important;
- text-shadow:0 0 6px rgba(85,255,59,.92)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-description{
- border:1px solid rgba(134,255,113,.9)!important;
- border-radius:12px!important;
- background:linear-gradient(145deg,rgba(6,27,10,.99),rgba(3,10,6,.99))!important;
- color:#fff!important;
- box-shadow:0 0 7px rgba(67,255,53,.28),inset 0 0 8px rgba(74,255,58,.09)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-meta{
- border:1px solid rgba(83,255,66,.95)!important;
- border-radius:11px!important;
- background:linear-gradient(150deg,#09210b,#030906)!important;
- color:#fff!important;
- box-shadow:0 0 7px rgba(67,255,53,.4),inset 0 0 8px rgba(74,255,58,.1)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-meta i{
- color:#7aff51!important;
- text-shadow:0 0 5px rgba(103,255,64,.7)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-composition{
- border:1px solid #5aff4a!important;
- border-radius:999px!important;
- background:linear-gradient(145deg,#0c3a10,#031107)!important;
- color:#fff!important;
- box-shadow:0 0 3px #61ff4b,0 0 10px rgba(44,255,37,.6),inset 0 0 8px rgba(111,255,90,.15)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-composition span,
-.rr-card[data-card="salmon_panko"] .rr-card-composition b{
- color:#8cff55!important;
- text-shadow:0 0 6px rgba(92,255,58,.8)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-purchase{
- border:1px solid rgba(105,255,87,.9)!important;
- border-radius:13px!important;
- background:linear-gradient(160deg,#0a1f0c,#030806)!important;
- box-shadow:0 0 8px rgba(46,255,43,.38),inset 0 0 9px rgba(92,255,72,.12)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-price{
- color:#fff!important;
- text-shadow:0 1px 5px rgba(0,0,0,.85),0 0 7px rgba(131,255,114,.26)!important;
-}
-
-
-
-
-/* v40: use the approved shrimp-panko title plaque in the HIT title slot only.
-   Description, metadata, composition, price, favorite and cart controls stay untouched. */
-.rr-card[data-card="salmon_panko"] .rr-card-title{
- padding:0!important;
- border:0!important;
- border-radius:0!important;
- background:transparent!important;
- color:transparent!important;
- text-shadow:none!important;
- box-shadow:none!important;
- overflow:hidden!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-title::before,
-.rr-card[data-card="salmon_panko"] .rr-card-title::after{
- content:none!important;
- display:none!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- display:block!important;
- width:100%!important;
- height:100%!important;
- min-width:0!important;
- min-height:0!important;
- object-fit:cover!important;
- object-position:center!important;
- border:0!important;
- border-radius:999px!important;
-}
-
-
-
-
-/* v41: fit the full shrimp-panko title plaque without disturbing other live card controls. */
-.rr-card[data-card="salmon_panko"] .rr-card-info{
- grid-template-rows:minmax(20cqw,1.35fr) minmax(0,1.55fr) minmax(0,.88fr) minmax(0,1.32fr)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- object-fit:contain!important;
- object-position:center center!important;
-}
-
-
-
-
-/* v44: clean title capsule source and crisp matching vector stats icons for the HIT card only. */
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- object-fit:contain!important;
- object-position:center center!important;
- image-rendering:auto!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-meta-svg{
- display:block!important;
- width:1.55em!important;
- height:1.55em!important;
- flex:0 0 1.55em!important;
- min-width:1.55em!important;
- min-height:1.55em!important;
- overflow:visible!important;
- shape-rendering:geometricPrecision!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-meta-sushi{
- filter:drop-shadow(0 0 1.3px rgba(130,255,96,.5))!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-meta-scale{
- filter:drop-shadow(0 0 1.3px rgba(130,255,96,.5))!important;
-}
-
-
-
-
-/* v45: original clean title plaque restored; larger crisp SVG stats icons, HIT only. */
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- object-fit:contain!important;
- object-position:center center!important;
- border-radius:0!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-meta-svg{
- width:16px!important;
- height:16px!important;
- flex:0 0 16px!important;
- min-width:16px!important;
- min-height:16px!important;
- align-self:center!important;
-}
-
-
-
-
-/* v46: restore previously working HIT title art and make both stats SVGs legible on mobile. */
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- object-fit:contain!important;
- object-position:center center!important;
- border-radius:999px!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-meta-svg{
- width:16px!important;
- height:16px!important;
- flex:0 0 16px!important;
- min-width:16px!important;
- min-height:16px!important;
- align-self:center!important;
-}
-
-
-
-
-/* v47: clean original shrimp-panko plaque with transparent rounded edges; stats icons crisp on HIT only. */
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- object-fit:contain!important;
- object-position:center center!important;
- border-radius:0!important;
- image-rendering:auto!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-meta-svg{
- width:16px!important;
- height:16px!important;
- flex:0 0 16px!important;
- min-width:16px!important;
- min-height:16px!important;
- align-self:center!important;
-}
-
-
-
-
-/* v48: clean capsule edges and remove the green underlay/halo from HIT composition button only. */
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- object-fit:contain!important;
- object-position:center center!important;
- border:0!important;
- border-radius:0!important;
- box-shadow:none!important;
- filter:none!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-composition{
- background:linear-gradient(145deg,#061009 0%,#020705 100%)!important;
- border:1px solid #67ff4d!important;
- box-shadow:0 0 1.5px rgba(103,255,77,.62),inset 0 0 0 1px rgba(103,255,77,.08)!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-composition span,
-.rr-card[data-card="salmon_panko"] .rr-card-composition b{
- color:#a0ff70!important;
- text-shadow:0 0 2px rgba(128,255,98,.24)!important;
-}
-
-
-
-
-/* v51: use the full-resolution original title plaque with clean transparent edges, only on HIT. */
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- display:block!important;
- width:100%!important;
- height:100%!important;
- object-fit:contain!important;
- object-position:center center!important;
- border:0!important;
- border-radius:0!important;
- box-shadow:none!important;
- filter:none!important;
- image-rendering:auto!important;
-}
-
-
-
-
-/* v54: inset original high-resolution HIT title and sharpen the Composition button edge. */
-.rr-card[data-card="salmon_panko"] .rr-card-title{
- display:flex!important;
- align-items:center!important;
- justify-content:center!important;
- overflow:hidden!important;
- padding:0!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- display:block!important;
- width:94%!important;
- height:90%!important;
- max-width:none!important;
- max-height:none!important;
- margin:auto!important;
- object-fit:contain!important;
- object-position:center center!important;
- border:0!important;
- border-radius:0!important;
- box-shadow:none!important;
- filter:none!important;
- image-rendering:auto!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-composition{
- background:linear-gradient(145deg,#061009 0%,#020705 100%)!important;
- border:1px solid #76ff55!important;
- box-shadow:none!important;
- filter:none!important;
- outline:0!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-composition span,
-.rr-card[data-card="salmon_panko"] .rr-card-composition b{
- color:#aaff7a!important;
- text-shadow:none!important;
-}
-
-
-
-
-/* v55: final crisp inset title and clean composition outline, Philadelphia HIT only. */
-.rr-card[data-card="salmon_panko"] .rr-card-title{
- display:flex!important;
- align-items:center!important;
- justify-content:center!important;
- overflow:hidden!important;
- padding:0!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- display:block!important;
- width:94%!important;
- height:90%!important;
- max-width:none!important;
- max-height:none!important;
- margin:auto!important;
- object-fit:contain!important;
- object-position:center center!important;
- border:0!important;
- border-radius:0!important;
- box-shadow:none!important;
- filter:none!important;
- image-rendering:auto!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-composition{
- background:linear-gradient(145deg,#061009 0%,#020705 100%)!important;
- border:1px solid #76ff55!important;
- box-shadow:none!important;
- filter:none!important;
- outline:0!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-composition span,
-.rr-card[data-card="salmon_panko"] .rr-card-composition b{
- color:#aaff7a!important;
- text-shadow:none!important;
-}
-
-
-
-
-/* v53 final: original 2x transparent capsule crop, inset title; sharp composition border. */
-.rr-card[data-card="salmon_panko"] .rr-card-title{
- display:flex!important;
- align-items:center!important;
- justify-content:center!important;
- overflow:hidden!important;
- padding:0!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- display:block!important;
- width:94%!important;
- height:90%!important;
- max-width:none!important;
- max-height:none!important;
- margin:auto!important;
- object-fit:contain!important;
- object-position:center center!important;
- border:0!important;
- border-radius:0!important;
- box-shadow:none!important;
- filter:none!important;
- image-rendering:auto!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-composition{
- background:linear-gradient(145deg,#061009 0%,#020705 100%)!important;
- border:1px solid #76ff55!important;
- box-shadow:none!important;
- filter:none!important;
- outline:0!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-composition span,
-.rr-card[data-card="salmon_panko"] .rr-card-composition b{
- color:#aaff7a!important;
- text-shadow:none!important;
-}
-
-
-
-
-/* v56: use the New Arrival pill structure in green; preserve the original shrimp, lettering and panko brush inside. */
-.rr-card[data-card="salmon_panko"] .rr-card-title{
- display:flex!important;
- align-items:center!important;
- justify-content:center!important;
- min-width:0!important;
- min-height:0!important;
- margin:0!important;
- padding:1cqw 2cqw!important;
- overflow:hidden!important;
- white-space:normal!important;
- border:1px solid #5aff4a!important;
- border-radius:999px!important;
- background:linear-gradient(180deg,#0a300d 0%,#031107 76%,#071e09 100%)!important;
- box-shadow:0 0 3px rgba(72,255,56,.92),0 0 10px rgba(35,235,33,.48),inset 0 0 10px rgba(81,255,69,.13)!important;
- text-align:center!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-card-title::before,
-.rr-card[data-card="salmon_panko"] .rr-card-title::after{
- content:none!important;
- display:none!important;
-}
-
-
-.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art{
- display:block!important;
- width:96%!important;
- height:90%!important;
- max-width:none!important;
- max-height:none!important;
- margin:auto!important;
- object-fit:contain!important;
- object-position:center center!important;
- border:0!important;
- border-radius:0!important;
- box-shadow:none!important;
- filter:none!important;
- image-rendering:auto!important;
-}
-
-/* Geometry reset: let Salmon Panko use the same shared catalogue card ratio and grid as Shrimp Panko.
-   Do not set a separate card aspect-ratio or grid split for this product. */
 .rr-card[data-card="salmon_panko"] .rr-card-photo {
-  height: 100% !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  aspect-ratio: auto !important;
-  flex: none !important;
+  border-bottom: 1px solid rgba(76,255,59,.9) !important;
+  box-shadow: 0 3px 14px rgba(52,255,42,.3) !important;
   background: #090b0d !important;
   background-image: none !important;
 }
+
 .rr-card[data-card="salmon_panko"] .rr-card-photo::before,
 .rr-card[data-card="salmon_panko"] .rr-card-photo::after {
   content: none !important;
@@ -488,28 +27,36 @@
   background-image: none !important;
   filter: none !important;
 }
-.rr-card[data-card="salmon_panko"] .rr-card-photo .rr-card-image {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
+
+.rr-card[data-card="salmon_panko"] .rr-card-image {
   object-fit: cover !important;
   object-position: center top !important;
-  background: transparent !important;
 }
 
+/* Same green information panel as Shrimp Panko. No custom card dimensions. */
+.rr-card[data-card="salmon_panko"] .rr-card-info {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(25,180,26,.22), transparent 62%),
+    linear-gradient(180deg, #061a09 0%, #061108 48%, #030805 100%) !important;
+  border-top: 1px solid rgba(76,255,63,.86) !important;
+  box-shadow: inset 0 0 16px rgba(45,255,43,.17) !important;
+}
 
-/* Single Salmon Panko title plaque only.
-   The PNG already contains the green capsule; the h3 must remain a transparent holder. */
+/*
+ * The h3 is only a layout slot. It must not draw another capsule
+ * and must not retain the obsolete 38.2px height limit.
+ */
 .rr-card[data-card="salmon_panko"] .rr-card-title {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   box-sizing: border-box !important;
+  grid-row: 1 !important;
   width: 100% !important;
   height: 100% !important;
   min-width: 0 !important;
   min-height: 0 !important;
+  max-height: none !important;
   margin: 0 !important;
   padding: 0 !important;
   overflow: hidden !important;
@@ -520,14 +67,17 @@
   color: transparent !important;
   text-shadow: none !important;
 }
+
 .rr-card[data-card="salmon_panko"] .rr-card-title::before,
 .rr-card[data-card="salmon_panko"] .rr-card-title::after {
   content: none !important;
   display: none !important;
 }
-.rr-card[data-card="salmon_panko"] .rr-card-title .rr-hit-panko-title-art {
+
+/* Match the Shrimp Panko artwork inset; one image, one visible capsule. */
+.rr-card[data-card="salmon_panko"] .rr-hit-panko-title-art {
   display: block !important;
-  width: 94% !important;
+  width: 96% !important;
   height: 90% !important;
   max-width: 100% !important;
   max-height: 100% !important;
@@ -539,4 +89,68 @@
   background: transparent !important;
   box-shadow: none !important;
   filter: none !important;
+  image-rendering: auto !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-card-description {
+  border: 1px solid rgba(134,255,113,.9) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(145deg, rgba(6,27,10,.99), rgba(3,10,6,.99)) !important;
+  color: #fff !important;
+  box-shadow: 0 0 7px rgba(67,255,53,.28),
+              inset 0 0 8px rgba(74,255,58,.09) !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-card-meta {
+  border: 1px solid rgba(83,255,66,.95) !important;
+  border-radius: 11px !important;
+  background: linear-gradient(150deg, #09210b, #030906) !important;
+  color: #fff !important;
+  box-shadow: 0 0 7px rgba(67,255,53,.4),
+              inset 0 0 8px rgba(74,255,58,.1) !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-card-meta i {
+  color: #7aff51 !important;
+  text-shadow: 0 0 5px rgba(103,255,64,.7) !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-card-composition {
+  border: 1px solid #5aff4a !important;
+  border-radius: 999px !important;
+  background: linear-gradient(145deg, #0c3a10, #031107) !important;
+  color: #fff !important;
+  box-shadow: 0 0 3px #61ff4b,
+              0 0 10px rgba(44,255,37,.6),
+              inset 0 0 8px rgba(111,255,90,.15) !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-card-composition span,
+.rr-card[data-card="salmon_panko"] .rr-card-composition b {
+  color: #8cff55 !important;
+  text-shadow: 0 0 6px rgba(92,255,58,.8) !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-card-purchase {
+  border: 1px solid rgba(105,255,87,.9) !important;
+  border-radius: 13px !important;
+  background: linear-gradient(160deg, #0a1f0c, #030806) !important;
+  box-shadow: 0 0 8px rgba(46,255,43,.38),
+              inset 0 0 9px rgba(92,255,72,.12) !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-card-price {
+  color: #fff !important;
+  text-shadow: 0 1px 5px rgba(0,0,0,.85),
+               0 0 7px rgba(131,255,114,.26) !important;
+}
+
+.rr-card[data-card="salmon_panko"] .rr-hit-meta-svg {
+  display: block !important;
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  align-self: center !important;
 }
