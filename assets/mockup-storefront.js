@@ -190,7 +190,7 @@ function card(p){
  const pankoCard=p.id==='philadelphia'||p.id==='salmon_panko';
  const artPhoto=hit&&(p.id==='philadelphia'||p.id==='salmon_panko');
  const image=p.id==='philadelphia'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4f0ca39-9e57-4852-a2be-008127afba9f.webp':photo(p);
- const heart='<button class="rr-card-heart '+(artPhoto?'rr-card-heart-art ':'')+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-pressed="'+(fav?'true':'false')+'" aria-label="'+(fav?'Удалить из избранного':'Добавить в избранное')+'">'+(fav?'♥':'♡')+'</button>';
+ const heart='<button class="rr-card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-pressed="'+(fav?'true':'false')+'" aria-label="'+(fav?'Удалить из избранного':'Добавить в избранное')+'">'+(fav?'♥':'♡')+'</button>';
  const cleanBadge=String(p.badge||'').trim();
  const badge=hit&&!artPhoto?'<span class="rr-card-hit-badge '+(p.id==='salmon_panko'?'rr-salmon-panko-hit':'')+'">✦ ХИТ</span>':(!hit&&cleanBadge&&!/хит/i.test(cleanBadge)?'<span class="rr-card-badge">'+esc(cleanBadge)+'</span>':'');
  return '<article class="product-card rr-card '+(pankoCard?'rr-card-panko ':'')+(hit?'rr-card-is-hit ':'')+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
