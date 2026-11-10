@@ -28,9 +28,14 @@
   filter: none !important;
 }
 
-.rr-card[data-card="salmon_panko"] .rr-card-image {
+.rr-card[data-card="salmon_panko"] .rr-card-photo .rr-card-image {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
   object-fit: cover !important;
   object-position: center top !important;
+  background: transparent !important;
 }
 
 /* Same green information panel as Shrimp Panko. No custom card dimensions. */
