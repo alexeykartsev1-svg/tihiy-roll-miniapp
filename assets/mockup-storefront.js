@@ -39,7 +39,7 @@ function observeSeasonalBannerImages(cards){
 const find=id=>state.products.find(p=>p.id===id);
 const qty=id=>Number(state.cart[id]||0);
 const stock=p=>p?.stock==null?null:Math.max(0,Number(p.stock)||0);
-const photo=p=>p?.id==='salmon_panko'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/e549c69f-0d66-496c-afbb-7d3c6e8d303f.webp':(p?.id==='asian_hotdog_chicken'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/77b66bf7-aeed-43e9-9dc8-102499c0f0ef.webp':(p?.id==='asian_hotdog_shrimp'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/782d8c4d-7e39-444d-9429-f775d5ab704e.webp':(p?.id==='asian_hotdog_salmon'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/97a9ac28-fa86-4ad3-98c5-b8ca0b7d5b0e.webp':(p?.photo||'./assets/set-party.webp'))));
+const photo=p=>{if(!p)return './assets/set-party.webp';if(p.id==='california')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4905c63-e46d-4ccb-8f14-abfa2211ba80.png';if(p.id==='warm_crab')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/f0825c4f-a2e3-43eb-b7bf-d6bf2c023dbc.png';if(p.id==='salmon_panko')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/e549c69f-0d66-496c-afbb-7d3c6e8d303f.webp';if(p.id==='asian_hotdog_chicken')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/77b66bf7-aeed-43e9-9dc8-102499c0f0ef.webp';if(p.id==='asian_hotdog_shrimp')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/782d8c4d-7e39-444d-9429-f775d5ab704e.webp';if(p.id==='asian_hotdog_salmon')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/97a9ac28-fa86-4ad3-98c5-b8ca0b7d5b0e.webp';return p.photo||'./assets/set-party.webp';};
 const productTotal=()=>state.products.reduce((sum,p)=>sum+p.price*qty(p.id),0);
 const cartCount=()=>Object.values(state.cart).reduce((sum,n)=>sum+Number(n||0),0);
 const setPrice=s=>(s.items||[]).reduce((sum,i)=>sum+(find(i.id)?.price||0)*Number(i.qty||0),0);
@@ -222,7 +222,7 @@ function card(p){
  const cleanBadge=String(p.badge||'').trim();
  const badge=hit&&!artPhoto?'<span class="rr-card-hit-badge '+(p.id==='salmon_panko'?'rr-salmon-panko-hit':'')+'">✦ ХИТ</span>':(!hit&&cleanBadge&&!/хит/i.test(cleanBadge)?'<span class="rr-card-badge">'+esc(cleanBadge)+'</span>':'');
  return '<article class="product-card rr-card '+(pankoCard?'rr-card-panko ':'')+(hit?'rr-card-is-hit ':'')+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
-  +'<div class="rr-card-photo '+(artPhoto?'rr-card-photo-art':'')+'"><img class="rr-card-image" src="'+image+'" alt="'+esc(p.name)+'" loading="lazy" decoding="async" fetchpriority="low">'+badge+heart+'</div>'
+  +'<div class="rr-card-photo '+(artPhoto?'rr-card-photo-art':'')+'"><img class="rr-card-image" src="'+image+'" alt="'+esc(p.name)+'" loading="'+(p.id==='california'?'eager':'lazy')+'" decoding="async" fetchpriority="'+(p.id==='california'?'high':'low')+'">'+badge+heart+'</div>'
   +'<div class="rr-card-info">'
   +'<h3 class="rr-card-title" aria-label="'+(p.id==='philadelphia'?'Креветка Панко':p.id==='salmon_panko'?'Лосось Панко':esc(p.name))+'">'+(p.id==='philadelphia'?'<img class="rr-hit-panko-title-art" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/fb7d8b7d-07b1-415a-b38d-364b5a6e6014.png" alt="Креветка Панко" loading="lazy" decoding="async" fetchpriority="low">':p.id==='salmon_panko'?'<span class="rr-panko-title-plain"><img class="rr-panko-title-decor" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/dd85965a-02fe-4f29-a2a9-39e269099767.png" alt="" aria-hidden="true" loading="lazy" decoding="async" fetchpriority="low"><span class="rr-panko-title-top">Лосось</span><span class="rr-panko-title-bottom">Панко</span></span>':p.id==='asian_hotdog_salmon'?'<span class="rr-salmon-title"><span>Азиатский Хот-Дог</span><b>Лосось</b></span>':p.id==='asian_hotdog_shrimp'?'<span class="rr-shrimp-title"><span>Азиатский Хот-Дог</span><b>Креветка</b></span>':p.id==='asian_hotdog_chicken'?'<span class="rr-chicken-title"><span>Азиатский Хот-Дог</span><b>Курица</b></span>':p.id==='asian_hotdog_crab'?'<span class="rr-crab-title"><span>Азиатский Хот-Дог</span><b>Снежный краб</b></span>':'<span>'+esc(p.name)+'</span>')+'</h3>'
   +'<p class="rr-card-description">'+esc(desc)+'</p>'
@@ -762,7 +762,7 @@ function updateHomePhone(settings){
 async function load(){
  let fallback={products:[]};
  try{
-  const response=await fetch('./assets/local-catalog-fallback.json?v=asian-hotdog-crab-v1',{cache:'force-cache'});
+  const response=await fetch('./assets/local-catalog-fallback.json?v=menu-photo-cachefix-20261111',{cache:'force-cache'});
   if(response.ok)fallback=await response.json();
  }catch(e){}
  state.products=Array.isArray(fallback.products)?fallback.products.filter(p=>p.active!==false):[];
