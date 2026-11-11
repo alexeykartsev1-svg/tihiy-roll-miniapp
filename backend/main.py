@@ -454,6 +454,7 @@ def _protect_existing_product_migrations(products: list[dict[str, Any]]) -> None
         ("asian-hotdog-snow-crab-v1", {"asian_hotdog_crab"}),
         ("salmon-panko-roll-v1", {"salmon_panko"}),
         ("salmon-panko-approved-art-v2", {"salmon_panko"}),
+        ("shrimp-panko-product-v1", {"shrimp_panko"}),
         ("geisha-crab-card-v1", {"warm_crab"}),
         ("california-card-photo-v1", {"california"}),
         ("chicken-sesame-card-v1", {"unagi"}),
@@ -903,6 +904,55 @@ def read_products() -> list[dict[str, Any]]:
                     handle.write("updated\\n")
             except OSError:
                 logger.warning("Could not create Chicken Sesame card migration marker at %s", chicken_sesame_marker)
+
+    # Split the former storefront-only Philadelphia alias into a real catalog product.
+    # Keep the original Philadelphia record untouched; the new item gets its own stable ID
+    # so carts, favorites, set composition, and future orders no longer collide.
+    shrimp_panko_marker = PRODUCTS_FILE + ".shrimp-panko-product-v1"
+    if not os.path.exists(shrimp_panko_marker):
+        shrimp_panko_existing = next(
+            (item for item in data if str(item.get("id", "")) == "shrimp_panko"),
+            None,
+        )
+        if shrimp_panko_existing is None:
+            philadelphia_product = next(
+                (item for item in data if str(item.get("id", "")) == "philadelphia"),
+                None,
+            )
+            if philadelphia_product is not None:
+                shrimp_panko_description = "Креветка в хрустящей панировке панко."
+                shrimp_panko_product = dict(philadelphia_product)
+                shrimp_panko_product.update({
+                    "id": "shrimp_panko",
+                    "name": "Креветка Панко",
+                    "price": int(philadelphia_product.get("price", 450) or 450),
+                    "cost": max(0, int(philadelphia_product.get("cost", 0) or 0)),
+                    "weight": str(philadelphia_product.get("weight") or "280 г"),
+                    "pieces": int(philadelphia_product.get("pieces", 8) or 8),
+                    "cat": str(philadelphia_product.get("cat") or "classic"),
+                    "badge": "ХИТ",
+                    "desc": shrimp_panko_description,
+                    "card_description": shrimp_panko_description,
+                    "details": "Креветка, панировка панко, рис, нори",
+                    "photo": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4f0ca39-9e57-4852-a2be-008127afba9f.webp",
+                    "gallery": [],
+                    "hit_template": True,
+                    "active": philadelphia_product.get("active", True),
+                    "sort_order": 6,
+                })
+                data.append(shrimp_panko_product)
+                write_products(data)
+                shrimp_panko_existing = shrimp_panko_product
+                logger.info("Created separate Shrimp Panko product with ID shrimp_panko")
+        if shrimp_panko_existing is not None:
+            try:
+                marker_dir = os.path.dirname(shrimp_panko_marker)
+                if marker_dir:
+                    os.makedirs(marker_dir, exist_ok=True)
+                with open(shrimp_panko_marker, "w", encoding="utf-8") as handle:
+                    handle.write("created\\n")
+            except OSError:
+                logger.warning("Could not create Shrimp Panko migration marker at %s", shrimp_panko_marker)
 
     return data
 

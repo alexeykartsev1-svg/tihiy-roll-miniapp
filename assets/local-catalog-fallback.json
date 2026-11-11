@@ -5,6 +5,25 @@
       "photo": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/e8001423-11b3-4f22-8dd1-59e3e09bae10.webp"
     },
     {
+      "id": "shrimp_panko",
+      "name": "Креветка Панко",
+      "price": 450,
+      "cost": 0,
+      "weight": "280 г",
+      "cat": "classic",
+      "badge": "ХИТ",
+      "desc": "Креветка в хрустящей панировке панко.",
+      "card_description": "Креветка в хрустящей панировке панко.",
+      "details": "Креветка, панировка панко, рис, нори",
+      "pieces": 8,
+      "stock": null,
+      "photo": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4f0ca39-9e57-4852-a2be-008127afba9f.webp",
+      "gallery": [],
+      "active": true,
+      "sort_order": 6,
+      "hit_template": true
+    },
+    {
       "id": "lava",
       "photo": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/df8722e4-988c-4704-ac7b-1e8508502eb4.webp"
     },
