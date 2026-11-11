@@ -852,10 +852,11 @@ if(galleryStage){
   }
  },{passive:true});
 }
-function openProductFromGrid(e){if(e.target.closest('button,[data-card-price]')){e.preventDefault();e.stopPropagation();return;}const el=e.target.closest('[data-card]');if(!el)return;const id=el.dataset.card;if(id.startsWith('set:')){const s=state.sets.find(x=>x.id===id.slice(4));if(s)setDetail(s);}else detail(find(id));}
-function openProductInfoFromGrid(e){if(e.target.closest('button,[data-card-price]')){e.preventDefault();e.stopPropagation();return;}const el=e.target.closest('[data-card]');if(!el)return;showBuilderInfo(el.dataset.card);}
+function openProductFromGrid(e){if(e.target.closest('[data-card-price]')){e.preventDefault();e.stopPropagation();return;}if(e.target.closest('button'))return;const el=e.target.closest('[data-card]');if(!el)return;const id=el.dataset.card;if(id.startsWith('set:')){const s=state.sets.find(x=>x.id===id.slice(4));if(s)setDetail(s);}else detail(find(id));}
+function openProductInfoFromGrid(e){if(e.target.closest('[data-card-price]')){e.preventDefault();e.stopPropagation();return;}if(e.target.closest('button'))return;const el=e.target.closest('[data-card]');if(!el)return;showBuilderInfo(el.dataset.card);}
 $('#builderGrid').addEventListener('click',event=>{
- if(event.target.closest('button,[data-card-price]')){event.preventDefault();event.stopPropagation();return;}
+ if(event.target.closest('[data-card-price]')){event.preventDefault();event.stopPropagation();return;}
+ if(event.target.closest('button'))return;
  const target=event.target.closest('[data-builder-info]');if(target)showBuilderInfo(target.dataset.builderInfo);
 });
 $('#builderGrid').addEventListener('keydown',event=>{
