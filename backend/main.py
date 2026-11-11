@@ -297,6 +297,7 @@ async def request_validation_error_handler(request: Request, exc: RequestValidat
 
 ADMIN_TELEGRAM_ID = os.getenv("ADMIN_TELEGRAM_ID", "").strip()
 PRODUCTS_FILE = os.getenv("PRODUCTS_FILE", os.path.join(os.path.dirname(__file__), "products.json"))
+CHICKEN_SESAME_ROLL_PHOTO = "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4c547d77-af4f-42b6-b6f7-be80f580bcdf.webp"
 CALIFORNIA_ROLL_PHOTO = "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4905c63-e46d-4ccb-8f14-abfa2211ba80.png"
 GEISHA_CRAB_PHOTO = "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/f0825c4f-a2e3-43eb-b7bf-d6bf2c023dbc.png"
 DEFAULT_PRODUCTS = [
@@ -305,7 +306,7 @@ DEFAULT_PRODUCTS = [
     {"id":"warm_crab","name":"Гейша с крабом","price":350,"weight":"280 г","cat":"warm","badge":"","desc":"Тёплый ролл с крабом и аппетитной золотистой корочкой.","photo":GEISHA_CRAB_PHOTO,"active":True,"sort_order":2},
     {"id":"warm_salmon","name":"Тёплый лосось","price":450,"weight":"280 г","cat":"warm","badge":"","desc":"Тёплый ролл с лососем, приготовленный до золотистой корочки.","photo":"","active":True,"sort_order":3},
     {"id":"california","name":"Калифорния","price":390,"cost":0,"weight":"280 г","cat":"classic","badge":"","desc":"Классический ролл с нежной начинкой и рисом.","photo":CALIFORNIA_ROLL_PHOTO,"active":True,"sort_order":4},
-    {"id":"unagi","name":"Унаги","price":460,"cost":0,"weight":"280 г","cat":"classic","badge":"","desc":"Ролл с угрём и насыщенным соусом унаги.","photo":"","active":True,"sort_order":5},
+    {"id":"unagi","name":"Курица с кунжутом","price":460,"cost":0,"weight":"280 г","cat":"classic","badge":"","desc":"Курица, сливочный сыр, свежий огурец, рис и кунжут.","photo":CHICKEN_SESAME_ROLL_PHOTO,"active":True,"sort_order":5},
 ]
 
 STARTER_CATEGORY_PRODUCTS = [
@@ -743,6 +744,27 @@ def read_products() -> list[dict[str, Any]]:
                     handle.write("updated\\n")
             except OSError:
                 logger.warning("Could not create California card migration marker at %s", california_card_marker)
+
+    # Owner-requested photo/title update for the next standard roll card.
+    # Keep the original product ID, price, category, weight, stock and order integrations.
+    chicken_sesame_marker = PRODUCTS_FILE + ".chicken-sesame-card-v1"
+    if not os.path.exists(chicken_sesame_marker):
+        chicken_sesame_product = next((item for item in data if str(item.get("id", "")) == "unagi"), None)
+        if chicken_sesame_product is not None:
+            chicken_sesame_product["name"] = "Курица с кунжутом"
+            chicken_sesame_product["photo"] = CHICKEN_SESAME_ROLL_PHOTO
+            chicken_sesame_product["desc"] = "Курица, сливочный сыр, свежий огурец, рис и кунжут."
+            chicken_sesame_product["card_description"] = "Курица, сливочный сыр, свежий огурец, рис и кунжут."
+            chicken_sesame_product["details"] = "Курица, сливочный сыр, свежий огурец, рис, нори, кунжут."
+            write_products(data)
+            try:
+                marker_dir = os.path.dirname(chicken_sesame_marker)
+                if marker_dir:
+                    os.makedirs(marker_dir, exist_ok=True)
+                with open(chicken_sesame_marker, "w", encoding="utf-8") as handle:
+                    handle.write("updated\\n")
+            except OSError:
+                logger.warning("Could not create Chicken Sesame card migration marker at %s", chicken_sesame_marker)
 
     return data
 

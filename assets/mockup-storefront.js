@@ -39,7 +39,7 @@ function observeSeasonalBannerImages(cards){
 const find=id=>state.products.find(p=>p.id===id);
 const qty=id=>Number(state.cart[id]||0);
 const stock=p=>p?.stock==null?null:Math.max(0,Number(p.stock)||0);
-const photo=p=>{if(!p)return './assets/set-party.webp';if(p.id==='california')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4905c63-e46d-4ccb-8f14-abfa2211ba80.png';if(p.id==='warm_crab')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/f0825c4f-a2e3-43eb-b7bf-d6bf2c023dbc.png';if(p.id==='salmon_panko')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/e549c69f-0d66-496c-afbb-7d3c6e8d303f.webp';if(p.id==='asian_hotdog_chicken')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/77b66bf7-aeed-43e9-9dc8-102499c0f0ef.webp';if(p.id==='asian_hotdog_shrimp')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/782d8c4d-7e39-444d-9429-f775d5ab704e.webp';if(p.id==='asian_hotdog_salmon')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/97a9ac28-fa86-4ad3-98c5-b8ca0b7d5b0e.webp';return p.photo||'./assets/set-party.webp';};
+const photo=p=>{if(!p)return './assets/set-party.webp';if(p.id==='unagi')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4c547d77-af4f-42b6-b6f7-be80f580bcdf.webp';if(p.id==='california')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4905c63-e46d-4ccb-8f14-abfa2211ba80.png';if(p.id==='warm_crab')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/f0825c4f-a2e3-43eb-b7bf-d6bf2c023dbc.png';if(p.id==='salmon_panko')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/e549c69f-0d66-496c-afbb-7d3c6e8d303f.webp';if(p.id==='asian_hotdog_chicken')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/77b66bf7-aeed-43e9-9dc8-102499c0f0ef.webp';if(p.id==='asian_hotdog_shrimp')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/782d8c4d-7e39-444d-9429-f775d5ab704e.webp';if(p.id==='asian_hotdog_salmon')return 'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/97a9ac28-fa86-4ad3-98c5-b8ca0b7d5b0e.webp';return p.photo||'./assets/set-party.webp';};
 const productTotal=()=>state.products.reduce((sum,p)=>sum+p.price*qty(p.id),0);
 const cartCount=()=>Object.values(state.cart).reduce((sum,n)=>sum+Number(n||0),0);
 const setPrice=s=>(s.items||[]).reduce((sum,i)=>sum+(find(i.id)?.price||0)*Number(i.qty||0),0);
@@ -762,7 +762,7 @@ function updateHomePhone(settings){
 async function load(){
  let fallback={products:[]};
  try{
-  const response=await fetch('./assets/local-catalog-fallback.json?v=menu-photo-cachefix-20261111',{cache:'force-cache'});
+  const response=await fetch('./assets/local-catalog-fallback.json?v=chicken-sesame-card-20261111',{cache:'force-cache'});
   if(response.ok)fallback=await response.json();
  }catch(e){}
  state.products=Array.isArray(fallback.products)?fallback.products.filter(p=>p.active!==false):[];
