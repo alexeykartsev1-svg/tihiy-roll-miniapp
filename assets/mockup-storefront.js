@@ -468,6 +468,7 @@ function storeNow(){
  return new Date(Number(v.year),Number(v.month)-1,Number(v.day),Number(v.hour),Number(v.minute));
 }
 function dateString(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function syncPickupDateDisplay(){const input=$('#pickupDate'),display=$('#pickupDateDisplay');if(!input||!display)return;const value=input.value;if(!value){display.textContent='Выбрать дату';return;}const parts=value.split('-').map(Number);if(parts.length!==3||parts.some(n=>!Number.isFinite(n))){display.textContent='Выбрать дату';return;}const date=new Date(parts[0],parts[1]-1,parts[2]);display.textContent=new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}).format(date);}
 function hoursFor(d){return {open:'12:00',close:'20:00',closed:[0,3].includes(d.getDay())};}
 function initialDate(){const now=storeNow();for(let i=0;i<14;i++){const d=new Date(now);d.setDate(now.getDate()+i);const h=hoursFor(d);if(!h.closed)return d;}return now;}
 async function refreshTimes(){
@@ -484,7 +485,7 @@ async function refreshTimes(){
  }
  select.innerHTML='<option value="">Выбрать время</option>'+opts.join('');
 }
-function preparePickup(){const date=$('#pickupDate'),now=storeNow();if(!date.value){date.min=dateString(now);date.value=dateString(initialDate());}else date.min=dateString(now);refreshTimes();}
+function preparePickup(){const date=$('#pickupDate'),now=storeNow();if(!date.value){date.min=dateString(now);date.value=dateString(initialDate());}else date.min=dateString(now);syncPickupDateDisplay();refreshTimes();}
 function pickupLabel(date,time){
  const p=date.split('-').map(Number),d=new Date(p[0],p[1]-1,p[2]),now=storeNow(),tomorrow=new Date(now);tomorrow.setDate(now.getDate()+1);
  const label=date===dateString(now)?'Сегодня':date===dateString(tomorrow)?'Завтра':DAYS[d.getDay()];
@@ -878,7 +879,7 @@ if(homePhoneLink){
   window.open(target,'_blank');
  },true);
 }
-$('#pickupDate').addEventListener('change',refreshTimes);
+$('#pickupDate').addEventListener('change',()=>{syncPickupDateDisplay();refreshTimes();});
 const checkoutName=$('#checkoutName'),checkoutPhone=$('#checkoutPhone'),deliveryAddress=$('#deliveryAddress');
 checkoutPhone.value=formatRussianPhone(checkoutPhone.value||'+7 ');
 checkoutPhone.addEventListener('focus',()=>{if(!checkoutPhone.value||checkoutPhone.value.trim()==='')checkoutPhone.value='+7 ';if(checkoutPhone.value.trim()==='+7'){try{checkoutPhone.setSelectionRange(checkoutPhone.value.length,checkoutPhone.value.length);}catch(_){}}});
