@@ -71,7 +71,7 @@ textarea { min-height:100px; }
 <div class="field full"><div style="padding:13px 14px;border:1px solid rgba(230,180,72,.38);border-radius:12px;background:linear-gradient(135deg,rgba(230,180,72,.09),rgba(7,13,18,.35))"><label for="hitTemplate" style="display:flex;align-items:center;gap:10px;font-weight:800;color:#f6d28a"><input id="hitTemplate" type="checkbox" style="width:18px;height:18px;accent-color:#e8b84c"> Использовать фирменный шаблон «ХИТ»</label><div class="help" style="margin:7px 0 0 28px">Фото блюда автоматически встанет в готовое оформление с девушкой-поваром, плашками «ХИТ», «Готовим под заказ» и «Свежая сборка». Название, описание, вес, количество и цена берутся из этого товара.</div></div></div>
 <div class="field full"><label>Дополнительные фотографии (до 5)</label><div id="galleryAdminEditor" class="admin-gallery-grid"></div><div class="help">Загрузи до пяти отдельных фотографий. Они будут листаться в карточке товара.</div></div>
 <div class="field full checks"><label><input type="checkbox" id="active" checked> Показывать на сайте</label></div>
-</div><div class="formactions"><button class="btn primary" type="submit" id="save">Сохранить</button><button class="btn" type="button" id="cancel">Отмена</button><button class="btn danger hidden" type="button" id="delete">Удалить товар</button></div></form></section></section><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="margin:0;font:700 20px Georgia,serif">Главный экран и реклама</h2><p class="muted">Тексты, слайды и рекламный блок сайта</p></div><button class="btn" type="button" id="reloadContent">Обновить</button></div><div class="formgrid">
+</div><div class="formactions"><button class="btn primary" type="button" id="save">Сохранить</button><button class="btn" type="button" id="cancel">Отмена</button><button class="btn danger hidden" type="button" id="delete">Удалить товар</button></div></form></section></section><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="margin:0;font:700 20px Georgia,serif">Главный экран и реклама</h2><p class="muted">Тексты, слайды и рекламный блок сайта</p></div><button class="btn" type="button" id="reloadContent">Обновить</button></div><div class="formgrid">
 <div class="field"><label for="heroTitle">Заголовок главного экрана</label><input id="heroTitle" maxlength="160"></div>
 <div class="field"><label for="heroButton">Текст главной кнопки</label><input id="heroButton" maxlength="50"></div>
 <div class="field full"><label for="heroSubtitle">Подзаголовок</label><textarea id="heroSubtitle" maxlength="300"></textarea></div>
@@ -254,6 +254,7 @@ $('clearPhoto').addEventListener('click',()=>{
 $('add').addEventListener('click',()=>openEditor());
 $('cancel').addEventListener('click',closeEditor);
 $('retry').addEventListener('click',boot);
+$('save').addEventListener('click',()=>{status('Нажатие получено. Проверяю и сохраняю товар…');$('productForm').requestSubmit();});
 $('productForm').addEventListener('submit',async event=>{
  event.preventDefault();
  const productForm=$('productForm');
@@ -477,4 +478,4 @@ window.TihiyAdmin={
   getInitData:()=>initData
 };
 boot();
-</script><script src="./assets/admin-workspace.js?v=orders-workbench-v2-20261031"></script></body></html>
+</script><script src="./assets/admin-workspace.js?v=product-save-click-fix-20261111a"></script></body></html>
