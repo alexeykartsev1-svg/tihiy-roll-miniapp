@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="250" viewBox="0 0 1200 250" role="img" aria-labelledby="title desc">
+<title id="title">Лосось Панко</title>
+<desc id="desc">Зелёная неоновая плашка с изображением лосося и надписью Лосось Панко</desc>
+<defs>
+ <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#08240b"/><stop offset=".55" stop-color="#031407"/><stop offset="1" stop-color="#001006"/></linearGradient>
+ <linearGradient id="lime" x2="0" y2="1"><stop stop-color="#d6ff22"/><stop offset=".42" stop-color="#a7ff00"/><stop offset="1" stop-color="#71e900"/></linearGradient>
+ <filter id="glow" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="7" result="b"/><feColorMatrix in="b" type="matrix" values="0 0 0 0 .22 0 0 0 0 1 0 0 0 0 .05 0 0 0 1 0" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></filter>
+ <filter id="soft" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="2.2"/></filter>
+</defs>
+<rect x="10" y="12" width="1180" height="226" rx="113" fill="#39ff21" opacity=".5" filter="url(#soft)"/>
+<rect x="13" y="12" width="1174" height="226" rx="113" fill="url(#bg)" stroke="#67ff24" stroke-width="7" filter="url(#glow)"/>
+<rect x="25" y="24" width="1150" height="202" rx="101" fill="none" stroke="#b1ff53" stroke-opacity=".55" stroke-width="2"/>
+<path d="M390 145 Q465 131 546 142 L1024 148 1093 166 1058 182 1114 189 1035 202 1071 213 978 217 919 226 564 224 490 215 423 224 365 214 397 198 348 192 414 179 369 169 430 159Z" fill="url(#lime)"/>
+<path d="M391 145 460 141 425 154 384 158M1004 146l80-7-58 16 77 3M378 211l75 7-53 8" fill="none" stroke="#dfff52" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+<!-- stylised salmon, with the same left-side icon footprint as the shrimp reference -->
+<g transform="translate(54 36)" fill="url(#lime)" stroke="#73ef13" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M29 91C48 57 87 30 134 29c37-1 65 14 84 39-14 27-44 45-81 49-45 5-84-4-108-26Z"/>
+ <path d="M31 91 7 72 15 108 37 113 49 98Z"/>
+ <path d="M63 58q17-10 34 0M65 78q21-11 42 0M68 98q17-8 35 0" fill="none" stroke="#184b0b" stroke-width="5"/>
+ <path d="M103 32q12-18 29-23M129 32q20-15 37-12M89 119q-10 18-27 25" fill="none" stroke="#9aff35" stroke-width="4"/>
+ <path d="M158 47q19 9 31 24M157 91q18-7 31-21" fill="none" stroke="#a9ff3d" stroke-width="4"/>
+ <circle cx="164" cy="56" r="6" fill="#07190a" stroke="none"/>
+ <path d="M177 83q-13 11-27 12" fill="none" stroke="#173f08" stroke-width="4"/>
+</g>
+<text x="704" y="105" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="94" font-weight="900" font-style="italic" letter-spacing="-3" fill="#061008" stroke="#031006" stroke-width="4" paint-order="stroke">Лосось</text>
+<text x="704" y="105" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="94" font-weight="900" font-style="italic" letter-spacing="-3" fill="#fff" stroke="#fff" stroke-width="1">Лосось</text>
+<text x="713" y="211" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="89" font-weight="900" font-style="italic" letter-spacing="-2" fill="#092008" stroke="#092008" stroke-width="2" paint-order="stroke">Панко</text>
+<path d="M1073 68l62-20M1082 88l50-15" stroke="#8eff13" stroke-width="10" stroke-linecap="round"/>
+</svg>
