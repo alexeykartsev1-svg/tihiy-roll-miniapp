@@ -556,7 +556,7 @@
           <label class="checkout-field identity-field">Ваше имя<input id="checkoutName" name="name" maxlength="100" minlength="2" required autocomplete="name" placeholder="Как к вам обращаться" aria-describedby="checkoutNameError"><span class="field-error" id="checkoutNameError" hidden>Введите корректное имя — минимум две буквы, без цифр.</span></label>
           <label class="checkout-field identity-field">Телефон<input id="checkoutPhone" name="phone" type="tel" inputmode="tel" maxlength="18" required autocomplete="tel" value="+7 " placeholder="+7 900 000-00-00" aria-describedby="checkoutPhoneError"><span class="field-error" id="checkoutPhoneError" hidden>Введите 10 цифр номера после +7.</span></label>
           <div class="form-row">
-            <label class="checkout-field">Дата<input name="pickup_date" id="pickupDate" type="date" required></label>
+            <label class="checkout-field checkout-date-field">Дата<span class="checkout-date-control"><span class="checkout-date-display" id="pickupDateDisplay" aria-hidden="true">Выбрать дату</span><span class="checkout-date-icon" aria-hidden="true">▦</span><input name="pickup_date" id="pickupDate" type="date" required aria-label="Дата получения"></span></label>
             <label class="checkout-field">Время<select name="pickup_time" id="pickupTime" required><option value="">Выбрать время</option></select></label>
           </div>
           <section class="fulfillment-block">
