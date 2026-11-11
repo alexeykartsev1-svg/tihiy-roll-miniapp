@@ -231,7 +231,7 @@ function card(p){
   +'<p class="rr-card-description">'+esc(desc)+'</p>'
   +'<div class="rr-card-meta-row"><div class="rr-card-meta"><span>'+(pankoCard?'<svg class="rr-hit-meta-svg rr-hit-meta-sushi" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><g stroke="#f8f5e9" stroke-width="2.2" stroke-linejoin="round"><path d="M4.5 19v15.5c0 5 16.5 5 16.5 0V19" fill="#fff"/><ellipse cx="12.75" cy="19" rx="8.25" ry="4.5" fill="#f4a07f"/><ellipse cx="12.75" cy="19" rx="2.7" ry="1.6" fill="#fff0db" stroke="none"/><path d="M26.5 11.5v20c0 5 17 5 17 0v-20" fill="#fff"/><ellipse cx="35" cy="11.5" rx="8.5" ry="4.7" fill="#f4a07f"/><ellipse cx="35" cy="11.5" rx="2.7" ry="1.6" fill="#fff0db" stroke="none"/></g><path d="M7 28q5.5 2.6 11 0M29 22q6 2.8 12 0" fill="none" stroke="#214a20" stroke-width="2.1" stroke-linecap="round"/></svg>':'<i aria-hidden="true">🍣</i>')+Number(p.pieces||8)+' шт.</span><span>'+(pankoCard?'<svg class="rr-hit-meta-svg rr-hit-meta-scale" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><g fill="none" stroke="#f4f5ed" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 7.5h28l-2.5 9H12.5z"/><path d="M24 16.5v4"/><circle cx="24" cy="28" r="10.5"/><path d="M24 28l5-5"/><path d="M20.5 28h7"/><path d="M14 40.5h20"/></g><path d="M24 26v4.8" stroke="#8dff62" stroke-width="2.2" stroke-linecap="round"/><circle cx="24" cy="28" r="1.8" fill="#8dff62"/></svg>':'<i aria-hidden="true">⚖</i>')+esc(p.weight||'280 г')+'</span></div>'
   +'<button class="rr-card-composition" type="button" data-composition="'+id+'" aria-label="Открыть состав"><span aria-hidden="true">✦</span> Состав <b aria-hidden="true">››</b></button></div>'
-  +'<div class="card-bottom card-purchase rr-card-purchase"><strong class="card-price rr-card-price">'+money(p.price)+'</strong>'+controls+'</div>'
+  +'<div class="card-bottom card-purchase rr-card-purchase"><strong class="card-price rr-card-price" data-card-price>'+money(p.price)+'</strong>'+controls+'</div>'
   +'</div></article>';
 }
 function renderHomeContent(){
@@ -505,14 +505,14 @@ function builderProductCard(p){
  const controls=n
   ?'<div class="card-quantity builder-card-stepper"><button type="button" data-builder-product="'+id+'" data-delta="-1" aria-label="Уменьшить">−</button><span>'+n+'</span><button type="button" data-builder-product="'+id+'" data-delta="1" aria-label="Увеличить">+</button></div>'
   :'<button type="button" class="card-add builder-add-one" data-builder-product="'+id+'" data-delta="1" aria-label="Добавить">+</button>';
- return '<article class="builder-card '+(n?'selected':'')+'" data-builder-info="'+id+'" tabindex="0" aria-label="Состав: '+esc(p.name)+'"><div class="builder-card-photo"><img src="'+photo(p)+'" data-image-fallback="'+esc(photoFallback(p))+'" alt="'+esc(p.name)+'" loading="lazy"></div><div class="builder-card-copy"><b>'+esc(p.name)+'</b><p class="builder-card-description">'+esc(productDescription(p))+'</p><small>'+(Number(p.pieces)||8)+' шт. · '+esc(p.weight||'280 г')+'</small><button type="button" class="card-composition builder-card-composition" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав</button><div class="builder-card-footer"><strong>'+money(p.price)+'</strong>'+controls+'</div></div></article>';
+ return '<article class="builder-card '+(n?'selected':'')+'" data-builder-info="'+id+'" tabindex="0" aria-label="Состав: '+esc(p.name)+'"><div class="builder-card-photo"><img src="'+photo(p)+'" data-image-fallback="'+esc(photoFallback(p))+'" alt="'+esc(p.name)+'" loading="lazy"></div><div class="builder-card-copy"><b>'+esc(p.name)+'</b><p class="builder-card-description">'+esc(productDescription(p))+'</p><small>'+(Number(p.pieces)||8)+' шт. · '+esc(p.weight||'280 г')+'</small><button type="button" class="card-composition builder-card-composition" data-composition="'+id+'"><span aria-hidden="true">✦</span> Состав</button><div class="builder-card-footer"><strong data-card-price>'+money(p.price)+'</strong>'+controls+'</div></div></article>';
 }
 function builderSetCard(s){
  const n=Number(state.builderSets[s.id]||0),id=esc(s.id),key='set:'+id,title=SET_NAMES[s.id]||s.name||'Готовый сет';
  const controls=n
   ?'<div class="card-quantity builder-card-stepper"><button type="button" data-builder-set="'+id+'" data-delta="-1" aria-label="Уменьшить">−</button><span>'+n+'</span><button type="button" data-builder-set="'+id+'" data-delta="1" aria-label="Увеличить">+</button></div>'
   :'<button type="button" class="card-add builder-add-one" data-builder-set="'+id+'" data-delta="1" aria-label="Добавить сет">+</button>';
- return '<article class="builder-card '+(n?'selected':'')+'" data-builder-info="'+key+'" tabindex="0" aria-label="Состав: '+esc(title)+'"><div class="builder-card-photo"><img src="'+setImage(s)+'" data-image-fallback="./assets/set-party.webp" alt="'+esc(title)+'" loading="lazy"></div><div class="builder-card-copy"><b>'+esc(title)+'</b><p class="builder-card-description">'+esc(s.description||'Готовый набор роллов для компании или уютного вечера.')+'</p><small>'+setPieces(s)+' шт. · '+setWeight(s)+' г</small><button type="button" class="card-composition builder-card-composition" data-composition="'+key+'"><span aria-hidden="true">✦</span> Состав</button><div class="builder-card-footer"><strong>'+money(setPrice(s))+'</strong>'+controls+'</div></div></article>';
+ return '<article class="builder-card '+(n?'selected':'')+'" data-builder-info="'+key+'" tabindex="0" aria-label="Состав: '+esc(title)+'"><div class="builder-card-photo"><img src="'+setImage(s)+'" data-image-fallback="./assets/set-party.webp" alt="'+esc(title)+'" loading="lazy"></div><div class="builder-card-copy"><b>'+esc(title)+'</b><p class="builder-card-description">'+esc(s.description||'Готовый набор роллов для компании или уютного вечера.')+'</p><small>'+setPieces(s)+' шт. · '+setWeight(s)+' г</small><button type="button" class="card-composition builder-card-composition" data-composition="'+key+'"><span aria-hidden="true">✦</span> Состав</button><div class="builder-card-footer"><strong data-card-price>'+money(setPrice(s))+'</strong>'+controls+'</div></div></article>';
 }
 function renderBuilder(){
  const filter=state.builderFilter;
@@ -850,15 +850,15 @@ if(galleryStage){
   }
  },{passive:true});
 }
-function openProductFromGrid(e){if(e.target.closest('button'))return;const el=e.target.closest('[data-card]');if(!el)return;const id=el.dataset.card;if(id.startsWith('set:')){const s=state.sets.find(x=>x.id===id.slice(4));if(s)setDetail(s);}else detail(find(id));}
-function openProductInfoFromGrid(e){if(e.target.closest('button'))return;const el=e.target.closest('[data-card]');if(!el)return;showBuilderInfo(el.dataset.card);}
+function openProductFromGrid(e){if(e.target.closest('button,[data-card-price]')){e.preventDefault();e.stopPropagation();return;}const el=e.target.closest('[data-card]');if(!el)return;const id=el.dataset.card;if(id.startsWith('set:')){const s=state.sets.find(x=>x.id===id.slice(4));if(s)setDetail(s);}else detail(find(id));}
+function openProductInfoFromGrid(e){if(e.target.closest('button,[data-card-price]')){e.preventDefault();e.stopPropagation();return;}const el=e.target.closest('[data-card]');if(!el)return;showBuilderInfo(el.dataset.card);}
 $('#builderGrid').addEventListener('click',event=>{
- if(event.target.closest('button'))return;
+ if(event.target.closest('button,[data-card-price]')){event.preventDefault();event.stopPropagation();return;}
  const target=event.target.closest('[data-builder-info]');if(target)showBuilderInfo(target.dataset.builderInfo);
 });
 $('#builderGrid').addEventListener('keydown',event=>{
  if(event.key!=='Enter'&&event.key!==' ')return;
- const target=event.target.closest('[data-builder-info]');if(!target||event.target.closest('button'))return;
+ const target=event.target.closest('[data-builder-info]');if(!target||event.target.closest('button,[data-card-price]'))return;
  event.preventDefault();showBuilderInfo(target.dataset.builderInfo);
 });
 $('#catalogueGrid').addEventListener('click',openProductFromGrid);
