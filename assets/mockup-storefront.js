@@ -519,19 +519,15 @@ function builderSetCard(s){
 }
 function renderBuilder(){
  const filter=state.builderFilter;
- let list=[];
- if(filter==='sets')list=state.sets.filter(s=>s.active!==false).map(builderSetCard);
- else{
-  const products=state.products.filter(p=>{
-   const c=productCategory(p);
-   if(filter==='all')return true;
-   if(filter==='rolls')return c==='rolls';
-   if(filter==='dogs')return c==='dogs';
-   if(filter==='snacks')return c==='snacks';
-   return false;
-  });
-  list=products.map(builderProductCard);
- }
+ const products=state.products.filter(p=>{
+  const c=productCategory(p);
+  if(filter==='all')return true;
+  if(filter==='rolls')return c==='rolls';
+  if(filter==='dogs')return c==='dogs';
+  if(filter==='snacks')return c==='snacks';
+  return false;
+ });
+ const list=products.map(builderProductCard);
  $('#builderGrid').innerHTML=list.length?list.join(''):'<div class="builder-empty"><span>🍣</span><b>Пока нет доступных блюд</b><small>В этой категории ещё нет активных позиций в меню.</small></div>';
  $$('.builder-filter').forEach(b=>b.classList.toggle('active',b.dataset.builderFilter===filter));
  const m=builderMetrics();
