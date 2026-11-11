@@ -971,6 +971,15 @@ def write_products(products: list[dict[str, Any]]) -> None:
         os.fsync(handle.fileno())
     os.replace(temporary, PRODUCTS_FILE)
 
+# Run one-time catalog migrations during process startup so the persistent menu is
+# already split before the storefront or admin makes its first request.
+# A damaged/unavailable catalog must not take the whole API service offline.
+try:
+    read_products()
+except Exception:
+    logger.exception("Product catalog startup migration failed; it will retry on the next catalog request")
+
+
 def current_menu() -> dict[str, dict[str, Any]]:
     result = {}
     for p in read_products():
