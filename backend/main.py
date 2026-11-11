@@ -297,13 +297,14 @@ async def request_validation_error_handler(request: Request, exc: RequestValidat
 
 ADMIN_TELEGRAM_ID = os.getenv("ADMIN_TELEGRAM_ID", "").strip()
 PRODUCTS_FILE = os.getenv("PRODUCTS_FILE", os.path.join(os.path.dirname(__file__), "products.json"))
+CALIFORNIA_ROLL_PHOTO = "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4905c63-e46d-4ccb-8f14-abfa2211ba80.png"
 GEISHA_CRAB_PHOTO = "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/f0825c4f-a2e3-43eb-b7bf-d6bf2c023dbc.png"
 DEFAULT_PRODUCTS = [
     {"id":"philadelphia","name":"Филадельфия","price":450,"cost":0,"weight":"280 г","cat":"classic","badge":"ХИТ","desc":"Нежный лосось, сливочный сыр, свежий огурец и рис.","photo":"","active":True,"sort_order":0},
     {"id":"lava","name":"Лава","price":350,"cost":0,"weight":"280 г","cat":"classic","badge":"","desc":"Нежный соус лава, сливочный сыр и свежие ингредиенты.","photo":"","active":True,"sort_order":1},
     {"id":"warm_crab","name":"Гейша с крабом","price":350,"weight":"280 г","cat":"warm","badge":"","desc":"Тёплый ролл с крабом и аппетитной золотистой корочкой.","photo":GEISHA_CRAB_PHOTO,"active":True,"sort_order":2},
     {"id":"warm_salmon","name":"Тёплый лосось","price":450,"weight":"280 г","cat":"warm","badge":"","desc":"Тёплый ролл с лососем, приготовленный до золотистой корочки.","photo":"","active":True,"sort_order":3},
-    {"id":"california","name":"Калифорния","price":390,"cost":0,"weight":"280 г","cat":"classic","badge":"","desc":"Классический ролл с нежной начинкой и рисом.","photo":"","active":True,"sort_order":4},
+    {"id":"california","name":"Калифорния","price":390,"cost":0,"weight":"280 г","cat":"classic","badge":"","desc":"Классический ролл с нежной начинкой и рисом.","photo":CALIFORNIA_ROLL_PHOTO,"active":True,"sort_order":4},
     {"id":"unagi","name":"Унаги","price":460,"cost":0,"weight":"280 г","cat":"classic","badge":"","desc":"Ролл с угрём и насыщенным соусом унаги.","photo":"","active":True,"sort_order":5},
 ]
 
@@ -724,6 +725,24 @@ def read_products() -> list[dict[str, Any]]:
                     handle.write("updated\\n")
             except OSError:
                 logger.warning("Could not create Geisha with crab migration marker at %s", geisha_crab_marker)
+
+    # Owner-requested image and title confirmation for the existing California card.
+    # Keep its existing price, category, weight, ingredients and standard storefront controls.
+    california_card_marker = PRODUCTS_FILE + ".california-card-photo-v1"
+    if not os.path.exists(california_card_marker):
+        california_product = next((item for item in data if str(item.get("id", "")) == "california"), None)
+        if california_product is not None:
+            california_product["name"] = "Калифорния"
+            california_product["photo"] = CALIFORNIA_ROLL_PHOTO
+            write_products(data)
+            try:
+                marker_dir = os.path.dirname(california_card_marker)
+                if marker_dir:
+                    os.makedirs(marker_dir, exist_ok=True)
+                with open(california_card_marker, "w", encoding="utf-8") as handle:
+                    handle.write("updated\\n")
+            except OSError:
+                logger.warning("Could not create California card migration marker at %s", california_card_marker)
 
     return data
 
