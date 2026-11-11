@@ -8,6 +8,7 @@ import re
 import logging
 import os
 import sqlite3
+import shutil
 import time
 import uuid
 from collections import defaultdict, deque
@@ -296,7 +297,10 @@ async def request_validation_error_handler(request: Request, exc: RequestValidat
 
 
 ADMIN_TELEGRAM_ID = os.getenv("ADMIN_TELEGRAM_ID", "").strip()
-PRODUCTS_FILE = os.getenv("PRODUCTS_FILE", os.path.join(os.path.dirname(__file__), "products.json"))
+_configured_products_file = os.getenv("PRODUCTS_FILE", "").strip()
+LEGACY_PRODUCTS_FILE = os.getenv("LEGACY_PRODUCTS_FILE", "").strip() or _configured_products_file or os.path.join(os.path.dirname(__file__), "products.json")
+PRODUCTS_FILE = os.getenv("PERSISTENT_PRODUCTS_FILE", "/var/data/products.json")
+CATALOG_SNAPSHOT_FILE = os.path.join(os.path.dirname(__file__), "catalog_migration_snapshot.json")
 CHICKEN_SESAME_ROLL_PHOTO = "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/4c547d77-af4f-42b6-b6f7-be80f580bcdf.webp"
 CALIFORNIA_ROLL_PHOTO = "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4905c63-e46d-4ccb-8f14-abfa2211ba80.png"
 GEISHA_CRAB_PHOTO = "https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/f0825c4f-a2e3-43eb-b7bf-d6bf2c023dbc.png"
@@ -340,14 +344,148 @@ STARTER_CATEGORY_PRODUCTS = [
     },
 ]
 
+# PERSISTENT_CATALOG_BOOTSTRAP_V1
+def _atomic_storage_json_write(path: str, payload: Any) -> None:
+    folder = os.path.dirname(path)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    temporary = path + ".migration.tmp"
+    with open(temporary, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=2)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temporary, path)
+
+
+def _load_storage_json(path: str, validator: Any) -> list[dict[str, Any]] | None:
+    if not path or not os.path.isfile(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except (OSError, json.JSONDecodeError) as exc:
+        logger.warning("Skipping unreadable legacy storage file %s: %s", path, exc)
+        return None
+    return payload if validator(payload) else None
+
+
+def _bootstrap_persistent_json(
+    target: str,
+    legacy_candidates: list[str],
+    snapshot_key: str,
+    defaults: list[dict[str, Any]],
+    validator: Any,
+) -> list[dict[str, Any]]:
+    folder = os.path.dirname(target)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+
+    if os.path.isfile(target):
+        existing = _load_storage_json(target, validator)
+        if existing is None:
+            corrupt_backup = target + ".corrupt-" + time.strftime("%Y%m%d-%H%M%S") + ".bak"
+            try:
+                shutil.copy2(target, corrupt_backup)
+            except OSError:
+                logger.exception("Could not preserve corrupt persistent storage %s", target)
+            raise RuntimeError(
+                f"Persistent catalog file {target} is invalid; preserved a backup at {corrupt_backup}. "
+                "Refusing to replace it with default products."
+            )
+        initial_backup = target + ".before-storage-migration.bak"
+        if not os.path.exists(initial_backup):
+            shutil.copy2(target, initial_backup)
+        logger.info("Using existing persistent storage: %s", target)
+        return existing
+
+    source_path = None
+    data = None
+    seen = set()
+    for candidate in legacy_candidates:
+        if not candidate:
+            continue
+        normalized = os.path.abspath(candidate)
+        if normalized in seen or normalized == os.path.abspath(target):
+            continue
+        seen.add(normalized)
+        data = _load_storage_json(candidate, validator)
+        if data is not None:
+            source_path = candidate
+            break
+
+    if data is None:
+        try:
+            with open(CATALOG_SNAPSHOT_FILE, "r", encoding="utf-8") as handle:
+                snapshot = json.load(handle)
+            candidate_data = snapshot.get(snapshot_key) if isinstance(snapshot, dict) else None
+            if validator(candidate_data):
+                data = candidate_data
+                logger.warning(
+                    "No legacy file found for %s; bootstrapping from the captured live catalog snapshot.",
+                    target,
+                )
+        except (OSError, json.JSONDecodeError, AttributeError):
+            logger.warning("No usable catalog snapshot found for %s; using built-in defaults.", target)
+
+    if data is None:
+        data = [dict(item) for item in defaults]
+        logger.warning("No previous data file found for %s; initialized the built-in starter catalog.", target)
+
+    _atomic_storage_json_write(target, data)
+    backup_suffix = ".migration-source.bak" if source_path else ".initial-seed.bak"
+    backup_path = target + backup_suffix
+    if not os.path.exists(backup_path):
+        if source_path:
+            shutil.copy2(source_path, backup_path)
+        else:
+            shutil.copy2(target, backup_path)
+    logger.info("Initialized persistent storage at %s from %s", target, source_path or "catalog snapshot/defaults")
+    return data
+
+
+def _protect_existing_product_migrations(products: list[dict[str, Any]]) -> None:
+    ids = {str(item.get("id", "")) for item in products}
+    rules = [
+        ("starter-category-cards-v1", {"asian_hotdog_shrimp", "asian_hotdog_chicken", "snack_tempura_shrimp", "snack_crispy_rolls"}),
+        ("restore-philadelphia-hit-v1", {"philadelphia"}),
+        ("asian-hotdog-salmon-v1", {"asian_hotdog_salmon"}),
+        ("asian-hotdog-shrimp-v1", {"asian_hotdog_shrimp"}),
+        ("asian-hotdog-chicken-v1", {"asian_hotdog_chicken"}),
+        ("asian-hotdog-snow-crab-v1", {"asian_hotdog_crab"}),
+        ("salmon-panko-roll-v1", {"salmon_panko"}),
+        ("salmon-panko-approved-art-v2", {"salmon_panko"}),
+        ("geisha-crab-card-v1", {"warm_crab"}),
+        ("california-card-photo-v1", {"california"}),
+        ("chicken-sesame-card-v1", {"unagi"}),
+    ]
+    for suffix, required_ids in rules:
+        if required_ids.issubset(ids):
+            marker_path = PRODUCTS_FILE + "." + suffix
+            try:
+                with open(marker_path, "a", encoding="utf-8"):
+                    pass
+            except OSError:
+                logger.exception("Could not persist migration guard %s", marker_path)
+
+
+_bootstrapped_products = _bootstrap_persistent_json(
+    PRODUCTS_FILE,
+    [LEGACY_PRODUCTS_FILE, os.path.join(os.path.dirname(__file__), "products.json")],
+    "products",
+    DEFAULT_PRODUCTS,
+    lambda value: isinstance(value, list) and all(isinstance(item, dict) for item in value),
+)
+_protect_existing_product_migrations(_bootstrapped_products)
+
 def read_products() -> list[dict[str, Any]]:
     try:
         with open(PRODUCTS_FILE, "r", encoding="utf-8") as handle:
             data = json.load(handle)
         if not isinstance(data, list) or not all(isinstance(item, dict) for item in data):
-            data = [dict(item) for item in DEFAULT_PRODUCTS]
-    except (OSError, json.JSONDecodeError):
-        data = [dict(item) for item in DEFAULT_PRODUCTS]
+            raise RuntimeError(f"Persistent product catalog {PRODUCTS_FILE} has an invalid structure.")
+    except (OSError, json.JSONDecodeError) as exc:
+        logger.exception("Could not read persistent product catalog %s", PRODUCTS_FILE)
+        raise RuntimeError(f"Could not read product catalog {PRODUCTS_FILE}; refusing to replace it with defaults.") from exc
 
     # Seed starter cards exactly once so they are real menu items accepted by
     # calculate_order/current_menu, while keeping later admin edits/deletions.
@@ -772,9 +910,15 @@ def write_products(products: list[dict[str, Any]]) -> None:
     folder = os.path.dirname(PRODUCTS_FILE)
     if folder:
         os.makedirs(folder, exist_ok=True)
+    if os.path.isfile(PRODUCTS_FILE):
+        backup_temporary = PRODUCTS_FILE + ".bak.tmp"
+        shutil.copy2(PRODUCTS_FILE, backup_temporary)
+        os.replace(backup_temporary, PRODUCTS_FILE + ".bak")
     temporary = PRODUCTS_FILE + ".tmp"
     with open(temporary, "w", encoding="utf-8") as handle:
         json.dump(products, handle, ensure_ascii=False, indent=2)
+        handle.flush()
+        os.fsync(handle.fileno())
     os.replace(temporary, PRODUCTS_FILE)
 
 def current_menu() -> dict[str, dict[str, Any]]:
@@ -789,7 +933,9 @@ def current_menu() -> dict[str, dict[str, Any]]:
                 result[str(p["id"])] = {"name": str(p["name"]), "price": price, "cost": max(0, int(p.get("cost", 0) or 0)), "stock": (None if p.get("stock") is None else max(0, int(p.get("stock", 0) or 0)))}
     return result
 
-CATEGORIES_FILE = os.getenv("CATEGORIES_FILE", os.path.join(os.path.dirname(__file__), "categories.json"))
+_configured_categories_file = os.getenv("CATEGORIES_FILE", "").strip()
+LEGACY_CATEGORIES_FILE = os.getenv("LEGACY_CATEGORIES_FILE", "").strip() or _configured_categories_file or os.path.join(os.path.dirname(__file__), "categories.json")
+CATEGORIES_FILE = os.getenv("PERSISTENT_CATEGORIES_FILE", "/var/data/categories.json")
 DEFAULT_CATEGORIES = [
     {"id":"classic","name":"Классические","icon":"🍣","sort_order":0},
     {"id":"warm","name":"Тёплые и мясные","icon":"🔥","sort_order":1},
@@ -798,21 +944,39 @@ DEFAULT_CATEGORIES = [
     {"id":"sets","name":"Сеты","icon":"🎁","sort_order":4},
     {"id":"all","name":"Другое","sort_order":5},
 ]
+_bootstrapped_categories = _bootstrap_persistent_json(
+    CATEGORIES_FILE,
+    [LEGACY_CATEGORIES_FILE, os.path.join(os.path.dirname(__file__), "categories.json")],
+    "categories",
+    DEFAULT_CATEGORIES,
+    lambda value: isinstance(value, list) and all(isinstance(item, dict) and item.get("id") and item.get("name") for item in value),
+)
+
+
 def read_categories() -> list[dict[str, Any]]:
     try:
         with open(CATEGORIES_FILE, "r", encoding="utf-8") as handle:
-            data=json.load(handle)
-        if isinstance(data,list) and all(isinstance(x,dict) and x.get("id") and x.get("name") for x in data):
-            return data
-    except (OSError,json.JSONDecodeError):
-        pass
-    return [dict(x) for x in DEFAULT_CATEGORIES]
+            data = json.load(handle)
+        if not isinstance(data, list) or not all(isinstance(item, dict) and item.get("id") and item.get("name") for item in data):
+            raise RuntimeError(f"Persistent category file {CATEGORIES_FILE} has an invalid structure.")
+        return data
+    except (OSError, json.JSONDecodeError) as exc:
+        logger.exception("Could not read persistent category file %s", CATEGORIES_FILE)
+        raise RuntimeError(f"Could not read category file {CATEGORIES_FILE}; refusing to replace it with defaults.") from exc
 def write_categories(categories: list[dict[str, Any]]) -> None:
-    folder=os.path.dirname(CATEGORIES_FILE)
-    if folder: os.makedirs(folder,exist_ok=True)
-    temporary=CATEGORIES_FILE+".tmp"
-    with open(temporary,"w",encoding="utf-8") as handle: json.dump(categories,handle,ensure_ascii=False,indent=2)
-    os.replace(temporary,CATEGORIES_FILE)
+    folder = os.path.dirname(CATEGORIES_FILE)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    if os.path.isfile(CATEGORIES_FILE):
+        backup_temporary = CATEGORIES_FILE + ".bak.tmp"
+        shutil.copy2(CATEGORIES_FILE, backup_temporary)
+        os.replace(backup_temporary, CATEGORIES_FILE + ".bak")
+    temporary = CATEGORIES_FILE + ".tmp"
+    with open(temporary, "w", encoding="utf-8") as handle:
+        json.dump(categories, handle, ensure_ascii=False, indent=2)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temporary, CATEGORIES_FILE)
 
 def require_admin_init_data(raw: str) -> dict[str, Any]:
     if not BOT_TOKEN:
@@ -994,7 +1158,30 @@ async def admin_delete_product(product_id: str, x_telegram_init_data: str | None
 
 # Order history is stored in SQLite. Set ORDERS_DB_PATH to a persistent disk path
 # on hosting providers if order history must survive service redeploys.
-ORDERS_DB_PATH = os.getenv("ORDERS_DB_PATH", "/tmp/tihiy_roll_orders.sqlite3")
+_configured_orders_db_path = os.getenv("ORDERS_DB_PATH", "").strip()
+LEGACY_ORDERS_DB_PATH = os.getenv("LEGACY_ORDERS_DB_PATH", "").strip() or _configured_orders_db_path or "/tmp/tihiy_roll_orders.sqlite3"
+ORDERS_DB_PATH = os.getenv("PERSISTENT_ORDERS_DB_PATH", "/var/data/tihiy_roll_orders.sqlite3")
+
+
+def _bootstrap_orders_database() -> None:
+    folder = os.path.dirname(ORDERS_DB_PATH)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    if os.path.isfile(ORDERS_DB_PATH):
+        backup_path = ORDERS_DB_PATH + ".before-storage-migration.bak"
+        if not os.path.exists(backup_path):
+            shutil.copy2(ORDERS_DB_PATH, backup_path)
+        logger.info("Using existing persistent order database: %s", ORDERS_DB_PATH)
+        return
+    if LEGACY_ORDERS_DB_PATH and os.path.isfile(LEGACY_ORDERS_DB_PATH) and os.path.abspath(LEGACY_ORDERS_DB_PATH) != os.path.abspath(ORDERS_DB_PATH):
+        shutil.copy2(LEGACY_ORDERS_DB_PATH, ORDERS_DB_PATH)
+        shutil.copy2(LEGACY_ORDERS_DB_PATH, ORDERS_DB_PATH + ".migration-source.bak")
+        logger.info("Copied legacy order database %s to persistent storage %s", LEGACY_ORDERS_DB_PATH, ORDERS_DB_PATH)
+    else:
+        logger.warning("No legacy SQLite file found; a new persistent order database will be initialized at %s", ORDERS_DB_PATH)
+
+
+_bootstrap_orders_database()
 VALID_ORDER_STATUSES = {"new", "accepted", "preparing", "ready", "completed", "cancelled"}
 
 def order_db():
