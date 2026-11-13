@@ -325,6 +325,55 @@ $('delete').addEventListener('click',async()=>{
  catch(error){status(error.message,'error')}
 });
 let siteSeasonalBanners=[];
+let siteSetPhotoProcessing={},siteSetPhotoFailed={},siteSetGalleryProcessing={},siteSetGalleryFailed={};
+
+function collectSetContentPayload(){
+ const ids=['solo','duo','party','newyear','autumn','winter','spring','summer'];
+ const pendingMain=Object.keys(siteSetPhotoProcessing).filter(id=>siteSetPhotoProcessing[id]);
+ const pendingGallery=Object.keys(siteSetGalleryProcessing).filter(key=>siteSetGalleryProcessing[key]);
+ if(pendingMain.length||pendingGallery.length)throw new Error('Дождись завершения обработки всех фотографий сетов.');
+ const failedMain=Object.keys(siteSetPhotoFailed).filter(id=>siteSetPhotoFailed[id]);
+ const failedGallery=Object.keys(siteSetGalleryFailed).filter(key=>siteSetGalleryFailed[key]);
+ if(failedMain.length||failedGallery.length)throw new Error('Некоторые фото сетов не удалось обработать. Повтори загрузку этих фотографий или убери их.');
+ return ids.map(id=>{
+  const description=document.querySelector('[data-set-field="'+id+'"]');
+  const url=document.querySelector('[data-set-url="'+id+'"]');
+  return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5),items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
+ });
+}
+
+async function saveSetContentOnly(){
+ const button=$('saveSetsFull');
+ const notice=$('saveSetsStatus');
+ if(button){button.disabled=true;button.textContent='Сохраняем…'}
+ if(notice){notice.textContent='Отправляем сеты и фотографии на сервер…';notice.className='muted'}
+ status('Сохраняем готовые сеты и фотографии…');
+ try{
+  const sets=collectSetContentPayload();
+  await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify({sets})});
+  const verify=await api('/api/admin/site-content');
+  const savedSets=Array.isArray(verify.sets)?verify.sets:[];
+  const mismatches=sets.filter(expected=>{
+   const actual=savedSets.find(row=>row&&row.id===expected.id);
+   if(!actual)return true;
+   return actual.description!==expected.description||actual.image!==expected.image||JSON.stringify(actual.photos||[])!==JSON.stringify(expected.photos)||JSON.stringify(actual.items||[])!==JSON.stringify(expected.items)||actual.active!==expected.active||(actual.stock??null)!==(expected.stock??null);
+  });
+  if(mismatches.length)throw new Error('Сервер не подтвердил сохранение сетов: '+mismatches.map(row=>row.id).join(', ')+'.');
+  siteContent=verify;
+  const message='Сеты, главные фотографии и дополнительные фото сохранены и подтверждены сервером.';
+  status(message,'ok');
+  if(notice){notice.textContent=message;notice.className='status ok'}
+  return true;
+ }catch(error){
+  const message='Не удалось сохранить сеты: '+(error&&error.message?error.message:String(error));
+  status(message,'error');
+  if(notice){notice.textContent=message;notice.className='status error'}
+  return false;
+ }finally{
+  if(button){button.disabled=false;button.textContent='Сохранить изменения сетов'}
+ }
+}
+
 async function loadSiteContent(){
  try{
   siteContent=await api('/api/admin/site-content');
@@ -399,7 +448,7 @@ function renderSetContentEditor(){
   {id:'summer',title:'Летний сет «Охлаждающий»',description:'Летний сет «Охлаждающий»: сочные роллы и хрустящие закуски для яркого летнего перекуса.',image:'./assets/set-party.webp',items:[['unagi',1],['california',1],['asian_hotdog_shrimp',1],['snack_tempura_shrimp',1]]}
  ];
  const savedSets=Array.isArray(siteContent.sets)?siteContent.sets:[];
- root.replaceChildren();siteSetPhotos={};siteSetGalleryPhotos={};siteSetItems={};siteSetActive={};siteSetStock={};
+ root.replaceChildren();siteSetPhotos={};siteSetGalleryPhotos={};siteSetItems={};siteSetActive={};siteSetStock={};siteSetPhotoProcessing={};siteSetPhotoFailed={};siteSetGalleryProcessing={};siteSetGalleryFailed={};
  definitions.forEach(def=>{
   const saved=savedSets.find(row=>row&&row.id===def.id)||{};
   const image=typeof saved.image==='string'?saved.image:'';
@@ -440,18 +489,29 @@ function renderSetContentEditor(){
   url.addEventListener('input',()=>{siteSetPhotos[def.id]='';preview.src=safeImage(url.value.trim()||def.image)});
   box.querySelector('[data-set-file="'+def.id+'"]').addEventListener('change',async event=>{
    const file=event.target.files&&event.target.files[0];if(!file)return;
-   try{siteSetPhotos[def.id]=await compressImage(file);url.value='';preview.src=siteSetPhotos[def.id];status('Главное фото '+def.title+' готово к сохранению.','ok')}
-   catch(error){status(error.message,'error');event.target.value=''}
+   siteSetPhotoProcessing[def.id]=true;siteSetPhotoFailed[def.id]=false;
+   status('Подготавливаем главное фото сета «'+def.title+'»…');
+   try{siteSetPhotos[def.id]=await compressImage(file,{maxDimension:1600,maxLength:1000000});url.value='';preview.src=siteSetPhotos[def.id];status('Главное фото '+def.title+' готово к сохранению.','ok')}
+   catch(error){siteSetPhotoFailed[def.id]=true;status('Главное фото сета «'+def.title+'» не подготовлено: '+error.message,'error');event.target.value=''}
+   finally{siteSetPhotoProcessing[def.id]=false}
   });
-  box.querySelector('[data-set-clear="'+def.id+'"]').addEventListener('click',()=>{siteSetPhotos[def.id]='';url.value='';box.querySelector('[data-set-file="'+def.id+'"]').value='';preview.src=safeImage(def.image);status('Главное фото будет сброшено после сохранения.')});
+  box.querySelector('[data-set-clear="'+def.id+'"]').addEventListener('click',()=>{siteSetPhotos[def.id]='';siteSetPhotoFailed[def.id]=false;url.value='';box.querySelector('[data-set-file="'+def.id+'"]').value='';preview.src=safeImage(def.image);status('Главное фото будет сброшено после сохранения.')});
   const gallery=box.querySelector('[data-set-gallery="'+def.id+'"]');
   for(let i=0;i<5;i++){
    const item=document.createElement('div');item.className='admin-gallery-item';
    const img=document.createElement('img');img.alt='Фото '+(i+1);img.src=safeImage(siteSetGalleryPhotos[def.id][i]||'');
    const input=document.createElement('input');input.type='file';input.accept='image/jpeg,image/png,image/webp';input.setAttribute('aria-label','Дополнительное фото '+(i+1)+' для '+def.title);
    const clear=document.createElement('button');clear.type='button';clear.className='btn';clear.textContent='Убрать';
-   input.addEventListener('change',async event=>{const file=event.target.files&&event.target.files[0];if(!file)return;try{siteSetGalleryPhotos[def.id][i]=await compressImage(file);img.src=siteSetGalleryPhotos[def.id][i];status('Фото '+(i+1)+' сета «'+def.title+'» загружено.','ok')}catch(error){status(error.message,'error');input.value=''}});
-   clear.addEventListener('click',()=>{siteSetGalleryPhotos[def.id][i]='';input.value='';img.src=safeImage('')});
+   const galleryKey=def.id+':'+i;
+   input.addEventListener('change',async event=>{
+    const file=event.target.files&&event.target.files[0];if(!file)return;
+    siteSetGalleryProcessing[galleryKey]=true;siteSetGalleryFailed[galleryKey]=false;
+    status('Подготавливаем дополнительное фото '+(i+1)+' сета «'+def.title+'»…');
+    try{siteSetGalleryPhotos[def.id][i]=await compressImage(file,{maxDimension:1200,maxLength:240000});img.src=siteSetGalleryPhotos[def.id][i];status('Дополнительное фото '+(i+1)+' сета «'+def.title+'» загружено.','ok')}
+    catch(error){siteSetGalleryFailed[galleryKey]=true;status('Дополнительное фото '+(i+1)+' сета «'+def.title+'» не подготовлено: '+error.message,'error');input.value=''}
+    finally{siteSetGalleryProcessing[galleryKey]=false}
+   });
+   clear.addEventListener('click',()=>{siteSetGalleryPhotos[def.id][i]='';siteSetGalleryFailed[galleryKey]=false;input.value='';img.src=safeImage('')});
    item.append(img,input,clear);gallery.append(item);
   }
  });
@@ -474,11 +534,7 @@ $('saveContent').addEventListener('click',async()=>{
   const payload={hero_title:$('heroTitle').value.trim(),hero_subtitle:$('heroSubtitle').value.trim(),hero_button:$('heroButton').value.trim(),promo_title:$('promoTitle').value.trim(),promo_text:$('promoText').value.trim(),promo_button:$('promoButton').value.trim(),promo_link:$('promoLink').value.trim(),promo_image:sitePromoImage,slides:[],sets:[],seasonal_banners:siteSeasonalBanners.map(row=>({id:row.id,active:row.active!==false}))};
   document.querySelectorAll('#slideEditor [data-slide]').forEach(el=>{const i=Number(el.dataset.slide);payload.slides[i]=payload.slides[i]||{title:'',accent:'',desc:'',image:'',button:'',active:true};payload.slides[i][el.dataset.key]=el.dataset.key==='active'?el.checked:el.value.trim()});
   payload.slides.forEach((slide,i)=>{const imageInput=document.querySelector('[data-slide="'+i+'"][data-key="image"]');slide.image=siteSlidePhotos[i]||(imageInput?imageInput.value.trim():'')});
-  payload.sets=['solo','duo','party','newyear','autumn','winter','spring','summer'].map(id=>{
-   const description=document.querySelector('[data-set-field="'+id+'"]');
-   const url=document.querySelector('[data-set-url="'+id+'"]');
-   return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5),items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
-  });
+  payload.sets=collectSetContentPayload();
   const saved=await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify(payload)});
   const verify=await api('/api/admin/site-content');
   const verified=Array.isArray(verify.seasonal_banners)?verify.seasonal_banners:[];
@@ -503,7 +559,8 @@ window.TihiyAdmin={
   openEditor,
   getProducts:()=>products,
   getOrders:()=>window.__TIHIY_ADMIN_ORDERS||[],
-  getInitData:()=>initData
+  getInitData:()=>initData,
+  saveSets:saveSetContentOnly
 };
 boot();
-</script><script src="./assets/admin-workspace.js?v=product-save-click-fix-20261111a"></script></body></html>
+</script><script src="./assets/admin-workspace.js?v=sets-save-upload-fix-20261113a"></script></body></html>
