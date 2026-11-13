@@ -83,7 +83,7 @@
     if(setTitle)setTitle.remove();if(setDescription)setDescription.remove();if(setEditor)setEditor.remove();
     if(setEditor)setPanel.append(setEditor);
     const saveSet=document.createElement('div');saveSet.className='formactions';
-    saveSet.innerHTML='<button class="btn primary" type="button" id="saveSetsFull">Сохранить изменения сетов</button>';
+    saveSet.innerHTML='<button class="btn primary" type="button" id="saveSetsFull">Сохранить изменения сетов</button><span id="saveSetsStatus" class="muted" role="status" aria-live="polite">Изменения ещё не сохранены</span>';
     setPanel.append(saveSet);sets.append(setPanel);
 
     const banners=page('banners','Главная и баннеры','Первый экран магазина, рекламные блоки и слайды');
@@ -138,7 +138,7 @@
       button.addEventListener('click',()=>activate(id));nav.append(button);
     });
     app.querySelectorAll('[data-go]').forEach(button=>button.addEventListener('click',()=>activate(button.dataset.go)));
-    $('#saveSetsFull')?.addEventListener('click',()=>$('#saveContent')?.click());
+    $('#saveSetsFull')?.addEventListener('click',()=>{const save=window.TihiyAdmin?.saveSets;const notice=$('#saveSetsStatus');if(typeof save==='function'){save()}else if(notice){notice.textContent='Редактор сетов ещё загружается. Обнови страницу через несколько секунд.';notice.className='status error'}});
     $('#adminRefreshOrders')?.addEventListener('click',()=>window.TihiyAdmin?.reloadOrders());
     $('#adminOrderSearch')?.addEventListener('input',event=>{ordersSearch=event.target.value.trim().toLocaleLowerCase('ru');renderOrders()});
     $('#adminOrderFrom')?.addEventListener('change',event=>{ordersFrom=event.target.value;renderOrders()});
