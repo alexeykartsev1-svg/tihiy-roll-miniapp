@@ -854,7 +854,7 @@ async function load(){
   syncHomeShortcutState();
   const address=$('#homePickupAddress');
   if(address)address.textContent=state.settings.pickup_address||'Социалистическая, 26, Чарышское';
-  const phone=state.settings.phone||'+7 923 000-58-57',digits=phone.replace(/\\D/g,'');
+  const phone=state.settings.phone||'+7 923 000-58-57',digits=phone.replace(/\D/g,'');
   $('#headerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));
   $('#footerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));
  }).catch(error=>{console.warn('Не удалось загрузить настройки магазина:',error)});
