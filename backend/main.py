@@ -445,6 +445,15 @@ def _bootstrap_persistent_json(
     return data
 
 
+def _set_product_category(products: list[dict[str, Any]], product_id: str, category_id: str) -> bool:
+    """Change only one known product's category; leave every other field untouched."""
+    product = next((row for row in products if str(row.get("id", "")) == product_id), None)
+    if product is None or product.get("cat") == category_id:
+        return False
+    product["cat"] = category_id
+    return True
+
+
 def _protect_existing_product_migrations(products: list[dict[str, Any]]) -> None:
     ids = {str(item.get("id", "")) for item in products}
     rules = [
@@ -867,6 +876,25 @@ def read_products() -> list[dict[str, Any]]:
                     handle.write("updated\\n")
             except OSError:
                 logger.warning("Could not create Geisha with crab migration marker at %s", geisha_crab_marker)
+
+    # One-time repair: warm_crab is a roll and belongs to the warm/rolls category.
+    # The previous admin category value could remain "snacks" after the card was renamed;
+    # repair only this product's category while preserving its photo, price, text and stock.
+    warm_crab_category_marker = PRODUCTS_FILE + ".warm-crab-roll-category-v1"
+    if not os.path.exists(warm_crab_category_marker):
+        warm_crab_exists = any(str(item.get("id", "")) == "warm_crab" for item in data)
+        if warm_crab_exists:
+            if _set_product_category(data, "warm_crab", "warm"):
+                write_products(data)
+                logger.info("Moved warm_crab product to the warm roll category")
+            try:
+                marker_dir = os.path.dirname(warm_crab_category_marker)
+                if marker_dir:
+                    os.makedirs(marker_dir, exist_ok=True)
+                with open(warm_crab_category_marker, "w", encoding="utf-8") as handle:
+                    handle.write("migrated\\n")
+            except OSError:
+                logger.warning("Could not create warm_crab category migration marker at %s", warm_crab_category_marker)
 
     # Owner-requested image and title confirmation for the existing California card.
     # Keep its existing price, category, weight, ingredients and standard storefront controls.
