@@ -86,12 +86,11 @@ textarea { min-height:100px; }
 <h3 style="margin:22px 0 8px">Сезонные баннеры на главной</h3><p class="muted">Убирай и возвращай каждый баннер отдельно. Это не удаляет сам сет из меню и не меняет его состав.</p><div id="seasonalBannerEditor" class="formgrid"></div>
 <h3 style="margin:20px 0 8px">Слайды главного экрана</h3><p class="muted">До 3 слайдов. Для изображения укажи прямую HTTPS-ссылку. Пустая ссылка сохранит исходное фото.</p><div id="slideEditor" class="formgrid"></div><div class="formactions"><button class="btn primary" id="saveContent" type="button">Сохранить оформление</button><span id="saveContentStatus" class="muted" role="status" aria-live="polite">Изменения ещё не сохранены</span></div></section><div class="foot">Тихий ролл · управление ассортиментом</div></main>
 <script>
-const API='https://tihiy-roll-order-api.onrender.com';const tg=window.Telegram&&window.Telegram.WebApp;let initData='';let products=[];let editingId=null;let photoData='';let photoCleared=false;let photoProcessing=false;let photoUploadFailed=false;let photoProcessingError='';const $=id=>document.getElementById(id);if(tg){tg.ready();tg.expand();initData=tg.initData||''}function status(msg,type=''){const el=$('status');el.textContent=msg;el.className='status '+type}async function api(path,opts={}){if(!initData)throw new Error('Нет данных авторизации Telegram. Открой панель из Telegram.');const headers={...(opts.headers||{}),'X-Telegram-Init-Data':initData};if(opts.body)headers['Content-Type']='application/json';const res=await fetch(API+path,{...opts,headers,cache:'no-store'});let data={};try{data=await res.json()}catch(_){}if(!res.ok){const detail=Array.isArray(data.detail)?data.detail.map(item=>item.msg||item.message||JSON.stringify(item)).join('; '):data.detail;throw new Error(detail||data.message||('Ошибка сервера: '+res.status))}return data}function safeImage(src){return src||'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#241b10"/><text x="50%" y="52%" text-anchor="middle" fill="#e5b96f" font-size="18">Нет фото</text></svg>')}async function boot(){if(!initData){$('login').classList.remove('hidden');status('Открой админ-панель из Telegram-магазина.','error');return}try{const check=await fetch(API+'/api/admin/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({init_data:initData}),cache:'no-store'});const result=await check.json();if(!check.ok||!result.is_admin){$('login').classList.remove('hidden');status('Доступ запрещён. Проверь ADMIN_TELEGRAM_ID в настройках сервера.','error');return}status('Доступ подтверждён. Загружаем товары…','ok');$('app').classList.remove('hidden');await loadProducts();await loadOrders();await loadSiteContent()}catch(e){$('login').classList.remove('hidden');status(e.message,'error')}}const orderStatusLabels={new:'Новый',accepted:'Принят',preparing:'Готовится',ready:'Готов',completed:'Выдан',cancelled:'Отменён'};
+const API='https://tihiy-roll-order-api.onrender.com';const tg=window.Telegram&&window.Telegram.WebApp;let initData='';let products=[];let editingId=null;let photoData='';let photoCleared=false;let photoProcessing=false;let photoUploadFailed=false;let photoProcessingError='';const $=id=>document.getElementById(id);if(tg){tg.ready();tg.expand();initData=tg.initData||''}function status(msg,type=''){const el=$('status');el.textContent=msg;el.className='status '+type}async function api(path,opts={}){if(!initData)throw new Error('Нет данных авторизации Telegram. Открой панель из Telegram.');const headers={...(opts.headers||{}),'X-Telegram-Init-Data':initData};if(opts.body)headers['Content-Type']='application/json';const res=await fetch(API+path,{...opts,headers,cache:'no-store'});let data={};try{data=await res.json()}catch(_){}if(!res.ok){const detail=Array.isArray(data.detail)?data.detail.map(item=>item.msg||item.message||JSON.stringify(item)).join('; '):data.detail;throw new Error(detail||data.message||('Ошибка сервера: '+res.status))}return data}function safeImage(src){return src||'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#241b10"/><text x="50%" y="52%" text-anchor="middle" fill="#e5b96f" font-size="18">Нет фото</text></svg>')}async function boot(){if(!initData){$('login').classList.remove('hidden');status('Открой админ-панель из Telegram.','error');return}try{const check=await fetch(API+'/api/admin/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({init_data:initData}),cache:'no-store'});const result=await check.json();if(!check.ok||!result.is_admin){$('login').classList.remove('hidden');status('Доступ запрещён. Проверь ADMIN_TELEGRAM_ID в настройках сервера.','error');return}status('Доступ подтверждён. Параллельно загружаем разделы…','ok');$('app').classList.remove('hidden');const ordersTask=loadOrders();const [productsResult,contentResult]=await Promise.allSettled([loadProducts(),loadSiteContentOriginal()]);if(siteContent){renderSetContentEditor();renderSeasonalBannerEditor()}if(productsResult.status==='rejected')status('Не удалось загрузить товары: '+productsResult.reason,'error');else if(contentResult.status==='rejected')status('Не удалось загрузить сеты: '+contentResult.reason,'error');else status('Админ-панель готова. Товары и сеты загружены.','ok');void ordersTask}catch(e){$('login').classList.remove('hidden');status(e.message,'error')}}const orderStatusLabels={new:'Новый',accepted:'Принят',preparing:'Готовится',ready:'Готов',completed:'Выдан',cancelled:'Отменён'};
 async function loadOrders(){
   try{
-    const data=await api('/api/admin/orders?limit=100');
+    const [data,analytics]=await Promise.all([api('/api/admin/orders?limit=100'),api('/api/admin/analytics')]);
     const summary=data.summary||{};
-    const analytics=await api('/api/admin/analytics');
     const reportOrders=Array.isArray(data.orders)?data.orders:[];
     window.__TIHIY_ADMIN_ORDERS=reportOrders;
     window.dispatchEvent(new CustomEvent('tihiy:orders-updated'));
@@ -122,8 +121,7 @@ async function loadOrders(){
 function statusMessage(msg,type=''){status(msg,type)}
 $('refreshOrders').addEventListener('click',loadOrders);
 let categories=[];
-async function loadCategories(){
-  categories=await api('/api/admin/categories');
+function renderCategories(){
   const select=$('cat');const previous=select.value;select.replaceChildren();
   categories.forEach(cat=>{const option=document.createElement('option');option.value=cat.id;option.textContent=cat.name;select.append(option)});
   if(categories.some(cat=>cat.id===previous))select.value=previous;
@@ -160,10 +158,13 @@ async function loadCategories(){
     actions.append(edit,up,down,remove);row.append(label,actions,form);list.append(row);
   });
 }
+async function loadCategories(){categories=await api('/api/admin/categories');renderCategories()}
 $('addCategory').addEventListener('click',async()=>{const name=$('newCategoryName').value.trim();let id=$('newCategoryId').value.trim();const icon=$('newCategoryIcon')?.value.trim()||'';const image=$('newCategoryImage')?.value.trim()||'';if(!id)id=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');if(!id){status('Введи ID категории латиницей, например baked-rolls.','error');return}try{await api('/api/admin/categories',{method:'POST',body:JSON.stringify({id,name,icon,image})});$('newCategoryName').value='';$('newCategoryId').value='';if($('newCategoryIcon'))$('newCategoryIcon').value='';if($('newCategoryImage'))$('newCategoryImage').value='';await loadCategories();status('Категория добавлена','ok')}catch(e){status(e.message,'error')}});
-async function loadProducts(){try{await loadCategories();products=await api('/api/admin/products');renderList();status('Загружено товаров: '+products.length,'ok')}catch(e){status(e.message,'error')}}function renderList(){const list=$('list');list.replaceChildren();if(!products.length){list.textContent='Товаров пока нет. Добавь первую карточку.';return}products.forEach(p=>{const row=document.createElement('article');row.className='row';const img=document.createElement('img');img.className='thumb';img.src=safeImage(p.photo);img.alt='';const content=document.createElement('div');const title=document.createElement('h3');title.textContent=p.name;const desc=document.createElement('p');desc.textContent=(p.active?'На сайте':'Скрыт')+' · '+(p.badge||'без плашки')+' · '+(p.weight||'вес не указан')+' · '+(p.stock==null?'остаток не ограничен':(p.stock>0?'остаток '+p.stock:'нет в наличии'));const price=document.createElement('div');price.className='price';price.textContent=new Intl.NumberFormat('ru-RU').format(p.price)+' ₽';const margin=document.createElement('p');margin.className='muted';margin.textContent=p.cost>0?'Себестоимость '+new Intl.NumberFormat('ru-RU').format(p.cost)+' ₽ · валовая прибыль '+new Intl.NumberFormat('ru-RU').format(p.price-p.cost)+' ₽ ('+Math.round((p.price-p.cost)/p.price*100)+'%)':'Себестоимость не указана';content.append(title,desc,price,margin);const actions=document.createElement('div');actions.className='row-actions';const edit=document.createElement('button');edit.className='btn';edit.textContent='✏️ Изменить';edit.onclick=()=>openEditor(p);const toggle=document.createElement('button');toggle.className='btn';toggle.textContent=p.active?'Скрыть':'Показать';toggle.onclick=async()=>{try{await api('/api/admin/products/'+encodeURIComponent(p.id),{method:'PUT',body:JSON.stringify({...p,active:!p.active})});await loadProducts()}catch(e){status(e.message,'error')}};actions.append(edit,toggle);row.append(img,content,actions);list.append(row)})}function openEditor(p=null){
+async function loadProducts(){try{const [categoryData,productData]=await Promise.all([api('/api/admin/categories'),api('/api/admin/products')]);categories=Array.isArray(categoryData)?categoryData:[];renderCategories();products=Array.isArray(productData)?productData:[];renderList();status('Загружено товаров: '+products.length,'ok');return products}catch(e){status(e.message,'error');throw e}}function renderList(){const list=$('list');list.replaceChildren();if(!products.length){list.textContent='Товаров пока нет. Добавь первую карточку.';return}products.forEach(p=>{const row=document.createElement('article');row.className='row';const img=document.createElement('img');img.className='thumb';img.loading='lazy';img.decoding='async';img.width=64;img.height=64;img.src=safeImage(p.photo_url||p.photo);img.alt='';const content=document.createElement('div');const title=document.createElement('h3');title.textContent=p.name;const desc=document.createElement('p');desc.textContent=(p.active?'На сайте':'Скрыт')+' · '+(p.badge||'без плашки')+' · '+(p.weight||'вес не указан')+' · '+(p.stock==null?'остаток не ограничен':(p.stock>0?'остаток '+p.stock:'нет в наличии'));const price=document.createElement('div');price.className='price';price.textContent=new Intl.NumberFormat('ru-RU').format(p.price)+' ₽';const margin=document.createElement('p');margin.className='muted';margin.textContent=p.cost>0?'Себестоимость '+new Intl.NumberFormat('ru-RU').format(p.cost)+' ₽ · валовая прибыль '+new Intl.NumberFormat('ru-RU').format(p.price-p.cost)+' ₽ ('+Math.round((p.price-p.cost)/p.price*100)+'%)':'Себестоимость не указана';content.append(title,desc,price,margin);const actions=document.createElement('div');actions.className='row-actions';const edit=document.createElement('button');edit.className='btn';edit.textContent='✏️ Изменить';edit.onclick=()=>openEditor(p);const toggle=document.createElement('button');toggle.className='btn';toggle.textContent=p.active?'Скрыть':'Показать';toggle.onclick=async()=>{try{await api('/api/admin/products/'+encodeURIComponent(p.id),{method:'PUT',body:JSON.stringify({...p,active:!p.active})});await loadProducts()}catch(e){status(e.message,'error')}};actions.append(edit,toggle);row.append(img,content,actions);list.append(row)})}let productGalleryLoaded=false;
+let productGalleryLoading=false;
+async function openEditor(p=null){
  editingId=p?p.id:null;photoData=p?p.photo||'':'';photoCleared=false;photoProcessing=false;photoUploadFailed=false;photoProcessingError='';
- productGalleryPhotos=p&&Array.isArray(p.gallery)?p.gallery.slice(0,5):[];productGalleryFailed=new Set();productGalleryProcessing=0;
+ productGalleryPhotos=p&&Array.isArray(p.gallery)?p.gallery.slice(0,5):[];productGalleryFailed=new Set();productGalleryProcessing=0;productGalleryLoading=false;productGalleryLoaded=!p||Array.isArray(p.gallery);
  $('editorTitle').textContent=p?'Редактировать товар':'Новый товар';
  $('pid').value=p?p.id:'';$('pid').disabled=!!p;$('name').value=p?p.name:'';
  $('price').value=p?p.price:'';$('cost').value=p?p.cost||0:0;
@@ -171,9 +172,19 @@ async function loadProducts(){try{await loadCategories();products=await api('/ap
  $('cat').value=p?p.cat||'all':'classic';$('badge').value=p?p.badge||'':'';
  $('desc').value=p?p.desc||'':'';$('cardDescription').value=p?p.card_description||'':'';$('details').value=p?p.details||'':'';
  $('active').checked=p?p.active:true;$('hitTemplate').checked=p?p.hit_template===true:false;$('photoFile').value='';
- $('photoPreview').src=safeImage(photoData);renderProductGalleryEditor();
+ $('photoPreview').src=safeImage(p?(p.photo_url||photoData):photoData);renderProductGalleryEditor();
  $('delete').classList.toggle('hidden',!p);$('editor').classList.add('open');
- $('editor').scrollIntoView({behavior:'smooth',block:'start'})
+ $('editor').scrollIntoView({behavior:'smooth',block:'start'});
+ if(p&&!productGalleryLoaded){
+  productGalleryLoading=true;status('Загружаем дополнительные фото этого товара…');
+  try{
+   const result=await api('/api/admin/products/'+encodeURIComponent(p.id)+'/gallery');
+   if(editingId!==p.id)return;
+   productGalleryPhotos=Array.isArray(result.gallery)?result.gallery.slice(0,5):[];
+   productGalleryLoaded=true;renderProductGalleryEditor();status('Карточка товара загружена.','ok');
+  }catch(error){if(editingId===p.id){productGalleryLoaded=false;status('Не удалось загрузить дополнительные фото: '+error.message,'error')}}
+  finally{productGalleryLoading=false}
+ }
 }let productGalleryPhotos=[];
 let productGalleryProcessing=0;
 let productGalleryFailed=new Set();
@@ -294,6 +305,7 @@ $('productForm').addEventListener('submit',async event=>{
  }
  if(photoProcessing){status('Дождись завершения обработки фотографии.','error');return;}
  if(photoUploadFailed){status('Главная фотография не подготовлена: '+(photoProcessingError||'неизвестная ошибка обработки')+'. Выбери её заново или нажми «Убрать фото».','error');return;}
+ if(productGalleryLoading||!productGalleryLoaded){status('Подожди, пока загрузятся дополнительные фото товара.','error');return;}
  if(productGalleryProcessing){status('Дождись завершения обработки дополнительных фотографий.','error');return;}
  if(productGalleryFailed.size){status('Есть дополнительные фото с ошибкой. Выбери их заново или убери.','error');return;}
  const currentProduct=editingId?products.find(item=>item.id===editingId):null;
@@ -304,16 +316,19 @@ $('productForm').addEventListener('submit',async event=>{
   details:$('details').value.trim(),card_description:$('cardDescription').value.trim(),
   gallery:productGalleryPhotos.filter(Boolean).slice(0,5),cat:$('cat').value,badge:$('badge').value,
   desc:$('desc').value.trim(),
-  photo:photoCleared?'':(photoData||(currentProduct?.photo||'')),
   hit_template:$('hitTemplate').checked,active:$('active').checked,
   sort_order:currentProduct?Number(currentProduct.sort_order)||0:products.reduce((max,item)=>Math.max(max,Number(item.sort_order)||0),-1)+1
  };
+ if(photoCleared)payload.photo='';
+ else if(photoData)payload.photo=photoData;
+ else if(!editingId)payload.photo='';
  const saveButton=$('save');saveButton.disabled=true;saveButton.textContent='Сохраняем…';
  try{
   const result=editingId
    ?await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'PUT',body:JSON.stringify(payload)})
    :await api('/api/admin/products',{method:'POST',body:JSON.stringify(payload)});
-  if(!result?.product||result.product.photo!==payload.photo)throw new Error('Сервер не подтвердил сохранение фотографии. Повтори сохранение.');
+  if(!result?.product)throw new Error('Сервер не подтвердил сохранение товара. Повтори сохранение.');
+  if(Object.prototype.hasOwnProperty.call(payload,'photo')&&result.product.photo!==payload.photo)throw new Error('Сервер не подтвердил сохранение фотографии. Повтори сохранение.');
   closeEditor();await loadProducts();
   status('Товар и фотография сохранены на сервере. Перезагрузи магазин, чтобы увидеть обновление.','ok');
  }catch(error){status(error.message||'Не удалось сохранить товар.','error')}
