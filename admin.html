@@ -368,6 +368,7 @@ function collectSetContentPayload(){
    const selected=itemRow.querySelector('[data-set-item-selected]');
    const quantity=itemRow.querySelector('[data-set-item-quantity]');
    const amount=Math.max(1,Math.min(50,Math.round(Number(quantity?.value)||1)));
+   if(selected?.checked&&quantity)quantity.value=String(amount);
    return selected?.checked?{id:itemRow.dataset.productId,qty:amount}:null;
   }).filter(Boolean):(siteSetItems[id]||[]).filter(item=>item.qty>0);
   siteSetItems[id]=selectedItems.map(item=>({...item}));
@@ -379,11 +380,25 @@ function collectSetContentPayload(){
  });
 }
 
+function updateSetSaveNotices(message,type='muted'){
+ ['saveSetsTopStatus','saveSetsStatus'].forEach(id=>{
+  const notice=$(id);if(!notice)return;
+  notice.textContent=message;
+  notice.className='status '+type;
+  notice.hidden=false;
+ });
+}
+let setContentSaving=false;
 async function saveSetContentOnly(){
- const button=$('saveSetsFull');
- const notice=$('saveSetsStatus');
- if(button){button.disabled=true;button.textContent='Сохраняем…'}
- if(notice){notice.textContent='Отправляем изменения сетов на сервер…';notice.className='muted'}
+ if(setContentSaving)return false;
+ setContentSaving=true;
+ const buttons=Array.from(document.querySelectorAll('#saveSetsFull,[data-save-set]'));
+ buttons.forEach(button=>{
+  if(!button.dataset.saveLabel)button.dataset.saveLabel=button.textContent;
+  button.disabled=true;
+  button.textContent='Сохраняем…';
+ });
+ updateSetSaveNotices('Сохраняем изменения сетов…','muted');
  status('Сохраняем готовые сеты и фотографии…');
  try{
   const sets=collectSetContentPayload();
@@ -403,17 +418,21 @@ async function saveSetContentOnly(){
   });
   if(mismatches.length)throw new Error('Сервер не подтвердил сохранение сетов: '+mismatches.map(row=>row.id).join(', ')+'.');
   siteContent=verify;
-  const message='Изменения сетов сохранены и подтверждены сервером. Дополнительные галереи загружаются отдельно.';
+  const message='Изменения сетов сохранены';
+  updateSetSaveNotices(message,'ok');
   status(message,'ok');
-  if(notice){notice.textContent=message;notice.className='status ok'}
   return true;
  }catch(error){
   const message='Не удалось сохранить сеты: '+(error&&error.message?error.message:String(error));
+  updateSetSaveNotices(message,'error');
   status(message,'error');
-  if(notice){notice.textContent=message;notice.className='status error'}
   return false;
  }finally{
-  if(button){button.disabled=false;button.textContent='Сохранить изменения сетов'}
+  buttons.forEach(button=>{
+   button.disabled=false;
+   button.textContent=button.dataset.saveLabel||'Сохранить изменения сетов';
+  });
+  setContentSaving=false;
  }
 }
 
@@ -535,21 +554,30 @@ function renderSetContentEditor(){
    const name=document.createElement('span');name.textContent=product.name+(product.active===false?' (скрыт на сайте)':'');
    label.append(checkbox,name);
    const qty=document.createElement('input');qty.type='number';qty.min='1';qty.max='50';qty.value=String(current?.qty||1);qty.disabled=!current;qty.setAttribute('data-set-item-quantity','');qty.setAttribute('aria-label','Количество порций '+product.name);
-   const syncSelectedItem=()=>{
-    const amount=Math.max(1,Math.min(50,Math.round(Number(qty.value)||1)));
-    if(checkbox.checked){
-     qty.disabled=false;qty.value=String(amount);
-     const index=siteSetItems[def.id].findIndex(item=>item.id===product.id);
-     if(index>=0)siteSetItems[def.id][index].qty=amount;
-     else siteSetItems[def.id].push({id:product.id,qty:amount});
-    }else{
+   const syncSelectedItem=(normalize=false)=>{
+    if(!checkbox.checked){
      qty.disabled=true;
      const index=siteSetItems[def.id].findIndex(item=>item.id===product.id);
      if(index>=0)siteSetItems[def.id].splice(index,1);
+     return;
     }
+    qty.disabled=false;
+    const raw=String(qty.value??'').trim();
+    // Keep an empty value while the user is replacing "1" with "2" or "3".
+    if(raw===''){
+     if(!normalize)return;
+     qty.value='1';
+    }
+    const amount=Math.max(1,Math.min(50,Math.round(Number(qty.value)||1)));
+    if(normalize)qty.value=String(amount);
+    const index=siteSetItems[def.id].findIndex(item=>item.id===product.id);
+    if(index>=0)siteSetItems[def.id][index].qty=amount;
+    else siteSetItems[def.id].push({id:product.id,qty:amount});
    };
-   checkbox.addEventListener('change',syncSelectedItem);
-   qty.addEventListener('input',syncSelectedItem);
+   checkbox.addEventListener('change',()=>syncSelectedItem(true));
+   qty.addEventListener('input',()=>syncSelectedItem(false));
+   qty.addEventListener('change',()=>syncSelectedItem(true));
+   qty.addEventListener('blur',()=>syncSelectedItem(true));
    row.append(label,qty);itemsRoot.append(row);
   });
   url.addEventListener('input',()=>{siteSetPhotos[def.id]='';siteSetPhotoCleared[def.id]=!url.value.trim();preview.src=safeImage(url.value.trim()||def.image)});
@@ -647,4 +675,4 @@ window.TihiyAdmin={
   saveSets:saveSetContentOnly
 };
 boot();
-</script><script src="./assets/admin-workspace.js?v=sets-save-upload-fix-20261113a"></script></body></html>
+</script><script src="./assets/admin-workspace.js?v=sets-save-feedback-qty-20261115a"></script></body></html>
