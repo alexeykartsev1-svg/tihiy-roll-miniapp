@@ -1709,7 +1709,20 @@ def write_store_settings(settings: dict[str, Any]) -> None:
         json.dump(settings, handle, ensure_ascii=False, indent=2)
     os.replace(temporary, STORE_SETTINGS_FILE)
 
-SITE_CONTENT_FILE = os.getenv("SITE_CONTENT_FILE", os.path.join(os.path.dirname(__file__), "site_content.json"))
+_CONFIGURED_SITE_CONTENT_FILE = os.getenv("SITE_CONTENT_FILE", "").strip()
+# Render's persistent disk is mounted at /var/data. Never keep owner-uploaded
+# set artwork in the deploy-specific application directory.
+SITE_CONTENT_FILE = (
+    os.getenv("PERSISTENT_SITE_CONTENT_FILE", "").strip()
+    or (_CONFIGURED_SITE_CONTENT_FILE if _CONFIGURED_SITE_CONTENT_FILE.startswith("/var/data/") else "/var/data/site_content.json")
+)
+SITE_CONTENT_LEGACY_FILES = list(dict.fromkeys(
+    path for path in (
+        _CONFIGURED_SITE_CONTENT_FILE,
+        os.path.join(os.path.dirname(__file__), "site_content.json"),
+    )
+    if path and os.path.abspath(path) != os.path.abspath(SITE_CONTENT_FILE)
+))
 DEFAULT_SITE_CONTENT = {
     "hero_title": "Тихо готовим, громко вкусно",
     "hero_subtitle": "Свежие роллы и азиатские блюда — приготовим к выбранному времени.",
@@ -1752,55 +1765,125 @@ DEFAULT_SET_ITEMS = {
     "spring": [{"id": "philadelphia", "qty": 1}, {"id": "california", "qty": 1}, {"id": "lava", "qty": 1}],
     "summer": [{"id": "unagi", "qty": 1}, {"id": "california", "qty": 1}, {"id": "asian_hotdog_shrimp", "qty": 1}, {"id": "snack_tempura_shrimp", "qty": 1}],
 }
-def read_site_content() -> dict[str, Any]:
+def _read_site_content_document(path: str) -> dict[str, Any]:
+    with open(path, "r", encoding="utf-8") as handle:
+        value = json.load(handle)
+    if not isinstance(value, dict):
+        raise RuntimeError(f"Site content file {path} has an invalid structure.")
+    return value
+
+
+def _load_site_content_document() -> dict[str, Any] | None:
+    backup_path = SITE_CONTENT_FILE + ".bak"
     try:
-        with open(SITE_CONTENT_FILE, "r", encoding="utf-8") as handle:
-            data = json.load(handle)
-        if isinstance(data, dict):
-            merged = dict(DEFAULT_SITE_CONTENT)
-            merged.update(data)
-            merged["slides"] = data.get("slides", DEFAULT_SITE_CONTENT["slides"])
-            saved_sets = data.get("sets", DEFAULT_SITE_CONTENT["sets"])
-            default_by_id = {row["id"]: row for row in DEFAULT_SITE_CONTENT["sets"]}
-            merged_sets = []
-            for row in saved_sets if isinstance(saved_sets, list) else DEFAULT_SITE_CONTENT["sets"]:
-                if not isinstance(row, dict):
-                    continue
-                defaults = default_by_id.get(row.get("id"), {})
-                merged_row = dict(defaults)
-                merged_row.update(row)
-                merged_row.setdefault("items", DEFAULT_SET_ITEMS.get(merged_row.get("id"), []))
-                merged_row.setdefault("active", True)
-                merged_row.setdefault("stock", None)
-                merged_sets.append(merged_row)
-            present_set_ids = {row.get("id") for row in merged_sets}
-            merged_sets.extend(dict(row) for row in DEFAULT_SITE_CONTENT["sets"] if row["id"] not in present_set_ids)
-            merged["sets"] = merged_sets
-            saved_banners = data.get("seasonal_banners", DEFAULT_SEASONAL_BANNERS)
-            banner_by_id = {row["id"]: row for row in DEFAULT_SEASONAL_BANNERS}
-            merged_banners = []
-            for row in saved_banners if isinstance(saved_banners, list) else DEFAULT_SEASONAL_BANNERS:
-                if not isinstance(row, dict) or row.get("id") not in banner_by_id:
-                    continue
-                banner = dict(banner_by_id[row["id"]])
-                banner.update(row)
-                banner["active"] = banner.get("active") is not False
-                merged_banners.append(banner)
-            present_banner_ids = {row["id"] for row in merged_banners}
-            merged_banners.extend(dict(row) for row in DEFAULT_SEASONAL_BANNERS if row["id"] not in present_banner_ids)
-            merged["seasonal_banners"] = merged_banners
-            return merged
-    except (OSError, json.JSONDecodeError):
-        pass
+        return _read_site_content_document(SITE_CONTENT_FILE)
+    except FileNotFoundError:
+        # Recover a valid backup first, then migrate the former deploy-local file.
+        for candidate in [backup_path, *SITE_CONTENT_LEGACY_FILES]:
+            try:
+                value = _read_site_content_document(candidate)
+            except FileNotFoundError:
+                continue
+            except (json.JSONDecodeError, RuntimeError) as exc:
+                logger.error("Ignoring invalid legacy site content file %s: %s", candidate, exc)
+                continue
+            write_site_content(value, backup_existing=False)
+            logger.warning("Recovered/migrated site content from %s to persistent storage %s", candidate, SITE_CONTENT_FILE)
+            return value
+        logger.warning("No previous site content file found; using defaults at persistent path %s", SITE_CONTENT_FILE)
+        return None
+    except json.JSONDecodeError as exc:
+        # Never silently replace an unreadable content file with defaults.
+        try:
+            backup = _read_site_content_document(backup_path)
+        except (FileNotFoundError, json.JSONDecodeError, RuntimeError) as backup_exc:
+            raise RuntimeError(
+                f"Site content file {SITE_CONTENT_FILE} is invalid and no usable backup exists."
+            ) from backup_exc
+        write_site_content(backup, backup_existing=False)
+        logger.error("Restored invalid site content file %s from its backup.", SITE_CONTENT_FILE)
+        return backup
+
+
+_SITE_CONTENT_STATUS_LOGGED = False
+
+
+def read_site_content() -> dict[str, Any]:
+    global _SITE_CONTENT_STATUS_LOGGED
+    data = _load_site_content_document()
+    if data is None:
+        data = json.loads(json.dumps(DEFAULT_SITE_CONTENT, ensure_ascii=False))
+    if not _SITE_CONTENT_STATUS_LOGGED:
+        solo = next((row for row in data.get("sets", []) if isinstance(row, dict) and row.get("id") == "solo"), {})
+        logger.info(
+            "Site content storage: %s; solo main photo present=%s; solo gallery photos=%s",
+            SITE_CONTENT_FILE,
+            bool(solo.get("image")),
+            len(solo.get("photos", [])) if isinstance(solo.get("photos"), list) else 0,
+        )
+        _SITE_CONTENT_STATUS_LOGGED = True
+    if isinstance(data, dict):
+        merged = dict(DEFAULT_SITE_CONTENT)
+        merged.update(data)
+        merged["slides"] = data.get("slides", DEFAULT_SITE_CONTENT["slides"])
+        saved_sets = data.get("sets", DEFAULT_SITE_CONTENT["sets"])
+        default_by_id = {row["id"]: row for row in DEFAULT_SITE_CONTENT["sets"]}
+        merged_sets = []
+        for row in saved_sets if isinstance(saved_sets, list) else DEFAULT_SITE_CONTENT["sets"]:
+            if not isinstance(row, dict):
+                continue
+            defaults = default_by_id.get(row.get("id"), {})
+            merged_row = dict(defaults)
+            merged_row.update(row)
+            merged_row.setdefault("items", DEFAULT_SET_ITEMS.get(merged_row.get("id"), []))
+            merged_row.setdefault("active", True)
+            merged_row.setdefault("stock", None)
+            merged_sets.append(merged_row)
+        present_set_ids = {row.get("id") for row in merged_sets}
+        merged_sets.extend(dict(row) for row in DEFAULT_SITE_CONTENT["sets"] if row["id"] not in present_set_ids)
+        merged["sets"] = merged_sets
+        saved_banners = data.get("seasonal_banners", DEFAULT_SEASONAL_BANNERS)
+        banner_by_id = {row["id"]: row for row in DEFAULT_SEASONAL_BANNERS}
+        merged_banners = []
+        for row in saved_banners if isinstance(saved_banners, list) else DEFAULT_SEASONAL_BANNERS:
+            if not isinstance(row, dict) or row.get("id") not in banner_by_id:
+                continue
+            banner = dict(banner_by_id[row["id"]])
+            banner.update(row)
+            banner["active"] = banner.get("active") is not False
+            merged_banners.append(banner)
+        present_banner_ids = {row["id"] for row in merged_banners}
+        merged_banners.extend(dict(row) for row in DEFAULT_SEASONAL_BANNERS if row["id"] not in present_banner_ids)
+        merged["seasonal_banners"] = merged_banners
+        return merged
     return json.loads(json.dumps(DEFAULT_SITE_CONTENT, ensure_ascii=False))
-def write_site_content(data: dict[str, Any]) -> None:
+
+
+def write_site_content(data: dict[str, Any], *, backup_existing: bool = True) -> None:
     folder = os.path.dirname(SITE_CONTENT_FILE)
     if folder:
         os.makedirs(folder, exist_ok=True)
+    if backup_existing and os.path.isfile(SITE_CONTENT_FILE):
+        backup_temporary = SITE_CONTENT_FILE + ".bak.tmp"
+        shutil.copy2(SITE_CONTENT_FILE, backup_temporary)
+        os.replace(backup_temporary, SITE_CONTENT_FILE + ".bak")
     temporary = SITE_CONTENT_FILE + ".tmp"
     with open(temporary, "w", encoding="utf-8") as handle:
         json.dump(data, handle, ensure_ascii=False, indent=2)
+        handle.flush()
+        os.fsync(handle.fileno())
     os.replace(temporary, SITE_CONTENT_FILE)
+
+
+def _resolve_site_set_image(item: dict[str, Any], existing_set: dict[str, Any]) -> str:
+    """A blank/missing image is not a delete. Clear only via the explicit UI action."""
+    if item.get("clear_image") is True:
+        return ""
+    incoming = item.get("image")
+    if isinstance(incoming, str) and incoming.strip():
+        return incoming.strip()
+    existing = existing_set.get("image", "")
+    return existing if isinstance(existing, str) else ""
 
 @app.get("/api/store-settings")
 async def get_store_settings() -> dict[str, Any]:
@@ -1943,7 +2026,10 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
             pieces = item.get("pieces", existing_set.get("pieces"))
             pieces_manual = item.get("pieces_manual", existing_set.get("pieces_manual", False))
             badge = item.get("badge", existing_set.get("badge", "НОВИНКА" if set_id == "newyear" else ""))
-            image = item.get("image", existing_set.get("image", ""))
+            clear_image = item.get("clear_image", False)
+            if not isinstance(clear_image, bool):
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: признак сброса главного фото должен быть true/false.")
+            image = _resolve_site_set_image(item, existing_set)
             for field_name, field_value in (("описание на странице товара", page_description), ("текст в карточке каталога", card_description), ("ингредиенты", details)):
                 if not isinstance(field_value, str) or len(field_value) > 1000:
                     raise HTTPException(status_code=400, detail=f"Сет {index+1}: поле «{field_name}» должно быть не длиннее 1000 символов.")
