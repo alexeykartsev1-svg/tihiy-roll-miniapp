@@ -81,9 +81,11 @@
     const setEditor=$('#setEditor',contentPanel);
     const setPanel=panel('Редактор готовых сетов','Настраивай описания и до пяти дополнительных фотографий для каждого набора.');
     if(setTitle)setTitle.remove();if(setDescription)setDescription.remove();if(setEditor)setEditor.remove();
+    const topSetNotice=document.createElement('div');topSetNotice.id='saveSetsTopStatus';topSetNotice.className='status muted hidden';topSetNotice.setAttribute('role','status');topSetNotice.setAttribute('aria-live','polite');
+    setPanel.append(topSetNotice);
     if(setEditor)setPanel.append(setEditor);
     const saveSet=document.createElement('div');saveSet.className='formactions';
-    saveSet.innerHTML='<button class="btn primary" type="button" id="saveSetsFull">Сохранить изменения сетов</button><span id="saveSetsStatus" class="muted" role="status" aria-live="polite">Изменения ещё не сохранены</span>';
+    saveSet.innerHTML='<button class="btn primary" type="button" id="saveSetsFull">Сохранить изменения сетов</button><span id="saveSetsStatus" class="status muted hidden" role="status" aria-live="polite"></span>';
     setPanel.append(saveSet);sets.append(setPanel);
 
     const banners=page('banners','Главная и баннеры','Первый экран магазина, рекламные блоки и слайды');
@@ -138,7 +140,7 @@
       button.addEventListener('click',()=>activate(id));nav.append(button);
     });
     app.querySelectorAll('[data-go]').forEach(button=>button.addEventListener('click',()=>activate(button.dataset.go)));
-    $('#saveSetsFull')?.addEventListener('click',()=>{const save=window.TihiyAdmin?.saveSets;const notice=$('#saveSetsStatus');if(typeof save==='function'){save()}else if(notice){notice.textContent='Редактор сетов ещё загружается. Обнови страницу через несколько секунд.';notice.className='status error'}});
+    $('#saveSetsFull')?.addEventListener('click',event=>{if(event.isTrusted)window.__TIHIY_ACTIVE_SET_SAVE_ID='';const save=window.TihiyAdmin?.saveSets;const notice=$('#saveSetsStatus');if(typeof save==='function'){save()}else if(notice){notice.textContent='Редактор сетов ещё загружается. Обнови страницу через несколько секунд.';notice.className='status error'}});
     $('#adminRefreshOrders')?.addEventListener('click',()=>window.TihiyAdmin?.reloadOrders());
     $('#adminOrderSearch')?.addEventListener('input',event=>{ordersSearch=event.target.value.trim().toLocaleLowerCase('ru');renderOrders()});
     $('#adminOrderFrom')?.addEventListener('change',event=>{ordersFrom=event.target.value;renderOrders()});
