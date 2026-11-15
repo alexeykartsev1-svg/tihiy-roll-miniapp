@@ -5652,7 +5652,7 @@ body {
 }
 
 
-/* 2026-11-15: remove generated "БОЛЬШОЙ СЕТ" label; keep the owner's badge in the corner. */
+/* 2026-11-15: use a single owner-configured badge; keep the owner's badge in the corner. */
 .rr-card .rr-card-photo .rr-card-set-badge{z-index:12!important;}
 .rr-card.rr-card-set-wide .rr-card-photo .rr-card-set-badge{
  top:12px!important;left:12px!important;right:auto!important;z-index:12!important;
