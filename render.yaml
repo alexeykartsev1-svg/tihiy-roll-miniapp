@@ -16,3 +16,5 @@ services:
         value: https://alexeykartsev1-svg.github.io
       - key: MAX_INIT_DATA_AGE_SECONDS
         value: "86400"
+      - key: PERSISTENT_SITE_CONTENT_FILE
+        value: /var/data/site_content.json

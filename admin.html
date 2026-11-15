@@ -391,7 +391,8 @@ function collectSetContentPayload(){
   const savedPieces=piecesManualMode?Math.max(1,Math.min(100,Math.round(Number(pieces?.value)||1))):Math.max(1,Math.min(100,Math.round(automaticPieces)||1));
   const row={id,description:cardText,desc:pageDescription?pageDescription.value.trim():'',card_description:cardText,details:details?details.value.trim():'',weight:weight?weight.value.trim():'',pieces:savedPieces,pieces_manual:piecesManualMode,badge:badge?badge.value:'',items:selectedItems,active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
   const image=siteSetPhotos[id]||(url?url.value.trim():'');
-  if(image||siteSetPhotoCleared[id])row.image=image;
+  if(image)row.image=image;
+  if(siteSetPhotoCleared[id])row.clear_image=true;
   if(siteSetGalleryLoaded[id])row.photos=(siteSetGalleryPhotos[id]||[]).slice(0,5);
   return row;
  });
