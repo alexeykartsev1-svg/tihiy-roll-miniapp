@@ -364,3 +364,33 @@
   border-color: rgba(255,255,255,.5) !important;
   color: #ff514b !important;
 }
+
+
+/* Detail view only: show complete product photos, centered without cropping.
+   Catalogue cards keep their existing image treatment. */
+.detail-image-stage {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #090d10 !important;
+}
+
+.detail-image-stage > img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+}
+
+.thumb {
+  display: grid !important;
+  place-items: center !important;
+  background: #0b1116 !important;
+}
+
+.thumb img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+}
