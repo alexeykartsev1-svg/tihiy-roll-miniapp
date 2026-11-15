@@ -1163,7 +1163,7 @@ async def admin_delete_category(category_id: str, x_telegram_init_data: str | No
     return {"ok":True}
 
 
-_DATA_IMAGE_PATTERN = re.compile(r"^data:image/(jpeg|png|webp);base64,([A-Za-z0-9+/=\\s]+)$")
+_DATA_IMAGE_PATTERN = re.compile(r"^data:image/(jpeg|png|webp);base64,([A-Za-z0-9+/=\s]+)$")
 
 
 def _data_image_parts(value: Any) -> tuple[str, bytes, str] | None:
@@ -1173,7 +1173,7 @@ def _data_image_parts(value: Any) -> tuple[str, bytes, str] | None:
     if not match:
         return None
     try:
-        payload = base64.b64decode(re.sub(r"\\s+", "", match.group(2)), validate=True)
+        payload = base64.b64decode(re.sub(r"\s+", "", match.group(2)), validate=True)
     except (ValueError, base64.binascii.Error):
         return None
     if not payload:
