@@ -73,6 +73,16 @@ def main() -> None:
     }
     assert unrelated_category_product == {"id": "lava", "cat": "classic", "price": 350}
     assert backend._set_product_category(category_repair_rows, "warm_crab", "warm") is False
+    renamed_crab_roll = {
+        "id": "custom_crab_roll", "name": "Тёплая с крабом", "cat": "snacks",
+        "price": 390, "photo": "keep-this-photo", "details": "keep-this-composition",
+    }
+    assert backend._is_warm_crab_roll_product(renamed_crab_roll) is True
+    assert backend._repair_warm_crab_roll_categories([renamed_crab_roll]) == ["custom_crab_roll"]
+    assert renamed_crab_roll == {
+        "id": "custom_crab_roll", "name": "Тёплая с крабом", "cat": "warm",
+        "price": 390, "photo": "keep-this-photo", "details": "keep-this-composition",
+    }
 
     # Large image blobs are no longer embedded in catalogue responses.
     image_data = "data:image/jpeg;base64,YQ=="

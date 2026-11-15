@@ -454,6 +454,22 @@ def _set_product_category(products: list[dict[str, Any]], product_id: str, categ
     return True
 
 
+def _is_warm_crab_roll_product(product: dict[str, Any]) -> bool:
+    if str(product.get("id", "")).lower() == "warm_crab":
+        return True
+    name_key = re.sub(r"[^a-zа-яё0-9]", "", str(product.get("name", "")).lower()).replace("ё", "е")
+    return "краб" in name_key and ("тепл" in name_key or "гейша" in name_key)
+
+
+def _repair_warm_crab_roll_categories(products: list[dict[str, Any]]) -> list[str]:
+    changed: list[str] = []
+    for product in products:
+        if _is_warm_crab_roll_product(product) and product.get("cat") != "warm":
+            product["cat"] = "warm"
+            changed.append(str(product.get("id", "")))
+    return changed
+
+
 def _protect_existing_product_migrations(products: list[dict[str, Any]]) -> None:
     ids = {str(item.get("id", "")) for item in products}
     rules = [
@@ -895,6 +911,25 @@ def read_products() -> list[dict[str, Any]]:
                     handle.write("migrated\\n")
             except OSError:
                 logger.warning("Could not create warm_crab category migration marker at %s", warm_crab_category_marker)
+
+    # Second guarded repair also recognizes renamed crab-roll cards by their title.
+    # This covers records whose ID differs from warm_crab but whose product name is
+    # "Тёплая с крабом", "Тёплый краб" or "Гейша с крабом".
+    warm_crab_name_category_marker = PRODUCTS_FILE + ".warm-crab-roll-category-v2"
+    if not os.path.exists(warm_crab_name_category_marker):
+        repaired_ids = _repair_warm_crab_roll_categories(data)
+        if repaired_ids:
+            write_products(data)
+            logger.info("Moved crab-roll products to the warm roll category: %s", ", ".join(repaired_ids))
+        if any(_is_warm_crab_roll_product(item) for item in data):
+            try:
+                marker_dir = os.path.dirname(warm_crab_name_category_marker)
+                if marker_dir:
+                    os.makedirs(marker_dir, exist_ok=True)
+                with open(warm_crab_name_category_marker, "w", encoding="utf-8") as handle:
+                    handle.write("migrated\\n")
+            except OSError:
+                logger.warning("Could not create warm crab name category marker at %s", warm_crab_name_category_marker)
 
     # Owner-requested image and title confirmation for the existing California card.
     # Keep its existing price, category, weight, ingredients and standard storefront controls.

@@ -90,6 +90,8 @@ function setCards(){return state.sets.filter(s=>s.active!==false).map(s=>{
  return {id:'set:'+s.id,set:s,name:s.name||SET_NAMES[s.id]||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',cat:'sets',badge,photo:setImage(s),desc:hasPageText?s.desc:(s.description||'Готовый набор роллов.'),card_description:hasCardText?s.card_description:(s.description||'Готовый набор роллов.'),details:s.details||''};
 });}
 function productCategory(p){
+ const nameKey=String(p?.name||'').toLowerCase().replace(/ё/g,'е').replace(/[^а-яa-z0-9]/g,'');
+ if(String(p?.id||'').toLowerCase()==='warm_crab'||(nameKey.includes('краб')&&(nameKey.includes('тепл')||nameKey.includes('гейша'))))return 'rolls';
  const raw=String(p.cat||p.category_id||p.category||'').toLowerCase().trim();
  const c=raw.replace(/[ _]+/g,'-');
  if(['dogs','dog','hotdog','hot-dog','hotdogs','hot-dogs','asian-hot-dogs','asian-hotdog','азиатские-хот-доги','азиатский-хот-дог'].includes(c)||c.includes('dog')||c.includes('хот-дог'))return 'dogs';
