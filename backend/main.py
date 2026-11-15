@@ -1889,7 +1889,7 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: вес должен быть текстом до 30 символов.")
             if pieces is not None and (not isinstance(pieces, int) or isinstance(pieces, bool) or not 1 <= pieces <= 100):
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: количество штук должно быть от 1 до 100.")
-            if badge not in {"", "ХИТ", "НОВИНКА", "СКИДКА"}:
+            if not isinstance(badge, str) or badge not in {"", "ХИТ", "НОВИНКА", "СКИДКА"}:
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: выбери плашку ХИТ, НОВИНКА, СКИДКА или «Без плашки».")
             if not isinstance(image, str) or len(image) > 1_000_000:
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: фотография слишком большая.")
