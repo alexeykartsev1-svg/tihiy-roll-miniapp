@@ -1808,11 +1808,44 @@ def _load_site_content_document() -> dict[str, Any] | None:
 _SITE_CONTENT_STATUS_LOGGED = False
 
 
+def _restore_solo_archive_photo_once(data: dict[str, Any]) -> bool:
+    """Restore the archived solo-set card image once, without replacing owner artwork."""
+    marker_path = SITE_CONTENT_FILE + ".solo-photo-archive-v1"
+    if os.path.exists(marker_path):
+        return False
+    sets = data.get("sets", [])
+    solo = next((row for row in sets if isinstance(row, dict) and row.get("id") == "solo"), None)
+    if solo is None:
+        return False
+
+    existing_image = solo.get("image")
+    restored = not (isinstance(existing_image, str) and existing_image.strip())
+    if restored:
+        archive_path = os.path.join(os.path.dirname(__file__), "solo_set_restored.webp.b64")
+        with open(archive_path, "r", encoding="ascii") as archive_file:
+            encoded = archive_file.read().strip()
+        if not encoded:
+            raise RuntimeError("Archived solo-set photo is empty.")
+        base64.b64decode(encoded, validate=True)
+        solo["image"] = "data:image/webp;base64," + encoded
+        # Save to the persistent file and keep a backup of the pre-restore content.
+        write_site_content(data)
+        logger.warning("Restored solo set main photo from the 14 Nov archive; owner-uploaded photos are never overwritten")
+
+    marker_dir = os.path.dirname(marker_path)
+    if marker_dir:
+        os.makedirs(marker_dir, exist_ok=True)
+    with open(marker_path, "w", encoding="utf-8") as marker_file:
+        marker_file.write("restored-or-owner-photo-kept\n")
+    return restored
+
+
 def read_site_content() -> dict[str, Any]:
     global _SITE_CONTENT_STATUS_LOGGED
     data = _load_site_content_document()
     if data is None:
         data = json.loads(json.dumps(DEFAULT_SITE_CONTENT, ensure_ascii=False))
+    _restore_solo_archive_photo_once(data)
     if not _SITE_CONTENT_STATUS_LOGGED:
         solo = next((row for row in data.get("sets", []) if isinstance(row, dict) and row.get("id") == "solo"), {})
         logger.info(
