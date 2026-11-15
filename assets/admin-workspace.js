@@ -140,7 +140,7 @@
       button.addEventListener('click',()=>activate(id));nav.append(button);
     });
     app.querySelectorAll('[data-go]').forEach(button=>button.addEventListener('click',()=>activate(button.dataset.go)));
-    $('#saveSetsFull')?.addEventListener('click',()=>{const save=window.TihiyAdmin?.saveSets;const notice=$('#saveSetsStatus');if(typeof save==='function'){save()}else if(notice){notice.textContent='Редактор сетов ещё загружается. Обнови страницу через несколько секунд.';notice.className='status error'}});
+    $('#saveSetsFull')?.addEventListener('click',event=>{if(event.isTrusted)window.__TIHIY_ACTIVE_SET_SAVE_ID='';const save=window.TihiyAdmin?.saveSets;const notice=$('#saveSetsStatus');if(typeof save==='function'){save()}else if(notice){notice.textContent='Редактор сетов ещё загружается. Обнови страницу через несколько секунд.';notice.className='status error'}});
     $('#adminRefreshOrders')?.addEventListener('click',()=>window.TihiyAdmin?.reloadOrders());
     $('#adminOrderSearch')?.addEventListener('input',event=>{ordersSearch=event.target.value.trim().toLocaleLowerCase('ru');renderOrders()});
     $('#adminOrderFrom')?.addEventListener('change',event=>{ordersFrom=event.target.value;renderOrders()});
