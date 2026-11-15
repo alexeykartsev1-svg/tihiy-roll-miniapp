@@ -5673,3 +5673,13 @@ body {
   font-size:21px!important;
  }
 }
+
+
+/* 2026-11-15: set badges must remain visible above wide-card artwork labels. */
+.rr-card .rr-card-photo .rr-card-set-badge{z-index:12!important;}
+.rr-card.rr-card-set-wide .rr-card-photo .rr-card-set-badge{
+ top:12px!important;left:150px!important;right:auto!important;z-index:12!important;
+}
+@media(max-width:390px){
+ .rr-card.rr-card-set-wide .rr-card-photo .rr-card-set-badge{top:8px!important;left:108px!important;}
+}

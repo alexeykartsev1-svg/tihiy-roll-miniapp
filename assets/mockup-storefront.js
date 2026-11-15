@@ -269,9 +269,11 @@ function card(p){
  const artPhoto=hit&&(p.id==='shrimp_panko'||p.id==='salmon_panko');
  const image=p.id==='shrimp_panko'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4f0ca39-9e57-4852-a2be-008127afba9f.webp':photo(p),imageFallback=image===photo(p)?photoFallback(p):photo(p);
  const heart='<button class="rr-card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-pressed="'+(fav?'true':'false')+'" aria-label="'+(fav?'Удалить из избранного':'Добавить в избранное')+'">'+(fav?'♥':'♡')+'</button>';
- const cleanBadge=String(p.badge||'').trim();
- const printedSetNewBadge=isSet&&p.set?.id==='solo'&&/^новинка$/i.test(cleanBadge);
- const badge=hit&&!artPhoto?'<span class="rr-card-hit-badge '+(p.id==='salmon_panko'?'rr-salmon-panko-hit':'')+'">✦ ХИТ</span>':(printedSetNewBadge?'':(isSet&&/^хит$/i.test(cleanBadge)?'<span class="rr-card-hit-badge">✦ ХИТ</span>':(!hit&&cleanBadge&&!/хит/i.test(cleanBadge)?'<span class="rr-card-badge">'+esc(cleanBadge)+'</span>':'')));
+ const cleanBadge=String(isSet?(p.set?.badge??p.badge??''):(p.badge||'')).trim();
+ const setBadge=isSet&&cleanBadge
+  ?(/^хит$/i.test(cleanBadge)?'<span class="rr-card-hit-badge rr-card-set-badge">✦ ХИТ</span>':'<span class="rr-card-badge rr-card-set-badge">'+esc(cleanBadge)+'</span>')
+  :'';
+ const badge=isSet?setBadge:(hit&&!artPhoto?'<span class="rr-card-hit-badge '+(p.id==='salmon_panko'?'rr-salmon-panko-hit':'')+'">✦ ХИТ</span>':(!hit&&cleanBadge&&!/хит/i.test(cleanBadge)?'<span class="rr-card-badge">'+esc(cleanBadge)+'</span>':''));
  return '<article class="product-card rr-card '+(isSet?'rr-card-set ':'')+(wideSet?'rr-card-set-wide ':'')+(pankoCard?'rr-card-panko ':'')+(hit?'rr-card-is-hit ':'')+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
   +'<div class="rr-card-photo '+(artPhoto?'rr-card-photo-art':'')+'"><img class="rr-card-image" src="'+image+'" data-image-fallback="'+esc(imageFallback)+'" alt="'+esc(p.name)+'" loading="'+(['california','philadelphia','shrimp_panko','salmon_panko'].includes(p.id)?'eager':'lazy')+'" decoding="async" fetchpriority="'+(['california','philadelphia','shrimp_panko','salmon_panko'].includes(p.id)?'high':'low')+'">'+badge+heart+'</div>'
   +'<div class="rr-card-info">'

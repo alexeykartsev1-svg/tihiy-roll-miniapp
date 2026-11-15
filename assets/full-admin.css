@@ -439,3 +439,9 @@ textarea{min-height:88px}
 .set-product-choice label span{min-width:0;line-height:1.35}
 .set-product-choice>input[type=number]{width:74px!important;min-height:34px!important}
 .set-product-choice>input[type=number]:disabled{opacity:.35!important}
+
+
+/* Automatic set pieces count: keep the manual override legible and explicit. */
+.set-pieces-manual-toggle{display:flex!important;align-items:center!important;gap:8px!important;margin-top:6px!important;color:#e8d4ae!important;font-size:12px!important}
+.set-pieces-manual-toggle input[type=checkbox]{width:17px!important;min-height:17px!important;height:17px!important;accent-color:#f23b36!important}
+.set-admin-meta input[data-set-pieces][readonly]{border-color:rgba(226,183,101,.42)!important;background:#17140f!important;color:#ffe2a2!important;opacity:1!important}

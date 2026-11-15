@@ -93,7 +93,7 @@ def main() -> None:
             saved_content = asyncio.run(backend.admin_update_site_content({
                 "sets": [{
                     "id": "solo", "description": "Карточка", "desc": "Страница", "card_description": "Карточка",
-                    "details": "Лосось, сыр, рис, нори", "weight": "640 г", "pieces": 16, "badge": "ХИТ",
+                    "details": "Лосось, сыр, рис, нори", "weight": "640 г", "pieces": 16, "pieces_manual": True, "badge": "ХИТ",
                     "image": "", "photos": [], "items": [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 2}], "active": True, "stock": None
                 }]
             }, "test-init-data"))
@@ -103,11 +103,12 @@ def main() -> None:
             assert saved_set["description"] == "Карточка"
             assert saved_set["details"] == "Лосось, сыр, рис, нори"
             assert saved_set["weight"] == "640 г" and saved_set["pieces"] == 16
+            assert saved_set["pieces_manual"] is True
             assert saved_set["badge"] == "ХИТ"
             assert saved_set["items"] == [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 2}]
             public_set = backend._catalog_set_payload(saved_set)
             assert public_set["desc"] == "Страница" and public_set["details"] == "Лосось, сыр, рис, нори"
-            assert public_set["weight"] == "640 г" and public_set["pieces"] == 16 and public_set["badge"] == "ХИТ"
+            assert public_set["weight"] == "640 г" and public_set["pieces"] == 16 and public_set["pieces_manual"] is True and public_set["badge"] == "ХИТ"
     finally:
         backend.SITE_CONTENT_FILE = original_site_content_file
         backend.PRODUCTS_FILE = original_products_file_for_sets
