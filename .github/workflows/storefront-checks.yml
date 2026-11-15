@@ -33,6 +33,7 @@ jobs:
           PERSISTENT_PRODUCTS_FILE: ${{ runner.temp }}/tihiy-roll-tests/products.json
           PERSISTENT_CATEGORIES_FILE: ${{ runner.temp }}/tihiy-roll-tests/categories.json
           PERSISTENT_ORDERS_DB_PATH: ${{ runner.temp }}/tihiy-roll-tests/orders.sqlite3
+          PERSISTENT_SITE_CONTENT_FILE: ${{ runner.temp }}/tihiy-roll-tests/site-content.json
         run: python test_backend.py
       - name: Check storefront JavaScript syntax and assets
         run: |
