@@ -81,9 +81,11 @@
     const setEditor=$('#setEditor',contentPanel);
     const setPanel=panel('Редактор готовых сетов','Настраивай описания и до пяти дополнительных фотографий для каждого набора.');
     if(setTitle)setTitle.remove();if(setDescription)setDescription.remove();if(setEditor)setEditor.remove();
+    const topSetNotice=document.createElement('div');topSetNotice.id='saveSetsTopStatus';topSetNotice.className='status muted hidden';topSetNotice.setAttribute('role','status');topSetNotice.setAttribute('aria-live','polite');
+    setPanel.append(topSetNotice);
     if(setEditor)setPanel.append(setEditor);
     const saveSet=document.createElement('div');saveSet.className='formactions';
-    saveSet.innerHTML='<button class="btn primary" type="button" id="saveSetsFull">Сохранить изменения сетов</button><span id="saveSetsStatus" class="muted" role="status" aria-live="polite">Изменения ещё не сохранены</span>';
+    saveSet.innerHTML='<button class="btn primary" type="button" id="saveSetsFull">Сохранить изменения сетов</button><span id="saveSetsStatus" class="status muted hidden" role="status" aria-live="polite"></span>';
     setPanel.append(saveSet);sets.append(setPanel);
 
     const banners=page('banners','Главная и баннеры','Первый экран магазина, рекламные блоки и слайды');
