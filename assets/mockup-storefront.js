@@ -416,6 +416,7 @@ function closeModal(id){const n=$('#'+id);if(!n)return;n.classList.remove('show'
 function renderFilterOptions(){const options=[['all','Все позиции'],['sets','Сеты'],['rolls','Роллы'],['dogs','Азиатские хот-доги'],['snacks','Закуски']];$('#filterOptions').innerHTML=options.map(x=>'<button type="button" data-filter-option="'+x[0]+'" class="'+(state.filter===x[0]?'active':'')+'">'+x[1]+'</button>').join('');}
 let photoLightboxOpen = false;
 let photoLightboxPreviousOverflow = '';
+let ignoreDetailPhotoClickUntil = 0;
 function syncPhotoLightbox(){
  if(!photoLightboxOpen)return;
  const image=$('#photoLightboxImage');
@@ -433,6 +434,7 @@ function syncPhotoLightbox(){
  if(next)next.hidden=!multiple;
 }
 function openPhotoLightbox(){
+ if(Date.now()<ignoreDetailPhotoClickUntil)return;
  if(!state.photos.length)return;
  const overlay=$('#photoLightbox');
  if(!overlay)return;
@@ -1058,12 +1060,7 @@ if(photoLightboxStage){
  });
  photoLightboxStage.addEventListener('pointercancel',()=>{lightboxPointerStart=null;});
 }
-document.addEventListener('keydown',event=>{
- if(!photoLightboxOpen)return;
- if(event.key==='Escape'){event.preventDefault();closePhotoLightbox();}
- else if(event.key==='ArrowLeft'){event.preventDefault();showGalleryPhoto(state.photoIndex-1);}
- else if(event.key==='ArrowRight'){event.preventDefault();showGalleryPhoto(state.photoIndex+1);}
-});
+
 const galleryStage=$('.detail-image-stage');
 let galleryTouchStart=null;
 if(galleryStage){
@@ -1076,6 +1073,7 @@ if(galleryStage){
   const touch=event.changedTouches[0],dx=touch.clientX-galleryTouchStart.x,dy=touch.clientY-galleryTouchStart.y;
   galleryTouchStart=null;
   if(Math.abs(dx)>46&&Math.abs(dx)>Math.abs(dy)*1.2){
+   ignoreDetailPhotoClickUntil=Date.now()+650;
    showGalleryPhoto(state.photoIndex+(dx<0?1:-1));
   }
  },{passive:true});
@@ -1129,7 +1127,7 @@ deliveryAddress.addEventListener('input',updateDeliveryMap);
 deliveryAddress.addEventListener('change',updateDeliveryMap);
 $('#checkoutForm').addEventListener('submit',sendOrder);
 $$('.modal-layer').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
-window.addEventListener('keydown',e=>{if(e.key==='Escape'){['cartModal','favoritesModal','filtersModal','builderInfoModal'].forEach(closeModal);$('#detailDevice').classList.remove('mobile-active');}});
+window.addEventListener('keydown',e=>{if(photoLightboxOpen){if(e.key==='Escape'){e.preventDefault();closePhotoLightbox();}else if(e.key==='ArrowLeft'){e.preventDefault();showGalleryPhoto(state.photoIndex-1);}else if(e.key==='ArrowRight'){e.preventDefault();showGalleryPhoto(state.photoIndex+1);}return;}if(e.key==='Escape'){['cartModal','favoritesModal','filtersModal','builderInfoModal'].forEach(closeModal);$('#detailDevice').classList.remove('mobile-active');}});
 // Refresh seasonal banner visibility when the customer returns to an already-open shop.
 async function refreshSeasonalBannerVisibility(){
  try{
