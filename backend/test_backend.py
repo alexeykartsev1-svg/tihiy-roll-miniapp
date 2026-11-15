@@ -116,12 +116,15 @@ def main() -> None:
                 {"id": "philadelphia", "name": "Филадельфия", "price": 500, "pieces": 8, "weight": "300 г", "active": True},
                 {"id": "lava", "name": "Лава", "price": 450, "pieces": 8, "weight": "280 г", "active": True},
             ])
+            original_main_photo = "data:image/webp;base64,YQ=="
+            original_gallery = ["data:image/webp;base64,Yg==", "data:image/webp;base64,Yw=="]
+            backend.write_site_content({"sets": [{"id": "solo", "image": original_main_photo, "photos": original_gallery}]})
             backend.admin_from_header = lambda _header: None
             saved_content = asyncio.run(backend.admin_update_site_content({
                 "sets": [{
                     "id": "solo", "description": "Карточка", "desc": "Страница", "card_description": "Карточка",
                     "details": "Лосось, сыр, рис, нори", "weight": "640 г", "pieces": 16, "pieces_manual": True, "badge": "ХИТ",
-                    "image": "", "photos": [], "items": [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 2}], "active": True, "stock": None
+                    "items": [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 2}], "active": True, "stock": None
                 }]
             }, "test-init-data"))
             saved_set = saved_content["content"]["sets"][0]
@@ -133,6 +136,10 @@ def main() -> None:
             assert saved_set["pieces_manual"] is True
             assert saved_set["badge"] == "ХИТ"
             assert saved_set["items"] == [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 2}]
+            assert saved_set["photos_count"] == 2
+            persisted_solo = next(row for row in backend.read_site_content()["sets"] if row["id"] == "solo")
+            assert persisted_solo["image"] == original_main_photo
+            assert persisted_solo["photos"] == original_gallery
             public_set = backend._catalog_set_payload(saved_set)
             assert public_set["desc"] == "Страница" and public_set["details"] == "Лосось, сыр, рис, нори"
             assert public_set["weight"] == "640 г" and public_set["pieces"] == 16 and public_set["pieces_manual"] is True and public_set["badge"] == "ХИТ"
@@ -140,6 +147,16 @@ def main() -> None:
         backend.SITE_CONTENT_FILE = original_site_content_file
         backend.PRODUCTS_FILE = original_products_file_for_sets
         backend.admin_from_header = original_admin_from_header
+            # Blank/missing image values must preserve artwork; clear only explicitly.
+            assert backend._resolve_site_set_image({"image": ""}, {"image": original_main_photo}) == original_main_photo
+            assert backend._resolve_site_set_image({}, {"image": original_main_photo}) == original_main_photo
+            assert backend._resolve_site_set_image({"clear_image": True}, {"image": original_main_photo}) == ""
+            # Every successful content save keeps the previous complete version.
+            backup_path = backend.SITE_CONTENT_FILE + ".bak"
+            assert os.path.isfile(backup_path)
+            with open(backup_path, "r", encoding="utf-8") as backup_file:
+                backup_data = json.load(backup_file)
+            assert backup_data["sets"][0]["image"] == original_main_photo
     try:
         ProductPayload(
             id="bad_roll",
