@@ -158,6 +158,40 @@ def main() -> None:
         backend.PRODUCTS_FILE = original_products_file_for_sets
         backend.admin_from_header = original_admin_from_header
 
+    original_solo_restore_path = backend.SITE_CONTENT_FILE
+    try:
+        with tempfile.TemporaryDirectory() as temporary:
+            backend.SITE_CONTENT_FILE = os.path.join(temporary, "site-content.json")
+            no_photo = {"sets": [{"id": "solo", "image": "", "photos": []}]}
+            assert backend._restore_solo_archive_photo_once(no_photo) is True
+            with open(backend.SITE_CONTENT_FILE, "r", encoding="utf-8") as saved_file:
+                restored_content = json.load(saved_file)
+            restored_solo = next(row for row in restored_content["sets"] if row["id"] == "solo")
+            assert restored_solo["image"].startswith("data:image/webp;base64,")
+            assert len(restored_solo["image"]) > 7000
+            assert os.path.isfile(backend.SITE_CONTENT_FILE + ".solo-photo-archive-v1")
+
+            # The restore is one-time: an owner may remove/change the image later
+            # and the archived fallback must never write over that choice.
+            restored_solo["image"] = ""
+            backend.write_site_content(restored_content)
+            assert backend._restore_solo_archive_photo_once(restored_content) is False
+            with open(backend.SITE_CONTENT_FILE, "r", encoding="utf-8") as saved_file:
+                after_owner_clear = json.load(saved_file)
+            assert next(row for row in after_owner_clear["sets"] if row["id"] == "solo")["image"] == ""
+    finally:
+        backend.SITE_CONTENT_FILE = original_solo_restore_path
+
+    try:
+        with tempfile.TemporaryDirectory() as temporary:
+            backend.SITE_CONTENT_FILE = os.path.join(temporary, "site-content.json")
+            owner_image = "https://example.test/my-own-solo-photo.webp"
+            owner_data = {"sets": [{"id": "solo", "image": owner_image, "photos": []}]}
+            assert backend._restore_solo_archive_photo_once(owner_data) is False
+            assert owner_data["sets"][0]["image"] == owner_image
+    finally:
+        backend.SITE_CONTENT_FILE = original_solo_restore_path
+
     original_legacy_site_files = backend.SITE_CONTENT_LEGACY_FILES
     original_site_content_logged = backend._SITE_CONTENT_STATUS_LOGGED
     try:
