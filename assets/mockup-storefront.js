@@ -64,7 +64,26 @@ function save(){try{localStorage.setItem('tihiy-stage1-cart',JSON.stringify(stat
 function loadSaved(){try{state.cart=JSON.parse(localStorage.getItem('tihiy-stage1-cart')||'{}');state.favorites=new Set(JSON.parse(localStorage.getItem('tihiy-stage1-fav')||'[]'));state.setCounts=JSON.parse(localStorage.getItem('tihiy-stage1-sets')||'{}');let migrated=false;const legacyPankoQty=Number(state.cart.philadelphia||0);if(legacyPankoQty>0){state.cart.shrimp_panko=Number(state.cart.shrimp_panko||0)+legacyPankoQty;delete state.cart.philadelphia;migrated=true;}if(state.favorites.has('philadelphia')){state.favorites.delete('philadelphia');state.favorites.add('shrimp_panko');migrated=true;}if(migrated)save();}catch(e){}}
 function setImage(s){if(!state.siteContentReady)return PRODUCT_PHOTO_PLACEHOLDER;const fixed={solo:'./assets/set-solo.webp',duo:'./assets/set-duo.webp',party:'./assets/set-party.webp',newyear:'./assets/set-party.webp',autumn:'./assets/set-party.webp',winter:'./assets/set-party.webp',spring:'./assets/set-party.webp',summer:'./assets/set-party.webp'};return s.image_url||s.image||((s.photos||[]).find(Boolean))||fixed[s.id]||'./assets/set-party.webp';}
 function setGallery(s){const own=[s.image_url||s.image,...(Array.isArray(s.photos)?s.photos:[])].filter(Boolean);const base=own[0]||setImage(s);return Array.from(new Set([base,...own.slice(1)])).slice(0,5);}
-function setCards(){return state.sets.filter(s=>s.active!==false).map(s=>({id:'set:'+s.id,set:s,name:SET_NAMES[s.id]||s.name||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',cat:'sets',badge:s.id==='newyear'?'НОВИНКА':'',photo:setImage(s),desc:s.description||'Готовый набор роллов.'}));}
+function mergeCatalogueSets(remoteRows){
+ const defaults=cloneDefaultSets();
+ const byId=new Map(defaults.map(row=>[row.id,row]));
+ (Array.isArray(remoteRows)?remoteRows:[]).forEach(remote=>{
+  if(!remote||typeof remote!=='object'||!remote.id)return;
+  const fallback=byId.get(remote.id)||{};
+  const merged={...fallback,...remote};
+  if(!Array.isArray(remote.items)||!remote.items.length)merged.items=fallback.items||[];
+  if(typeof merged.description!=='string'||!merged.description)merged.description=fallback.description||'';
+  if(!merged.image_url&&!merged.image)merged.image=fallback.image||'';
+  if(!Array.isArray(remote.photos))merged.photos=fallback.photos||[];
+  if(typeof merged.active!=='boolean')merged.active=fallback.active!==false;
+  byId.set(remote.id,merged);
+ });
+ const rows=Array.from(byId.values());
+ // A malformed/empty status payload must not blank the whole catalogue.
+ if(rows.length&&!rows.some(row=>row.active!==false))rows.forEach(row=>{row.active=true});
+ return rows;
+}
+function setCards(){return state.sets.filter(s=>s.active!==false).map(s=>({id:'set:'+s.id,set:s,name:s.name||SET_NAMES[s.id]||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',cat:'sets',badge:s.id==='newyear'?'НОВИНКА':'',photo:setImage(s),desc:s.description||'Готовый набор роллов.'}));}
 function productCategory(p){
  const raw=String(p.cat||p.category_id||p.category||'').toLowerCase().trim();
  const c=raw.replace(/[ _]+/g,'-');
@@ -230,7 +249,7 @@ function cardControlsMarkup(p){
 function card(p){
  const id=esc(p.id),isSet=!!p.set,limit=isSet?p.set.stock:stock(p),available=limit==null||Number(limit)>0;
  const fav=state.favorites.has(p.id),hit=!isSet&&(p.hit_template===true||/хит/i.test(String(p.badge||'')));
- const wideSet=isSet&&Number(p.pieces||0)>=48;
+ const wideSet=isSet&&(Number(p.pieces||0)>=48||p.set?.wide===true||p.set?.layout==='wide'||p.set?.card_size==='wide'||p.set?.id==='party'||/большой стол|на компанию|15 человек/i.test(String(p.name||'')));
  const desc=productCardDescription(p),controls=cardControlsMarkup(p);
  const pankoCard=p.id==='shrimp_panko'||p.id==='salmon_panko';
  const artPhoto=hit&&(p.id==='shrimp_panko'||p.id==='salmon_panko');
@@ -899,7 +918,7 @@ async function load(){
 
  contentRequest.then(content=>{
   const serverSets=Array.isArray(content?.sets)?content.sets:[];
-  state.sets=serverSets.length?serverSets:cloneDefaultSets();
+  state.sets=mergeCatalogueSets(serverSets);
   state.seasonalBanners=Array.isArray(content?.seasonal_banners)?content.seasonal_banners:[];
   state.siteContentReady=true;
   if(!serverSets.length)console.warn('API site-content не вернул готовые сеты; показана резервная подборка.');
