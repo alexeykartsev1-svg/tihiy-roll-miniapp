@@ -394,3 +394,50 @@
   object-fit: contain !important;
   object-position: center center !important;
 }
+
+
+/* Detail gallery: fill the letterbox with a soft, enlarged continuation
+   of the current photo while keeping the original image fully visible. */
+.detail-image-stage {
+  isolation: isolate !important;
+  background: #111316 !important;
+}
+
+.detail-image-stage.has-detail-backdrop::before {
+  content: "" !important;
+  position: absolute !important;
+  z-index: 0 !important;
+  inset: -24px !important;
+  background-image: var(--detail-gallery-backdrop) !important;
+  background-position: center center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  filter: blur(22px) brightness(.62) saturate(1.08) !important;
+  transform: scale(1.06) !important;
+  opacity: .88 !important;
+  pointer-events: none !important;
+}
+
+.detail-image-stage > img {
+  position: relative !important;
+  z-index: 1 !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: transparent !important;
+}
+
+.detail-image-stage::after {
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+
+.detail-image-stage > button,
+.detail-image-stage .detail-photo-count {
+  z-index: 3 !important;
+}
+
+/* Small gallery previews should use their full thumbnail slot. */
+.thumb img {
+  object-fit: cover !important;
+  object-position: center center !important;
+}
