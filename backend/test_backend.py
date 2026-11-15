@@ -57,6 +57,23 @@ def main() -> None:
     assert catalog_item.pieces == 8
     assert catalog_item.gallery == ["data:image/jpeg;base64,YQ=="]
 
+    # The warm crab roll category repair changes only cat and is idempotent.
+    category_repair_product = {
+        "id": "warm_crab", "name": "Гейша с крабом", "cat": "snacks",
+        "price": 350, "photo": "preserve-photo", "details": "preserve-ingredients",
+        "stock": 4,
+    }
+    unrelated_category_product = {"id": "lava", "cat": "classic", "price": 350}
+    category_repair_rows = [category_repair_product, unrelated_category_product]
+    assert backend._set_product_category(category_repair_rows, "warm_crab", "warm") is True
+    assert category_repair_product == {
+        "id": "warm_crab", "name": "Гейша с крабом", "cat": "warm",
+        "price": 350, "photo": "preserve-photo", "details": "preserve-ingredients",
+        "stock": 4,
+    }
+    assert unrelated_category_product == {"id": "lava", "cat": "classic", "price": 350}
+    assert backend._set_product_category(category_repair_rows, "warm_crab", "warm") is False
+
     # Large image blobs are no longer embedded in catalogue responses.
     image_data = "data:image/jpeg;base64,YQ=="
     image_parts = backend._data_image_parts(image_data)
