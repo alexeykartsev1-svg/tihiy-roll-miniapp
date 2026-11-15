@@ -1392,11 +1392,15 @@ async def admin_update_product(product_id: str, payload: ProductPayload, x_teleg
     products = read_products()
     for index, item in enumerate(products):
         if item.get("id") == product_id:
-            updated = payload.model_dump()
-            fields_set = getattr(payload, "model_fields_set", set())
-            if "photo" not in fields_set:
+            # Treat PUT as a safe partial update: only fields explicitly sent by
+            # the admin form may replace stored values. This protects descriptions,
+            # composition, main photo and gallery from accidental default/empty values.
+            updated = dict(item)
+            updated.update(payload.model_dump(exclude_unset=True))
+            updated["id"] = product_id
+            if "photo" not in payload.model_fields_set:
                 updated["photo"] = item.get("photo", "")
-            if "gallery" not in fields_set:
+            if "gallery" not in payload.model_fields_set:
                 updated["gallery"] = item.get("gallery", [])
             products[index] = updated
             write_products(products)
@@ -2097,7 +2101,7 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 if photo and not (photo.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", photo)):
                     raise HTTPException(status_code=400, detail=f"Фото {photo_index+1} сета {index+1}: нужен HTTPS URL или JPG, PNG, WebP.")
                 clean_photos.append(photo.strip())
-            items = item.get("items", DEFAULT_SET_ITEMS[set_id])
+            items = item.get("items", existing_set.get("items") or DEFAULT_SET_ITEMS[set_id])
             if not isinstance(items, list) or not items or len(items) > 12:
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: укажи от 1 до 12 позиций.")
             available_ids = {str(product.get("id")) for product in read_products()}
@@ -2114,14 +2118,21 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                     raise HTTPException(status_code=400, detail=f"Сет {index+1}: количество позиции должно быть от 1 до 50.")
                 clean_items.append({"id": product_id, "qty": quantity})
                 used_item_ids.add(product_id)
-            active = item.get("active", True)
-            stock = item.get("stock")
+            active = item.get("active", existing_set.get("active", True))
+            stock = item.get("stock", existing_set.get("stock"))
             if not isinstance(active, bool):
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: признак активности должен быть true/false.")
             if stock is not None and (not isinstance(stock, int) or isinstance(stock, bool) or not 0 <= stock <= 10000):
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: остаток должен быть пустым (без учёта) или от 0 до 10 000.")
             clean_sets.append({"id": set_id, "description": card_description.strip(), "desc": page_description.strip(), "card_description": card_description.strip(), "details": details.strip(), "weight": weight.strip(), "pieces": pieces, "pieces_manual": pieces_manual, "badge": badge, "image": image.strip(), "photos": clean_photos, "items": clean_items, "active": active, "stock": stock})
             seen.add(set_id)
+        # A partial admin payload must never delete other saved sets. Preserve
+        # every existing set omitted from this request; only explicit rows update.
+        clean_ids = {str(row.get("id")) for row in clean_sets}
+        clean_sets.extend(
+            dict(row) for row in current.get("sets", [])
+            if isinstance(row, dict) and str(row.get("id")) not in clean_ids
+        )
         current["sets"] = clean_sets
     if "seasonal_banners" in payload:
         banners = payload["seasonal_banners"]
