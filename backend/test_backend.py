@@ -1,4 +1,5 @@
 """Offline smoke tests: python test_backend.py"""
+import asyncio
 import hashlib
 import hmac
 import json
@@ -75,6 +76,38 @@ def main() -> None:
     assert compact_set["image_url"].startswith("https://tihiy-roll-order-api.onrender.com/api/sets/test_set/photo?v=")
     admin_summary = backend._admin_site_content_payload({"sets": [{"id": "test_set", "image": image_data, "photos": [image_data]}]})
     assert "photos" not in admin_summary["sets"][0] and admin_summary["sets"][0]["photos_count"] == 1
+
+    # Set editor metadata is persisted and returned to both admin and storefront payloads.
+    original_site_content_file = backend.SITE_CONTENT_FILE
+    original_products_file_for_sets = backend.PRODUCTS_FILE
+    original_admin_from_header = backend.admin_from_header
+    try:
+        with tempfile.TemporaryDirectory() as temporary:
+            backend.SITE_CONTENT_FILE = os.path.join(temporary, "site-content.json")
+            backend.PRODUCTS_FILE = os.path.join(temporary, "products.json")
+            backend.write_products([{"id": "philadelphia", "name": "Филадельфия", "price": 500, "pieces": 8, "weight": "300 г", "active": True}])
+            backend.admin_from_header = lambda _header: None
+            saved_content = asyncio.run(backend.admin_update_site_content({
+                "sets": [{
+                    "id": "solo", "description": "Карточка", "desc": "Страница", "card_description": "Карточка",
+                    "details": "Лосось, сыр, рис, нори", "weight": "640 г", "pieces": 16, "badge": "ХИТ",
+                    "image": "", "photos": [], "items": [{"id": "philadelphia", "qty": 1}], "active": True, "stock": None
+                }]
+            }, "test-init-data"))
+            saved_set = saved_content["content"]["sets"][0]
+            assert saved_set["desc"] == "Страница"
+            assert saved_set["card_description"] == "Карточка"
+            assert saved_set["description"] == "Карточка"
+            assert saved_set["details"] == "Лосось, сыр, рис, нори"
+            assert saved_set["weight"] == "640 г" and saved_set["pieces"] == 16
+            assert saved_set["badge"] == "ХИТ"
+            public_set = backend._catalog_set_payload(saved_set)
+            assert public_set["desc"] == "Страница" and public_set["details"] == "Лосось, сыр, рис, нори"
+            assert public_set["weight"] == "640 г" and public_set["pieces"] == 16 and public_set["badge"] == "ХИТ"
+    finally:
+        backend.SITE_CONTENT_FILE = original_site_content_file
+        backend.PRODUCTS_FILE = original_products_file_for_sets
+        backend.admin_from_header = original_admin_from_header
     try:
         ProductPayload(
             id="bad_roll",
@@ -165,7 +198,7 @@ def main() -> None:
     else:
         raise AssertionError("Unknown category should be rejected")
 
-    print("OK: Telegram auth, product gallery, pricing, category and shop settings validation passed.")
+    print("OK: Telegram auth, product/set metadata, galleries, pricing, category and shop settings validation passed.")
 
 
 if __name__ == "__main__":
