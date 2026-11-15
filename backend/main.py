@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import hashlib
 import hmac
 import json
@@ -19,7 +20,7 @@ from urllib.parse import parse_qsl
 import httpx
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -1160,9 +1161,127 @@ async def admin_delete_category(category_id: str, x_telegram_init_data: str | No
     write_categories(updated)
     return {"ok":True}
 
+
+_DATA_IMAGE_PATTERN = re.compile(r"^data:image/(jpeg|png|webp);base64,([A-Za-z0-9+/=\\s]+)$")
+
+
+def _data_image_parts(value: Any) -> tuple[str, bytes, str] | None:
+    if not isinstance(value, str):
+        return None
+    match = _DATA_IMAGE_PATTERN.match(value.strip())
+    if not match:
+        return None
+    try:
+        payload = base64.b64decode(re.sub(r"\\s+", "", match.group(2)), validate=True)
+    except (ValueError, base64.binascii.Error):
+        return None
+    if not payload:
+        return None
+    digest = hashlib.sha256(payload).hexdigest()[:20]
+    return "image/" + match.group(1), payload, digest
+
+
+def _asset_delivery_url(kind: str, item_id: str, value: Any, gallery_index: int | None = None) -> str:
+    if not isinstance(value, str) or not value:
+        return ""
+    parts = _data_image_parts(value)
+    if not parts:
+        return value
+    digest = parts[2]
+    item_key = str(item_id)
+    if gallery_index is None:
+        return f"/api/{kind}/{item_key}/photo?v={digest}"
+    return f"/api/{kind}/{item_key}/gallery/{gallery_index}?v={digest}"
+
+
+def _serve_data_image(value: Any) -> Response:
+    parts = _data_image_parts(value)
+    if not parts:
+        raise HTTPException(status_code=404, detail="Фотография не найдена.")
+    media_type, payload, digest = parts
+    return Response(
+        content=payload,
+        media_type=media_type,
+        headers={
+            "Cache-Control": "public, max-age=31536000, immutable",
+            "ETag": '"' + digest + '"',
+            "X-Content-Type-Options": "nosniff",
+        },
+    )
+
+
+def _catalog_product_payload(product: dict[str, Any]) -> dict[str, Any]:
+    row = {key: value for key, value in product.items() if key != "gallery"}
+    photo_value = row.get("photo", "")
+    if isinstance(photo_value, str) and photo_value.startswith("data:image/"):
+        row.pop("photo", None)
+    row["photo_url"] = _asset_delivery_url("products", str(product.get("id", "")), photo_value)
+    return row
+
+
+def _catalog_set_payload(set_row: dict[str, Any]) -> dict[str, Any]:
+    row = {key: value for key, value in set_row.items() if key != "photos"}
+    image_value = row.get("image", "")
+    if isinstance(image_value, str) and image_value.startswith("data:image/"):
+        row.pop("image", None)
+    row["image_url"] = _asset_delivery_url("sets", str(set_row.get("id", "")), image_value)
+    return row
+
+
+def _admin_site_content_payload(data: dict[str, Any]) -> dict[str, Any]:
+    result = dict(data)
+    result["sets"] = []
+    for original in data.get("sets", []):
+        if not isinstance(original, dict):
+            continue
+        row = dict(original)
+        photos = row.pop("photos", [])
+        row["photos_count"] = len(photos) if isinstance(photos, list) else 0
+        image_value = row.get("image", "")
+        if isinstance(image_value, str) and image_value.startswith("data:image/"):
+            row.pop("image", None)
+        row["image_url"] = _asset_delivery_url("sets", str(row.get("id", "")), image_value)
+        result["sets"].append(row)
+    return result
+
+
 @app.get("/api/menu")
 async def get_menu() -> list[dict[str, Any]]:
-    return sorted([p for p in read_products() if p.get("active", True)], key=lambda p: (int(p.get("sort_order", 0)), str(p.get("name", ""))))
+    products = [p for p in read_products() if p.get("active", True)]
+    ordered = sorted(products, key=lambda p: (int(p.get("sort_order", 0)), str(p.get("name", ""))))
+    return [_catalog_product_payload(item) for item in ordered]
+
+
+@app.get("/api/products/{product_id}/photo")
+async def get_product_photo(product_id: str) -> Response:
+    product = next((item for item in read_products() if str(item.get("id")) == product_id), None)
+    if not product:
+        raise HTTPException(status_code=404, detail="Товар не найден.")
+    return _serve_data_image(product.get("photo", ""))
+
+
+@app.get("/api/products/{product_id}/gallery")
+async def get_product_gallery(product_id: str) -> dict[str, Any]:
+    product = next((item for item in read_products() if str(item.get("id")) == product_id), None)
+    if not product:
+        raise HTTPException(status_code=404, detail="Товар не найден.")
+    gallery = product.get("gallery", [])
+    gallery = gallery if isinstance(gallery, list) else []
+    return {
+        "photos": [
+            _asset_delivery_url("products", product_id, value, index) if isinstance(value, str) and value else ""
+            for index, value in enumerate(gallery[:5])
+        ]
+    }
+
+
+@app.get("/api/products/{product_id}/gallery/{index}")
+async def get_product_gallery_photo(product_id: str, index: int) -> Response:
+    product = next((item for item in read_products() if str(item.get("id")) == product_id), None)
+    gallery = product.get("gallery", []) if product else []
+    if not isinstance(gallery, list) or index < 0 or index >= len(gallery):
+        raise HTTPException(status_code=404, detail="Дополнительное фото не найдено.")
+    return _serve_data_image(gallery[index])
 
 @app.post("/api/admin/check")
 async def admin_check(payload: dict[str, Any]) -> dict[str, Any]:
@@ -1178,7 +1297,17 @@ async def admin_check(payload: dict[str, Any]) -> dict[str, Any]:
 @app.get("/api/admin/products")
 async def admin_get_products(x_telegram_init_data: str | None = Header(default=None)) -> list[dict[str, Any]]:
     admin_from_header(x_telegram_init_data)
-    return sorted(read_products(), key=lambda p: (int(p.get("sort_order", 0)), str(p.get("name", ""))))
+    products = sorted(read_products(), key=lambda p: (int(p.get("sort_order", 0)), str(p.get("name", ""))))
+    return [_catalog_product_payload(item) for item in products]
+
+
+@app.get("/api/admin/products/{product_id}/gallery")
+async def admin_get_product_gallery(product_id: str, x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    product = next((item for item in read_products() if str(item.get("id")) == product_id), None)
+    if not product:
+        raise HTTPException(status_code=404, detail="Товар не найден.")
+    return {"gallery": product.get("gallery", []) if isinstance(product.get("gallery"), list) else []}
 
 @app.post("/api/admin/products")
 async def admin_create_product(payload: ProductPayload, x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
@@ -1189,7 +1318,7 @@ async def admin_create_product(payload: ProductPayload, x_telegram_init_data: st
     item = payload.model_dump()
     products.append(item)
     write_products(products)
-    return {"ok": True, "product": item}
+    return {"ok": True, "product": _catalog_product_payload(item)}
 
 @app.put("/api/admin/products/{product_id}")
 async def admin_update_product(product_id: str, payload: ProductPayload, x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
@@ -1199,9 +1328,15 @@ async def admin_update_product(product_id: str, payload: ProductPayload, x_teleg
     products = read_products()
     for index, item in enumerate(products):
         if item.get("id") == product_id:
-            products[index] = payload.model_dump()
+            updated = payload.model_dump()
+            fields_set = getattr(payload, "model_fields_set", set())
+            if "photo" not in fields_set:
+                updated["photo"] = item.get("photo", "")
+            if "gallery" not in fields_set:
+                updated["gallery"] = item.get("gallery", [])
+            products[index] = updated
             write_products(products)
-            return {"ok": True, "product": products[index]}
+            return {"ok": True, "product": _catalog_product_payload(products[index])}
     raise HTTPException(status_code=404, detail="Товар не найден.")
 
 @app.delete("/api/admin/products/{product_id}")
@@ -1632,12 +1767,58 @@ async def admin_update_store_settings(payload: dict[str, Any], x_telegram_init_d
 
 @app.get("/api/site-content")
 async def get_site_content() -> dict[str, Any]:
-    return read_site_content()
+    data = read_site_content()
+    return {
+        "sets": [_catalog_set_payload(row) for row in data.get("sets", []) if isinstance(row, dict)],
+        "seasonal_banners": data.get("seasonal_banners", DEFAULT_SEASONAL_BANNERS),
+    }
+
+
+@app.get("/api/sets/{set_id}/photo")
+async def get_set_photo(set_id: str) -> Response:
+    row = next((item for item in read_site_content().get("sets", []) if str(item.get("id")) == set_id), None)
+    if not row:
+        raise HTTPException(status_code=404, detail="Сет не найден.")
+    return _serve_data_image(row.get("image", ""))
+
+
+@app.get("/api/sets/{set_id}/gallery")
+async def get_set_gallery(set_id: str) -> dict[str, Any]:
+    row = next((item for item in read_site_content().get("sets", []) if str(item.get("id")) == set_id), None)
+    if not row:
+        raise HTTPException(status_code=404, detail="Сет не найден.")
+    photos = row.get("photos", [])
+    photos = photos if isinstance(photos, list) else []
+    return {
+        "photos": [
+            _asset_delivery_url("sets", set_id, value, index) if isinstance(value, str) and value else ""
+            for index, value in enumerate(photos[:5])
+        ]
+    }
+
+
+@app.get("/api/sets/{set_id}/gallery/{index}")
+async def get_set_gallery_photo(set_id: str, index: int) -> Response:
+    row = next((item for item in read_site_content().get("sets", []) if str(item.get("id")) == set_id), None)
+    photos = row.get("photos", []) if row else []
+    if not isinstance(photos, list) or index < 0 or index >= len(photos):
+        raise HTTPException(status_code=404, detail="Дополнительное фото не найдено.")
+    return _serve_data_image(photos[index])
+
 
 @app.get("/api/admin/site-content")
 async def admin_get_site_content(x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
     admin_from_header(x_telegram_init_data)
-    return read_site_content()
+    return _admin_site_content_payload(read_site_content())
+
+
+@app.get("/api/admin/site-content/sets/{set_id}/gallery")
+async def admin_get_set_gallery(set_id: str, x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
+    admin_from_header(x_telegram_init_data)
+    row = next((item for item in read_site_content().get("sets", []) if str(item.get("id")) == set_id), None)
+    if not row:
+        raise HTTPException(status_code=404, detail="Сет не найден.")
+    return {"photos": row.get("photos", []) if isinstance(row.get("photos"), list) else []}
 
 @app.put("/api/admin/site-content")
 async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_data: str | None = Header(default=None)) -> dict[str, Any]:
@@ -1678,21 +1859,27 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
             raise HTTPException(status_code=400, detail="Можно настроить не более 8 готовых сетов.")
         clean_sets = []
         seen = set()
+        existing_sets_by_id = {
+            str(row.get("id")): row
+            for row in current.get("sets", [])
+            if isinstance(row, dict)
+        }
         for index, item in enumerate(sets):
             if not isinstance(item, dict):
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: неверный формат.")
             set_id = item.get("id")
             if set_id not in allowed_set_ids or set_id in seen:
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: неизвестный или повторяющийся ID.")
-            description = item.get("description", "")
-            image = item.get("image", "")
+            existing_set = existing_sets_by_id.get(str(set_id), {})
+            description = item.get("description", existing_set.get("description", ""))
+            image = item.get("image", existing_set.get("image", ""))
             if not isinstance(description, str) or len(description) > 300:
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: описание должно быть до 300 символов.")
             if not isinstance(image, str) or len(image) > 1_000_000:
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: фотография слишком большая.")
             if image and not (image.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", image)):
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: используй HTTPS-ссылку или загрузи JPG, PNG, WebP.")
-            photos = item.get("photos", [])
+            photos = item.get("photos", existing_set.get("photos", []))
             if not isinstance(photos, list) or len(photos) > 5:
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: можно загрузить не более 5 дополнительных фотографий.")
             clean_photos = []
@@ -1751,7 +1938,7 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 clean_banners.append(dict(default_banner))
         current["seasonal_banners"] = clean_banners
     write_site_content(current)
-    return {"ok": True, "content": current}
+    return {"ok": True, "content": _admin_site_content_payload(current)}
 
 @app.get("/health")
 async def health() -> dict[str, Any]:
