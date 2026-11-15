@@ -555,3 +555,5 @@
     min-height: 42px !important;
   }
 }
+
+.photo-lightbox-arrow[hidden] { display: none !important; }
