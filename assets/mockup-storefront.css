@@ -5463,29 +5463,6 @@ body {
  aspect-ratio:16 / 7.2!important;
  overflow:hidden!important;
 }
-.rr-card.rr-card-set-wide .rr-card-photo::before{
- content:"БОЛЬШОЙ СЕТ"!important;
- position:absolute!important;
- z-index:3!important;
- top:12px!important;
- left:12px!important;
- display:inline-flex!important;
- align-items:center!important;
- justify-content:center!important;
- min-height:30px!important;
- padding:6px 12px!important;
- border:1px solid rgba(255,213,105,.95)!important;
- border-radius:999px!important;
- background:linear-gradient(145deg,rgba(22,17,8,.94),rgba(3,5,7,.94))!important;
- color:#ffe09a!important;
- font-size:clamp(10px,2.7vw,13px)!important;
- font-weight:950!important;
- letter-spacing:.06em!important;
- line-height:1!important;
- text-shadow:0 1px 4px #000!important;
- box-shadow:0 0 10px rgba(255,190,63,.42),inset 0 0 7px rgba(255,215,120,.12)!important;
- pointer-events:none!important;
-}
 .rr-card.rr-card-set-wide .rr-card-image{
  width:100%!important;
  height:100%!important;
@@ -5675,11 +5652,22 @@ body {
 }
 
 
-/* 2026-11-15: set badges must remain visible above wide-card artwork labels. */
+/* 2026-11-15: remove generated "БОЛЬШОЙ СЕТ" label; keep the owner's badge in the corner. */
 .rr-card .rr-card-photo .rr-card-set-badge{z-index:12!important;}
 .rr-card.rr-card-set-wide .rr-card-photo .rr-card-set-badge{
- top:12px!important;left:150px!important;right:auto!important;z-index:12!important;
+ top:12px!important;left:12px!important;right:auto!important;z-index:12!important;
+}
+/* "НОВИНКА" on wide sets is half-size compared with the previous badge. */
+.rr-card.rr-card-set-wide .rr-card-photo .rr-card-set-badge-new{
+ min-height:4.5%!important;
+ padding:.6cqw 1.5cqw!important;
+ border-width:.65px!important;
+ font-size:clamp(5px,2.95cqw,11.5px)!important;
+ box-shadow:0 0 1.25cqw rgba(255,188,44,.45),inset 0 0 1cqw rgba(255,204,88,.09)!important;
 }
 @media(max-width:390px){
- .rr-card.rr-card-set-wide .rr-card-photo .rr-card-set-badge{top:8px!important;left:108px!important;}
+ .rr-card.rr-card-set-wide .rr-card-photo .rr-card-set-badge{top:6px!important;left:6px!important;}
+ .rr-card.rr-card-set-wide .rr-card-photo .rr-card-set-badge-new{
+  font-size:clamp(5px,2.95cqw,10px)!important;
+ }
 }
