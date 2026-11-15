@@ -5621,3 +5621,44 @@ body {
  .rr-card.rr-card-set-wide .rr-card-add,
  .rr-card.rr-card-set-wide .rr-card-stepper{height:42px!important;min-height:42px!important;}
 }
+
+
+/* 2026-11-15: keep the favourite heart fully inside a true circular frame.
+   Earlier percentage height rules made the frame elliptical on wide set photos. */
+.rr-card .rr-card-photo .rr-card-heart,
+.rr-card.rr-card-set-wide .rr-card-heart{
+ position:absolute!important;
+ z-index:20!important;
+ top:12px!important;
+ right:12px!important;
+ width:clamp(38px,4.4vw,46px)!important;
+ height:clamp(38px,4.4vw,46px)!important;
+ min-width:38px!important;
+ min-height:38px!important;
+ max-width:46px!important;
+ max-height:46px!important;
+ aspect-ratio:1 / 1!important;
+ box-sizing:border-box!important;
+ display:grid!important;
+ place-items:center!important;
+ margin:0!important;
+ padding:0!important;
+ border:1.5px solid rgba(255,255,255,.72)!important;
+ border-radius:50%!important;
+ background:rgba(0,0,0,.64)!important;
+ color:#fff!important;
+ font-family:Arial,sans-serif!important;
+ font-size:clamp(23px,2.6vw,29px)!important;
+ font-weight:700!important;
+ line-height:1!important;
+ text-align:center!important;
+ text-indent:0!important;
+ opacity:1!important;
+ pointer-events:auto!important;
+}
+.rr-card .rr-card-photo .rr-card-heart.active,
+.rr-card.rr-card-set-wide .rr-card-heart.active{
+ color:#ff514b!important;
+ border-color:rgba(255,255,255,.82)!important;
+ background:rgba(0,0,0,.76)!important;
+}
