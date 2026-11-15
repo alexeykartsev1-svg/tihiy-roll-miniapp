@@ -822,16 +822,24 @@ function updateHomePhone(settings){
  if(text)text.textContent=display;
 }
 async function load(){
- let fallback={products:[]};
- try{
-  const response=await fetch('./assets/local-catalog-fallback.json?v=product-photo-isolation-20261111b',{cache:'force-cache'});
-  if(response.ok)fallback=await response.json();
- }catch(e){}
+ // Start all independent network requests immediately, before reading the local fallback snapshot.
+ const fallbackRequest=(async()=>{
+  try{
+   const response=await fetch('./assets/local-catalog-fallback.json?v=product-photo-isolation-20261111b',{cache:'force-cache'});
+   if(response.ok)return await response.json();
+  }catch(error){console.warn('Не удалось загрузить локальный снимок каталога:',error)}
+  return {products:[]};
+ })();
+ const menuRequest=apiGet('/api/menu');
+ const contentRequest=apiGet('/api/site-content');
+ const settingsRequest=apiGet('/api/store-settings');
+
+ const fallback=await fallbackRequest;
  state.products=Array.isArray(fallback.products)?fallback.products.filter(p=>p.active!==false):[];
  state.sets=cloneDefaultSets();
  state.seasonalBanners=[];
  state.settings={};
- photoFallbackMap.clear();state.products.forEach(p=>{if(p?.id&&p.photo)photoFallbackMap.set(p.id,String(p.photo));});
+ photoFallbackMap.clear();
  const localProducts=new Map(state.products.map(p=>[p.id,p]));
  updateHomePhone(state.settings);
  updateStoreHours();
@@ -845,7 +853,8 @@ async function load(){
   if(!p){delete state.cart[id];continue;}
   if(stock(p)!==null)state.cart[id]=Math.min(stock(p),qty(id));
  }
- // Render the local snapshot immediately; API refresh happens in the background.
+ // Text and card structure render immediately; product and set photos stay on neutral placeholders
+ // until the current server snapshot arrives, so old local photos never flash first.
  renderAll();
  const first=find('philadelphia')||state.products[0];
  if(first)detail(first,false);
@@ -857,48 +866,69 @@ async function load(){
   if(app.initData)checkAdminEntry(app.initData);
  }
  const syncPhoneLinks=()=>{
-  const settings=state.settings,phone=settings.phone||'+7 923 000-58-57',digits=phone.replace(/\D/g,'');
+  const settings=state.settings,phone=settings.phone||'+7 923 000-58-57',digits=phone.replace(/\\D/g,'');
   $('#headerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));
   $('#footerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));
  };
  syncPhoneLinks();
- apiGet('/api/menu').then(menu=>{
-  if(!Array.isArray(menu))return;
+
+ menuRequest.then(menu=>{
+  if(!Array.isArray(menu))throw new Error('Сервер вернул неверный каталог товаров.');
   state.products=menu.filter(p=>p&&p.active!==false).map(apiProduct=>{
    const existing=localProducts.get(apiProduct.id)||{};
-   Object.assign(existing,apiProduct,{photo:apiProduct.photo||existing.photo||''});
+   Object.assign(existing,apiProduct);
+   if(!Object.prototype.hasOwnProperty.call(apiProduct,'photo'))existing.photo='';
+   if(!apiProduct.photo_url)existing.photo_url=apiProduct.photo||'';
+   delete existing.gallery;
    return existing;
   });
+  state.menuReady=true;
   for(const id of Object.keys(state.cart)){
    const p=find(id);
    if(!p){delete state.cart[id];continue;}
    if(stock(p)!==null)state.cart[id]=Math.min(stock(p),qty(id));
   }
   renderAll();
- }).catch(error=>{console.warn('Не удалось обновить каталог товаров:',error)});
- apiGet('/api/site-content').then(content=>{
+  if(state.selected&&!state.selected.set)rebuildDetailGallery(state.selected);
+ }).catch(error=>{
+  console.warn('Не удалось обновить каталог товаров:',error);
+  state.menuReady=true;
+  renderAll();
+  if(state.selected&&!state.selected.set)rebuildDetailGallery(state.selected);
+ });
+
+ contentRequest.then(content=>{
   const serverSets=Array.isArray(content?.sets)?content.sets:[];
   state.sets=serverSets.length?serverSets:cloneDefaultSets();
   state.seasonalBanners=Array.isArray(content?.seasonal_banners)?content.seasonal_banners:[];
+  state.siteContentReady=true;
   if(!serverSets.length)console.warn('API site-content не вернул готовые сеты; показана резервная подборка.');
   renderAll();
+  if(state.selected?.set){
+   const updated=state.sets.find(row=>row.id===state.selected.set.id);
+   if(updated){state.selected.set=updated;rebuildDetailGallery(state.selected)}
+  }
  }).catch(error=>{
   console.warn('Не удалось загрузить готовые сеты:',error);
   if(!state.sets.length)state.sets=cloneDefaultSets();
+  state.siteContentReady=true;
   renderAll();
+  if(state.selected?.set)rebuildDetailGallery(state.selected);
  });
- apiGet('/api/store-settings').then(settings=>{
+
+ settingsRequest.then(settings=>{
   state.settings=settings||{};
   updateHomePhone(state.settings);
   updateStoreHours();
   syncHomeShortcutState();
   const address=$('#homePickupAddress');
   if(address)address.textContent=state.settings.pickup_address||'Социалистическая, 26, Чарышское';
-  const phone=state.settings.phone||'+7 923 000-58-57',digits=phone.replace(/\D/g,'');
+  const phone=state.settings.phone||'+7 923 000-58-57',digits=phone.replace(/\\D/g,'');
   $('#headerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));
   $('#footerPhone')?.setAttribute('href','tel:+7'+digits.slice(-10));
  }).catch(error=>{console.warn('Не удалось загрузить настройки магазина:',error)});
-}document.addEventListener('error',event=>{const image=event.target;if(!image||image.tagName!=='IMG'||!image.dataset?.imageFallback)return;const src=image.getAttribute('src')||'';const fallback=image.dataset.imageFallback;if(image.dataset.imageFallbackUsed!=='1'&&fallback!==src){image.dataset.imageFallbackUsed='1';image.src=fallback;return;}if(src!==PRODUCT_PHOTO_PLACEHOLDER){image.dataset.imageFallbackUsed='2';image.src=PRODUCT_PHOTO_PLACEHOLDER;return;}image.style.visibility='hidden';},true);document.addEventListener('click',e=>{const favoriteButton=e.target.closest('[data-fav]');if(favoriteButton){e.preventDefault();e.stopPropagation();const id=favoriteButton.dataset.fav,p=id.startsWith('set:')?{set:true}:find(id),added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();syncFavoriteButtons(id);renderBadges();if(state.activeScreen==='favoritesScreen'||$('#favoritesModal')?.classList.contains('show'))renderFavorites();toast(productKind(p)+(added?' добавлен в избранное':' удалён из избранного'));return;}const seasonalCard=e.target.closest('.home-seasonal-card[data-seasonal-banner]');if(seasonalCard){openSetFromHome(seasonalCard.dataset.seasonalBanner);return;}const composition=e.target.closest('[data-composition]');if(composition){showBuilderInfo(composition.dataset.composition);return;}const b=e.target.closest('button');if(!b)return;if(b.dataset.filter){state.filter=b.dataset.filter;$$('.category-tile').forEach(x=>x.classList.toggle('active',x===b));renderCatalog();return;}if(b.dataset.cardQty){const id=b.dataset.id,delta=Number(b.dataset.cardQty)||0;if(id.startsWith('set:'))changeSetCart(id.slice(4),delta);else changeCart(id,delta);return;}if(b.dataset.add){const id=b.dataset.add;if(id.startsWith('set:'))addSet(state.sets.find(s=>s.id===id.slice(4)));else addProduct(find(id),1);return;}if(b.dataset.fav){const id=b.dataset.fav,p=id.startsWith('set:')?{set:true}:find(id),added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();syncFavoriteButtons(id);renderBadges();if(state.activeScreen==='favoritesScreen'||$('#favoritesModal')?.classList.contains('show'))renderFavorites();toast(productKind(p)+(added?' добавлен в избранное':' удалён из избранного'));return;}if(b.dataset.cartQty){changeCart(b.dataset.id,Number(b.dataset.cartQty));return;}if(b.dataset.cartRemove){changeCart(b.dataset.cartRemove,-qty(b.dataset.cartRemove));return;}if(b.dataset.builderFilter!==undefined){state.builderFilter=b.dataset.builderFilter;renderBuilder();return;}if(b.dataset.builderProduct){changeBuilderProduct(b.dataset.builderProduct,Number(b.dataset.delta)||0);return;}if(b.dataset.builderSet){changeBuilderSet(b.dataset.builderSet,Number(b.dataset.delta)||0);return;}if(b.hasAttribute('data-workflow-back')){returnToCatalogue();return;}if(b.id==='builderAddToCart'){addBuilderToCart();return;}if(b.id==='cartCheckout'){openModal('cartModal');return;}if(b.id==='cartKeepShopping'){returnToCatalogue();return;}if(b.id==='confirmationHome'){showHomeScreen();return;}if(b.hasAttribute('data-open-cart')){showCartScreen();return;}if(b.hasAttribute('data-open-favorites')){openModal('favoritesModal');return;}if(b.dataset.close){closeModal(b.dataset.close);return;}if(b.dataset.photoIndex!==undefined){showGalleryPhoto(Number(b.dataset.photoIndex));return;}if(b.hasAttribute('data-gallery-next')){showGalleryPhoto(state.photoIndex+1);return;}if(b.id==='detailBack'){document.body.classList.remove('detail-open');$('#detailDevice').classList.remove('mobile-active');return;}if(b.id==='detailMinus'){changeDetail(-1);return;}if(b.id==='detailPlus'){changeDetail(1);return;}if(b.id==='detailAdd'){addSelected();return;}if(b.id==='detailFavorite'&&state.selected){const item=state.selected,id=item.id,added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();renderBadges();b.textContent=added?'♥':'♡';toast(productKind(item)+(added?' добавлен в избранное':' удалён из избранного'));return;}if(b.id==='detailShare'){if(navigator.share)navigator.share({title:state.selected?.name||'Тихий ролл',url:location.href}).catch(()=>{});else toast('Поделись ссылкой на магазин.');return;}if(b.id==='filterOpen'||b.classList.contains('menu-trigger')){openModal('filtersModal');return;}if(b.dataset.filterOption){state.filter=b.dataset.filterOption;renderFilterOptions();return;}if(b.id==='applyFilters'){renderCatalog();closeModal('filtersModal');return;}if(b.dataset.removeFav){state.favorites.delete(b.dataset.removeFav);save();renderFavorites();renderBadges();return;}if(b.dataset.fulfillment){updateCheckoutFulfillment(b.dataset.fulfillment);return;}if(b.hasAttribute('data-home-catalog')){state.filter='all';returnToCatalogue();$$('.category-tile').forEach(x=>x.classList.remove('active'));renderCatalog();if($('#catalogue'))$('#catalogue').scrollTop=0;return;}if(b.hasAttribute('data-home-builder')){showBuilderScreen();return;}if(b.hasAttribute('data-home-newyear')){openSetFromHome('newyear');return;}if(b.dataset.homeFilter){state.filter=b.dataset.homeFilter;syncHomeShortcutState();returnToCatalogue();$$('.category-tile').forEach(x=>x.classList.toggle('active',x.dataset.filter===state.filter));renderCatalog();if($('#catalogue'))$('#catalogue').scrollTop=0;return;}if(b.dataset.nav==='home'){showHomeScreen();return;}if(b.dataset.nav==='favorites'){showFavoritesScreen();return;}if(b.dataset.nav==='catalogue'){returnToCatalogue();return;}if(b.dataset.nav==='builder'){showBuilderScreen();return;}if(b.dataset.nav==='cart'){showCartScreen();return;}});
+}
+document.addEventListener('error',event=>{const image=event.target;if(!image||image.tagName!=='IMG'||!image.dataset?.imageFallback)return;const src=image.getAttribute('src')||'';const fallback=image.dataset.imageFallback;if(image.dataset.imageFallbackUsed!=='1'&&fallback!==src){image.dataset.imageFallbackUsed='1';image.src=fallback;return;}if(src!==PRODUCT_PHOTO_PLACEHOLDER){image.dataset.imageFallbackUsed='2';image.src=PRODUCT_PHOTO_PLACEHOLDER;return;}image.style.visibility='hidden';},true);document.addEventListener('click',e=>{const favoriteButton=e.target.closest('[data-fav]');if(favoriteButton){e.preventDefault();e.stopPropagation();const id=favoriteButton.dataset.fav,p=id.startsWith('set:')?{set:true}:find(id),added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();syncFavoriteButtons(id);renderBadges();if(state.activeScreen==='favoritesScreen'||$('#favoritesModal')?.classList.contains('show'))renderFavorites();toast(productKind(p)+(added?' добавлен в избранное':' удалён из избранного'));return;}const seasonalCard=e.target.closest('.home-seasonal-card[data-seasonal-banner]');if(seasonalCard){openSetFromHome(seasonalCard.dataset.seasonalBanner);return;}const composition=e.target.closest('[data-composition]');if(composition){showBuilderInfo(composition.dataset.composition);return;}const b=e.target.closest('button');if(!b)return;if(b.dataset.filter){state.filter=b.dataset.filter;$$('.category-tile').forEach(x=>x.classList.toggle('active',x===b));renderCatalog();return;}if(b.dataset.cardQty){const id=b.dataset.id,delta=Number(b.dataset.cardQty)||0;if(id.startsWith('set:'))changeSetCart(id.slice(4),delta);else changeCart(id,delta);return;}if(b.dataset.add){const id=b.dataset.add;if(id.startsWith('set:'))addSet(state.sets.find(s=>s.id===id.slice(4)));else addProduct(find(id),1);return;}if(b.dataset.fav){const id=b.dataset.fav,p=id.startsWith('set:')?{set:true}:find(id),added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();syncFavoriteButtons(id);renderBadges();if(state.activeScreen==='favoritesScreen'||$('#favoritesModal')?.classList.contains('show'))renderFavorites();toast(productKind(p)+(added?' добавлен в избранное':' удалён из избранного'));return;}if(b.dataset.cartQty){changeCart(b.dataset.id,Number(b.dataset.cartQty));return;}if(b.dataset.cartRemove){changeCart(b.dataset.cartRemove,-qty(b.dataset.cartRemove));return;}if(b.dataset.builderFilter!==undefined){state.builderFilter=b.dataset.builderFilter;renderBuilder();return;}if(b.dataset.builderProduct){changeBuilderProduct(b.dataset.builderProduct,Number(b.dataset.delta)||0);return;}if(b.dataset.builderSet){changeBuilderSet(b.dataset.builderSet,Number(b.dataset.delta)||0);return;}if(b.hasAttribute('data-workflow-back')){returnToCatalogue();return;}if(b.id==='builderAddToCart'){addBuilderToCart();return;}if(b.id==='cartCheckout'){openModal('cartModal');return;}if(b.id==='cartKeepShopping'){returnToCatalogue();return;}if(b.id==='confirmationHome'){showHomeScreen();return;}if(b.hasAttribute('data-open-cart')){showCartScreen();return;}if(b.hasAttribute('data-open-favorites')){openModal('favoritesModal');return;}if(b.dataset.close){closeModal(b.dataset.close);return;}if(b.dataset.photoIndex!==undefined){showGalleryPhoto(Number(b.dataset.photoIndex));return;}if(b.hasAttribute('data-gallery-next')){showGalleryPhoto(state.photoIndex+1);return;}if(b.id==='detailBack'){document.body.classList.remove('detail-open');$('#detailDevice').classList.remove('mobile-active');return;}if(b.id==='detailMinus'){changeDetail(-1);return;}if(b.id==='detailPlus'){changeDetail(1);return;}if(b.id==='detailAdd'){addSelected();return;}if(b.id==='detailFavorite'&&state.selected){const item=state.selected,id=item.id,added=!state.favorites.has(id);if(added)state.favorites.add(id);else state.favorites.delete(id);save();renderBadges();b.textContent=added?'♥':'♡';toast(productKind(item)+(added?' добавлен в избранное':' удалён из избранного'));return;}if(b.id==='detailShare'){if(navigator.share)navigator.share({title:state.selected?.name||'Тихий ролл',url:location.href}).catch(()=>{});else toast('Поделись ссылкой на магазин.');return;}if(b.id==='filterOpen'||b.classList.contains('menu-trigger')){openModal('filtersModal');return;}if(b.dataset.filterOption){state.filter=b.dataset.filterOption;renderFilterOptions();return;}if(b.id==='applyFilters'){renderCatalog();closeModal('filtersModal');return;}if(b.dataset.removeFav){state.favorites.delete(b.dataset.removeFav);save();renderFavorites();renderBadges();return;}if(b.dataset.fulfillment){updateCheckoutFulfillment(b.dataset.fulfillment);return;}if(b.hasAttribute('data-home-catalog')){state.filter='all';returnToCatalogue();$$('.category-tile').forEach(x=>x.classList.remove('active'));renderCatalog();if($('#catalogue'))$('#catalogue').scrollTop=0;return;}if(b.hasAttribute('data-home-builder')){showBuilderScreen();return;}if(b.hasAttribute('data-home-newyear')){openSetFromHome('newyear');return;}if(b.dataset.homeFilter){state.filter=b.dataset.homeFilter;syncHomeShortcutState();returnToCatalogue();$$('.category-tile').forEach(x=>x.classList.toggle('active',x.dataset.filter===state.filter));renderCatalog();if($('#catalogue'))$('#catalogue').scrollTop=0;return;}if(b.dataset.nav==='home'){showHomeScreen();return;}if(b.dataset.nav==='favorites'){showFavoritesScreen();return;}if(b.dataset.nav==='catalogue'){returnToCatalogue();return;}if(b.dataset.nav==='builder'){showBuilderScreen();return;}if(b.dataset.nav==='cart'){showCartScreen();return;}});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const seasonalCard=e.target.closest('.home-seasonal-card[data-seasonal-banner]');if(!seasonalCard)return;e.preventDefault();openSetFromHome(seasonalCard.dataset.seasonalBanner);});
 const galleryStage=$('.detail-image-stage');
 let galleryTouchStart=null;
