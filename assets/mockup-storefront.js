@@ -419,7 +419,7 @@ function syncDetailBackdrop(src){
  if(!stage)return;
  const value=String(src||'').trim();
  if(value){
-  const escaped=value.replace(/["\\\n\r]/g,'\\function showGalleryPhoto(index){');
+  const escaped=value.replace(/["\\\n\r]/g,char=>'\\'+char);
   stage.style.setProperty('--detail-gallery-backdrop','url("'+escaped+'")');
   stage.classList.add('has-detail-backdrop');
  }else{
