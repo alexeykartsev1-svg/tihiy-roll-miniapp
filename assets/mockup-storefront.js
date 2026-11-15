@@ -414,10 +414,28 @@ function renderAll(){renderCatalog();renderHomeContent();renderBadges();renderCa
 function openModal(id){const n=$('#'+id);n.classList.add('show');n.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';if(id==='cartModal'){renderCart();preparePickup();updateCheckoutFulfillment($('#fulfillment').value||'Самовывоз');}if(id==='favoritesModal')renderFavorites();if(id==='filtersModal')renderFilterOptions();}
 function closeModal(id){const n=$('#'+id);if(!n)return;n.classList.remove('show');n.setAttribute('aria-hidden','true');if(!$('.modal-layer.show'))document.body.style.overflow='';}
 function renderFilterOptions(){const options=[['all','Все позиции'],['sets','Сеты'],['rolls','Роллы'],['dogs','Азиатские хот-доги'],['snacks','Закуски']];$('#filterOptions').innerHTML=options.map(x=>'<button type="button" data-filter-option="'+x[0]+'" class="'+(state.filter===x[0]?'active':'')+'">'+x[1]+'</button>').join('');}
+function syncDetailBackdrop(src){
+ const stage=$('.detail-image-stage');
+ if(!stage)return;
+ const value=String(src||'').trim();
+ if(value){
+  const escaped=value.replace(/["\\\n\r]/g,char=>'\\'+char);
+  stage.style.setProperty('--detail-gallery-backdrop','url("'+escaped+'")');
+  stage.classList.add('has-detail-backdrop');
+ }else{
+  stage.style.removeProperty('--detail-gallery-backdrop');
+  stage.classList.remove('has-detail-backdrop');
+ }
+ const hero=$('#detailHero');
+ if(hero&&hero.dataset.backdropSyncBound!=='1'){
+  hero.dataset.backdropSyncBound='1';
+  hero.addEventListener('load',()=>syncDetailBackdrop(hero.currentSrc||hero.src));
+ }
+}
 function showGalleryPhoto(index){
  if(!state.photos.length)return;
  state.photoIndex=((index%state.photos.length)+state.photos.length)%state.photos.length;
- $('#detailHero').src=state.photos[state.photoIndex];
+ $('#detailHero').src=state.photos[state.photoIndex];syncDetailBackdrop(state.photos[state.photoIndex]);
  $$('.thumb').forEach((button,i)=>button.classList.toggle('active',i===state.photoIndex));
  const counter=$('#detailPhotoCount');
  if(counter)counter.textContent=(state.photoIndex+1)+' / '+state.photos.length;
@@ -435,7 +453,7 @@ function rebuildDetailGallery(p){
  const detailHero=$('#detailHero');
  detailHero.dataset.imageFallback=p.set?PRODUCT_PHOTO_PLACEHOLDER:photoFallback(p);
  detailHero.dataset.imageFallbackUsed='0';
- detailHero.src=state.photos[state.photoIndex]||photo(p);
+ detailHero.src=state.photos[state.photoIndex]||photo(p);syncDetailBackdrop(state.photos[state.photoIndex]||photo(p));
  const strip=$('#photoStrip');
  strip.innerHTML=state.photos.map((src,i)=>'<button class="thumb '+(i===state.photoIndex?'active':'')+'" type="button" data-photo-index="'+i+'"><img src="'+src+'" data-image-fallback="'+esc(p.set?PRODUCT_PHOTO_PLACEHOLDER:photoFallback(p))+'" alt="Фото '+(i+1)+'" loading="lazy" decoding="async"></button>').join('')+'<button class="thumb thumb-next" type="button" data-gallery-next>›</button>';
  const counter=$('#detailPhotoCount');
@@ -465,7 +483,7 @@ function detail(p,openOnMobile=true){
  state.selected=p;state.detailQty=0;
  const ownGallery=Array.isArray(p.gallery)?p.gallery.filter(Boolean):[];const ownPhotos=p.set?setGallery(p.set):[photo(p),...ownGallery];state.photos=Array.from(new Set(ownPhotos.filter(Boolean))).slice(0,5);
  state.photos=Array.from(new Set(state.photos)).slice(0,5);state.photoIndex=0;
- const detailHero=$('#detailHero');detailHero.dataset.imageFallback=p.set?PRODUCT_PHOTO_PLACEHOLDER:photoFallback(p);detailHero.dataset.imageFallbackUsed='0';detailHero.src=state.photos[0]||photo(p);detailHero.alt=p.name;
+ const detailHero=$('#detailHero');detailHero.dataset.imageFallback=p.set?PRODUCT_PHOTO_PLACEHOLDER:photoFallback(p);detailHero.dataset.imageFallbackUsed='0';detailHero.src=state.photos[0]||photo(p);detailHero.alt=p.name;syncDetailBackdrop(state.photos[0]||photo(p));
  $('#detailName').textContent=p.name;$('#detailDescription').textContent=productDescription(p);
  $('#detailPieces').textContent=(p.pieces||8)+' шт.';$('#detailWeight').textContent=p.weight||'280 г';
  $('#detailPrice').textContent=money(p.price);$('#detailQty').textContent='0';
