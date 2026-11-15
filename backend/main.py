@@ -1885,6 +1885,13 @@ def _resolve_site_set_image(item: dict[str, Any], existing_set: dict[str, Any]) 
     existing = existing_set.get("image", "")
     return existing if isinstance(existing, str) else ""
 
+# Inspect/migrate site content before accepting requests so owner-uploaded
+# set photos are recovered at boot, not only after a storefront/admin visit.
+try:
+    read_site_content()
+except Exception:
+    logger.exception("Persistent site content startup check failed; saved data was not replaced")
+
 @app.get("/api/store-settings")
 async def get_store_settings() -> dict[str, Any]:
     return read_store_settings()
