@@ -33,6 +33,7 @@ logger = logging.getLogger("tihiy-roll-api")
 BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
 ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID", "").strip()
 MAX_INIT_DATA_AGE_SECONDS = int(os.getenv("MAX_INIT_DATA_AGE_SECONDS", "86400"))
+PUBLIC_API_BASE = os.getenv("PUBLIC_API_BASE", "https://tihiy-roll-order-api.onrender.com").strip().rstrip("/")
 ALLOWED_ORIGINS = [
     value.strip().rstrip("/")
     for value in os.getenv(
@@ -1190,8 +1191,8 @@ def _asset_delivery_url(kind: str, item_id: str, value: Any, gallery_index: int 
     digest = parts[2]
     item_key = str(item_id)
     if gallery_index is None:
-        return f"/api/{kind}/{item_key}/photo?v={digest}"
-    return f"/api/{kind}/{item_key}/gallery/{gallery_index}?v={digest}"
+        return f"{PUBLIC_API_BASE}/api/{kind}/{item_key}/photo?v={digest}"
+    return f"{PUBLIC_API_BASE}/api/{kind}/{item_key}/gallery/{gallery_index}?v={digest}"
 
 
 def _serve_data_image(value: Any) -> Response:
