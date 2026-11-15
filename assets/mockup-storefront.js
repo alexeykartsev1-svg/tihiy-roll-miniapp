@@ -384,6 +384,44 @@ function showGalleryPhoto(index){
  const counter=$('#detailPhotoCount');
  if(counter)counter.textContent=(state.photoIndex+1)+' / '+state.photos.length;
 }
+
+const detailGalleryRequests=new Map();
+function rebuildDetailGallery(p){
+ if(!p)return;
+ const current=state.photos[state.photoIndex]||state.photos[0]||'';
+ const ownGallery=Array.isArray(p.gallery)?p.gallery.filter(Boolean):[];
+ const ownPhotos=p.set?setGallery(p.set):[photo(p),...ownGallery];
+ state.photos=Array.from(new Set(ownPhotos.filter(Boolean))).slice(0,5);
+ const foundIndex=current?state.photos.indexOf(current):-1;
+ state.photoIndex=foundIndex>=0?foundIndex:0;
+ const detailHero=$('#detailHero');
+ detailHero.dataset.imageFallback=p.set?PRODUCT_PHOTO_PLACEHOLDER:photoFallback(p);
+ detailHero.dataset.imageFallbackUsed='0';
+ detailHero.src=state.photos[state.photoIndex]||photo(p);
+ const strip=$('#photoStrip');
+ strip.innerHTML=state.photos.map((src,i)=>'<button class="thumb '+(i===state.photoIndex?'active':'')+'" type="button" data-photo-index="'+i+'"><img src="'+src+'" data-image-fallback="'+esc(p.set?PRODUCT_PHOTO_PLACEHOLDER:photoFallback(p))+'" alt="Фото '+(i+1)+'" loading="lazy" decoding="async"></button>').join('')+'<button class="thumb thumb-next" type="button" data-gallery-next>›</button>';
+ const counter=$('#detailPhotoCount');
+ if(counter){counter.textContent=(state.photoIndex+1)+' / '+Math.max(1,state.photos.length);counter.hidden=state.photos.length<2;}
+}
+function loadDetailGallery(p){
+ if(!p)return;
+ const isSet=!!p.set;
+ const id=isSet?p.set.id:p.id;
+ const key=(isSet?'set:':'product:')+id;
+ const target=isSet?p.set:p;
+ if(target.__galleryLoaded)return;
+ if(detailGalleryRequests.has(key))return;
+ const endpoint=isSet?'/api/sets/':'/api/products/';
+ const request=apiGet(endpoint+encodeURIComponent(id)+'/gallery').then(result=>{
+  const photos=Array.isArray(result?.photos)?result.photos.filter(Boolean):[];
+  if(isSet)p.set.photos=photos;else p.gallery=photos;
+  target.__galleryLoaded=true;
+  if(state.selected&&state.selected.id===p.id)rebuildDetailGallery(state.selected);
+ }).catch(error=>{
+  console.warn('Не удалось загрузить дополнительную галерею:',error);
+ }).finally(()=>detailGalleryRequests.delete(key));
+ detailGalleryRequests.set(key,request);
+}
 function detail(p,openOnMobile=true){
  if(!p)return;
  state.selected=p;state.detailQty=0;
@@ -408,6 +446,7 @@ function detail(p,openOnMobile=true){
  const limit=p.set?(p.set.stock==null?null:Math.max(0,Number(p.set.stock)||0)):stock(p);
  $('#detailAdd').disabled=limit===0;
  if(openOnMobile&&matchMedia('(max-width:1120px)').matches){$('#detailDevice').classList.add('mobile-active');document.body.classList.add('detail-open');}
+ loadDetailGallery(p);
  renderCatalog();
 }
 function setDetail(s){detail({id:'set:'+s.id,name:SET_NAMES[s.id]||s.name||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',set:s,desc:s.description||'Готовый набор роллов.'});}
