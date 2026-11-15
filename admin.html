@@ -328,7 +328,10 @@ $('productForm').addEventListener('submit',async event=>{
    ?await api('/api/admin/products/'+encodeURIComponent(editingId),{method:'PUT',body:JSON.stringify(payload)})
    :await api('/api/admin/products',{method:'POST',body:JSON.stringify(payload)});
   if(!result?.product)throw new Error('Сервер не подтвердил сохранение товара. Повтори сохранение.');
-  if(Object.prototype.hasOwnProperty.call(payload,'photo')&&result.product.photo!==payload.photo)throw new Error('Сервер не подтвердил сохранение фотографии. Повтори сохранение.');
+  if(Object.prototype.hasOwnProperty.call(payload,'photo')){
+   const photoConfirmed=payload.photo===''?(result.product.photo||'')==='':Boolean(result.product.photo||result.product.photo_url);
+   if(!photoConfirmed)throw new Error('Сервер не подтвердил сохранение фотографии. Повтори сохранение.');
+  }
   closeEditor();await loadProducts();
   status('Товар и фотография сохранены на сервере. Перезагрузи магазин, чтобы увидеть обновление.','ok');
  }catch(error){status(error.message||'Не удалось сохранить товар.','error')}
