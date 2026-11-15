@@ -446,7 +446,7 @@ function detail(p,openOnMobile=true){
  const limit=p.set?(p.set.stock==null?null:Math.max(0,Number(p.set.stock)||0)):stock(p);
  $('#detailAdd').disabled=limit===0;
  if(openOnMobile&&matchMedia('(max-width:1120px)').matches){$('#detailDevice').classList.add('mobile-active');document.body.classList.add('detail-open');}
- loadDetailGallery(p);
+ if(openOnMobile)loadDetailGallery(p);
  renderCatalog();
 }
 function setDetail(s){detail({id:'set:'+s.id,name:SET_NAMES[s.id]||s.name||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',set:s,desc:s.description||'Готовый набор роллов.'});}
