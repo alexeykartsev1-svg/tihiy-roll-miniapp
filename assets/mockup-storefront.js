@@ -906,7 +906,7 @@ async function load(){
   renderAll();
   if(state.selected?.set){
    const updated=state.sets.find(row=>row.id===state.selected.set.id);
-   if(updated){state.selected.set=updated;rebuildDetailGallery(state.selected)}
+   if(updated){state.selected.set=updated;rebuildDetailGallery(state.selected);if(state.activeScreen==='catalogueScreen')loadDetailGallery(state.selected)}
   }
  }).catch(error=>{
   console.warn('Не удалось загрузить готовые сеты:',error);
