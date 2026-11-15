@@ -271,7 +271,7 @@ function card(p){
  const heart='<button class="rr-card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-pressed="'+(fav?'true':'false')+'" aria-label="'+(fav?'Удалить из избранного':'Добавить в избранное')+'">'+(fav?'♥':'♡')+'</button>';
  const cleanBadge=String(isSet?(p.set?.badge??p.badge??''):(p.badge||'')).trim();
  const setBadge=isSet&&cleanBadge
-  ?(/^хит$/i.test(cleanBadge)?'<span class="rr-card-hit-badge rr-card-set-badge">✦ ХИТ</span>':'<span class="rr-card-badge rr-card-set-badge">'+esc(cleanBadge)+'</span>')
+  ?(/^хит$/i.test(cleanBadge)?'<span class="rr-card-hit-badge rr-card-set-badge">✦ ХИТ</span>':'<span class="rr-card-badge rr-card-set-badge '+(/^новинка$/i.test(cleanBadge)?'rr-card-set-badge-new':'')+'">'+esc(cleanBadge)+'</span>')
   :'';
  const badge=isSet?setBadge:(hit&&!artPhoto?'<span class="rr-card-hit-badge '+(p.id==='salmon_panko'?'rr-salmon-panko-hit':'')+'">✦ ХИТ</span>':(!hit&&cleanBadge&&!/хит/i.test(cleanBadge)?'<span class="rr-card-badge">'+esc(cleanBadge)+'</span>':''));
  return '<article class="product-card rr-card '+(isSet?'rr-card-set ':'')+(wideSet?'rr-card-set-wide ':'')+(pankoCard?'rr-card-panko ':'')+(hit?'rr-card-is-hit ':'')+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
