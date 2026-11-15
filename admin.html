@@ -355,9 +355,15 @@ function collectSetContentPayload(){
  const failedGallery=Object.keys(siteSetGalleryFailed).filter(key=>siteSetGalleryFailed[key]);
  if(failedMain.length||failedGallery.length)throw new Error('Некоторые фото сетов не удалось обработать. Повтори загрузку этих фотографий или убери их.');
  return ids.map(id=>{
-  const description=document.querySelector('[data-set-field="'+id+'"]');
+  const pageDescription=document.querySelector('[data-set-desc="'+id+'"]');
+  const cardDescription=document.querySelector('[data-set-card-description="'+id+'"]');
+  const details=document.querySelector('[data-set-details="'+id+'"]');
+  const weight=document.querySelector('[data-set-weight="'+id+'"]');
+  const pieces=document.querySelector('[data-set-pieces="'+id+'"]');
+  const badge=document.querySelector('[data-set-badge="'+id+'"]');
   const url=document.querySelector('[data-set-url="'+id+'"]');
-  const row={id,description:description?description.value.trim():'',items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
+  const cardText=cardDescription?cardDescription.value.trim():'';
+  const row={id,description:cardText,desc:pageDescription?pageDescription.value.trim():'',card_description:cardText,details:details?details.value.trim():'',weight:weight?weight.value.trim():'',pieces:Math.max(1,Math.min(100,Math.round(Number(pieces?.value)||1))),badge:badge?badge.value:'',items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
   const image=siteSetPhotos[id]||(url?url.value.trim():'');
   if(image||siteSetPhotoCleared[id])row.image=image;
   if(siteSetGalleryLoaded[id])row.photos=(siteSetGalleryPhotos[id]||[]).slice(0,5);
@@ -379,7 +385,7 @@ async function saveSetContentOnly(){
   const mismatches=sets.filter(expected=>{
    const actual=savedSets.find(row=>row&&row.id===expected.id);
    if(!actual)return true;
-   if(actual.description!==expected.description||JSON.stringify(actual.items||[])!==JSON.stringify(expected.items)||actual.active!==expected.active||(actual.stock??null)!==(expected.stock??null))return true;
+   if(actual.description!==expected.description||actual.desc!==expected.desc||actual.card_description!==expected.card_description||actual.details!==expected.details||String(actual.weight||'')!==expected.weight||Number(actual.pieces)!==expected.pieces||String(actual.badge||'')!==expected.badge||JSON.stringify(actual.items||[])!==JSON.stringify(expected.items)||actual.active!==expected.active||(actual.stock??null)!==(expected.stock??null))return true;
    if(Object.prototype.hasOwnProperty.call(expected,'image')){
     if(String(expected.image||'').startsWith('data:image/')){if(!actual.image_url)return true}
     else if((actual.image||'')!==expected.image)return true;
@@ -491,12 +497,19 @@ function renderSetContentEditor(){
   siteSetItems[def.id]=existingItems.map(row=>({id:row.id,qty:Number(row.qty)||0})).filter(row=>row.qty>0);
   siteSetActive[def.id]=saved.active!==false;
   siteSetStock[def.id]=saved.stock==null?null:Number(saved.stock);
+  const calculatedPieces=existingItems.reduce((sum,row)=>sum+(Number(products.find(product=>product.id===row.id)?.pieces)||8)*Number(row.qty||0),0);
+  const calculatedWeight=existingItems.reduce((sum,row)=>sum+(parseInt(products.find(product=>product.id===row.id)?.weight,10)||0)*Number(row.qty||0),0);
   const box=document.createElement('div');box.className='set-admin-card';
-  box.innerHTML='<div class="set-admin-fields"><strong></strong><div class="field"><label>Описание на карточке</label><textarea maxlength="300" data-set-field="'+def.id+'"></textarea></div><div class="field"><label>Ссылка на главное фото (можно оставить пустой)</label><input type="url" maxlength="2000" data-set-url="'+def.id+'" placeholder="HTTPS или загрузить файл ниже"></div><div class="field"><label>Главное фото</label><input class="set-admin-file" type="file" accept="image/jpeg,image/png,image/webp" data-set-file="'+def.id+'"></div><details class="set-admin-gallery" data-set-gallery-details="'+def.id+'"><summary>Дополнительные фото — до 5 (загружаются по запросу)</summary><div class="admin-gallery-grid" data-set-gallery="'+def.id+'"></div></details></div><div class="set-admin-image"><img class="set-admin-preview" data-set-preview="'+def.id+'" alt="" loading="lazy" decoding="async"><button class="btn" type="button" data-set-clear="'+def.id+'">Сбросить главное фото</button><div class="help">Фото загружаются с компьютера и сжимаются автоматически.</div></div><div class="set-composition-admin"><h4>Состав сета</h4><p class="help">Выбирай товары и указывай количество порций в составе.</p><div data-set-items="'+def.id+'"></div><div class="set-admin-options"><label><input type="checkbox" data-set-active="'+def.id+'"> Показывать на сайте</label><label>Остаток наборов (пусто — без учёта; 0 — нет в наличии) <input type="number" min="0" max="10000" placeholder="Без ограничений" data-set-stock="'+def.id+'"></label></div><div class="formactions set-admin-save-row"><button class="btn primary" type="button" data-save-set="'+def.id+'">Сохранить изменения сетов</button></div></div>';
+  box.innerHTML='<div class="set-admin-fields"><strong></strong><div class="formgrid set-admin-meta" style="margin:10px 0"><div class="field"><label>Вес, г</label><input type="text" maxlength="30" data-set-weight="'+def.id+'" placeholder="Например, 960 г"></div><div class="field"><label>Количество, шт.</label><input type="number" min="1" max="100" data-set-pieces="'+def.id+'" placeholder="Например, 32"></div><div class="field full"><label>Плашка</label><select data-set-badge="'+def.id+'"><option value="">Без плашки</option><option value="ХИТ">ХИТ</option><option value="НОВИНКА">НОВИНКА</option><option value="СКИДКА">СКИДКА</option></select></div><div class="field full"><label>Описание на странице товара</label><textarea maxlength="1000" data-set-desc="'+def.id+'" placeholder="Подробное описание сета для страницы товара"></textarea></div><div class="field full"><label>Текст в карточке каталога</label><textarea maxlength="1000" data-set-card-description="'+def.id+'" placeholder="Короткий текст под названием сета в каталоге"></textarea></div><div class="field full"><label>Ингредиенты для окна «Состав»</label><textarea maxlength="1000" data-set-details="'+def.id+'" placeholder="Например: Филадельфия, Лава, креветка, рис, нори"></textarea></div></div><div class="field"><label>Ссылка на главное фото (можно оставить пустой)</label><input type="url" maxlength="2000" data-set-url="'+def.id+'" placeholder="HTTPS или загрузить файл ниже"></div><div class="field"><label>Главное фото</label><input class="set-admin-file" type="file" accept="image/jpeg,image/png,image/webp" data-set-file="'+def.id+'"></div><details class="set-admin-gallery" data-set-gallery-details="'+def.id+'"><summary>Дополнительные фото — до 5 (загружаются по запросу)</summary><div class="admin-gallery-grid" data-set-gallery="'+def.id+'"></div></details></div><div class="set-admin-image"><img class="set-admin-preview" data-set-preview="'+def.id+'" alt="" loading="lazy" decoding="async"><button class="btn" type="button" data-set-clear="'+def.id+'">Сбросить главное фото</button><div class="help">Фото загружаются с компьютера и сжимаются автоматически.</div></div><div class="set-composition-admin"><h4>Состав сета</h4><p class="help">Выбирай товары и указывай количество порций в составе.</p><div data-set-items="'+def.id+'"></div><div class="set-admin-options"><label><input type="checkbox" data-set-active="'+def.id+'"> Показывать на сайте</label><label>Остаток наборов (пусто — без учёта; 0 — нет в наличии) <input type="number" min="0" max="10000" placeholder="Без ограничений" data-set-stock="'+def.id+'"></label></div><div class="formactions set-admin-save-row"><button class="btn primary" type="button" data-save-set="'+def.id+'">Сохранить изменения сетов</button></div></div>';
   root.append(box);
   box.querySelector('[data-save-set="'+def.id+'"]').addEventListener('click',()=>{const existingButton=$('saveSetsFull');if(existingButton)existingButton.click();else if(typeof window.TihiyAdmin?.saveSets==='function')window.TihiyAdmin.saveSets();});
   box.querySelector('strong').textContent=def.title;
-  box.querySelector('[data-set-field="'+def.id+'"]').value=typeof saved.description==='string'?saved.description:def.description;
+  box.querySelector('[data-set-desc="'+def.id+'"]').value=typeof saved.desc==='string'?saved.desc:(typeof saved.description==='string'?saved.description:def.description);
+  box.querySelector('[data-set-card-description="'+def.id+'"]').value=typeof saved.card_description==='string'?saved.card_description:(typeof saved.description==='string'?saved.description:def.description);
+  box.querySelector('[data-set-details="'+def.id+'"]').value=typeof saved.details==='string'?saved.details:'';
+  box.querySelector('[data-set-weight="'+def.id+'"]').value=saved.weight!=null&&String(saved.weight).trim()?String(saved.weight):(calculatedWeight?calculatedWeight+' г':'');
+  box.querySelector('[data-set-pieces="'+def.id+'"]').value=Number.isInteger(Number(saved.pieces))&&Number(saved.pieces)>0?String(saved.pieces):String(Math.min(100,Math.max(1,calculatedPieces||8)));
+  box.querySelector('[data-set-badge="'+def.id+'"]').value=typeof saved.badge==='string'?saved.badge:(def.id==='newyear'?'НОВИНКА':'');
   const url=box.querySelector('[data-set-url="'+def.id+'"]');
   const preview=box.querySelector('[data-set-preview="'+def.id+'"]');
   url.value=image.startsWith('data:image/')?'':image;
