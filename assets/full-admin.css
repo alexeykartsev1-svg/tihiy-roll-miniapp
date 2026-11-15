@@ -431,3 +431,11 @@ textarea{min-height:88px}
  .admin-print-receipt{display:block!important;position:absolute;inset:0 auto auto 0;width:100%;padding:16mm;color:#111;background:#fff;font:12pt/1.45 Arial,sans-serif}
  .admin-print-receipt h1{font-size:20pt}.admin-print-receipt h2{font-size:15pt}
 }
+
+
+/* Set composition chooser: an explicit inclusion checkbox and a portion count. */
+.set-product-choice label{display:flex!important;align-items:center!important;gap:8px!important;min-width:0}
+.set-product-choice label input[type=checkbox]{flex:0 0 17px!important;width:17px!important;height:17px!important;min-height:17px!important;margin:0!important;accent-color:#f23b36!important}
+.set-product-choice label span{min-width:0;line-height:1.35}
+.set-product-choice>input[type=number]{width:74px!important;min-height:34px!important}
+.set-product-choice>input[type=number]:disabled{opacity:.35!important}

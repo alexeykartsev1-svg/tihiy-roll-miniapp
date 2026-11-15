@@ -55,7 +55,7 @@ textarea { min-height:100px; }
 @media(max-width:700px){.admin-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 </style><link rel="stylesheet" href="./assets/premium-admin.css?v=orders-workbench-v2-20261031">
-<link rel="stylesheet" href="./assets/full-admin.css?v=orders-workbench-v2-20261031"></head><body><main class="wrap"><header class="head"><div class="brand">ТИХИЙ РОЛЛ<small>ПАНЕЛЬ УПРАВЛЕНИЯ</small></div><span class="tag">🔐 Только владелец</span></header><div id="status" class="status">Проверяем доступ Telegram…</div><section id="login" class="panel login hidden"><h2>Панель владельца</h2><p class="muted">Открой эту страницу через кнопку «Управление» внутри Telegram-магазина. Доступ проверяется на сервере по Telegram ID.</p><button class="btn" id="retry">Проверить ещё раз</button></section><section id="app" class="hidden"><div class="panel"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Меню и товары</h2><div class="muted">Меняй фотографии, названия, цены и описание — покупатели увидят обновления после перезагрузки магазина.</div></div><button class="btn primary" id="add">＋ Добавить товар</button></div><div id="list" class="list"></div></div><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Заказы</h2><div class="muted">Статусы заказов и сводка по продажам</div></div><button class="btn" id="refreshOrders" type="button">Обновить</button></div><div id="analyticsSummary" class="muted" style="margin-bottom:12px">Загружаем статистику…</div><div id="ordersList" class="list"></div></section><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 22px Georgia,serif;margin:0">Категории меню</h2><div class="muted">Создавай новые категории. Удалить можно только пустую категорию.</div></div></div><div class="formgrid" style="margin-top:14px"><div class="field"><label for="newCategoryName">Название категории</label><input id="newCategoryName" maxlength="60" placeholder="Например, Запечённые роллы"></div><div class="field"><label for="newCategoryId">ID (латиница)</label><input id="newCategoryId" maxlength="30" pattern="[A-Za-z0-9_-]{2,30}" placeholder="baked-rolls"></div><div class="field"><label for="newCategoryIcon">Значок (эмодзи)</label><input id="newCategoryIcon" maxlength="16" placeholder="🍣"></div><div class="field"><label for="newCategoryImage">Фото категории (HTTPS, необязательно)</label><input id="newCategoryImage" maxlength="2000" placeholder="https://..."></div><div class="field full"><button class="btn primary" id="addCategory" type="button">Добавить категорию</button></div></div><div id="categoriesList" class="list" style="margin-top:12px"></div></section><section id="editor" class="panel editor"><div class="toolbar"><h2 id="editorTitle" style="font:700 22px Georgia,serif;margin:0">Карточка товара</h2><span class="tag">Изменения сохраняются на сервере</span></div><form id="productForm" novalidate><div class="formgrid">
+<link rel="stylesheet" href="./assets/full-admin.css?v=set-checkbox-chooser-20261115b"></head><body><main class="wrap"><header class="head"><div class="brand">ТИХИЙ РОЛЛ<small>ПАНЕЛЬ УПРАВЛЕНИЯ</small></div><span class="tag">🔐 Только владелец</span></header><div id="status" class="status">Проверяем доступ Telegram…</div><section id="login" class="panel login hidden"><h2>Панель владельца</h2><p class="muted">Открой эту страницу через кнопку «Управление» внутри Telegram-магазина. Доступ проверяется на сервере по Telegram ID.</p><button class="btn" id="retry">Проверить ещё раз</button></section><section id="app" class="hidden"><div class="panel"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Меню и товары</h2><div class="muted">Меняй фотографии, названия, цены и описание — покупатели увидят обновления после перезагрузки магазина.</div></div><button class="btn primary" id="add">＋ Добавить товар</button></div><div id="list" class="list"></div></div><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 23px Georgia,serif;margin:0">Заказы</h2><div class="muted">Статусы заказов и сводка по продажам</div></div><button class="btn" id="refreshOrders" type="button">Обновить</button></div><div id="analyticsSummary" class="muted" style="margin-bottom:12px">Загружаем статистику…</div><div id="ordersList" class="list"></div></section><section class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="font:700 22px Georgia,serif;margin:0">Категории меню</h2><div class="muted">Создавай новые категории. Удалить можно только пустую категорию.</div></div></div><div class="formgrid" style="margin-top:14px"><div class="field"><label for="newCategoryName">Название категории</label><input id="newCategoryName" maxlength="60" placeholder="Например, Запечённые роллы"></div><div class="field"><label for="newCategoryId">ID (латиница)</label><input id="newCategoryId" maxlength="30" pattern="[A-Za-z0-9_-]{2,30}" placeholder="baked-rolls"></div><div class="field"><label for="newCategoryIcon">Значок (эмодзи)</label><input id="newCategoryIcon" maxlength="16" placeholder="🍣"></div><div class="field"><label for="newCategoryImage">Фото категории (HTTPS, необязательно)</label><input id="newCategoryImage" maxlength="2000" placeholder="https://..."></div><div class="field full"><button class="btn primary" id="addCategory" type="button">Добавить категорию</button></div></div><div id="categoriesList" class="list" style="margin-top:12px"></div></section><section id="editor" class="panel editor"><div class="toolbar"><h2 id="editorTitle" style="font:700 22px Georgia,serif;margin:0">Карточка товара</h2><span class="tag">Изменения сохраняются на сервере</span></div><form id="productForm" novalidate><div class="formgrid">
 <div class="field"><label for="pid">ID товара (латиница, не менять у существующего)</label><input id="pid" required pattern="[A-Za-z0-9_-]{2,48}" maxlength="48"></div>
 <div class="field"><label for="name">Название</label><input id="name" required maxlength="100"></div>
 <div class="field"><label for="price">Цена, ₽</label><input id="price" type="number" required min="1" max="100000"></div>
@@ -363,7 +363,15 @@ function collectSetContentPayload(){
   const badge=document.querySelector('[data-set-badge="'+id+'"]');
   const url=document.querySelector('[data-set-url="'+id+'"]');
   const cardText=cardDescription?cardDescription.value.trim():'';
-  const row={id,description:cardText,desc:pageDescription?pageDescription.value.trim():'',card_description:cardText,details:details?details.value.trim():'',weight:weight?weight.value.trim():'',pieces:Math.max(1,Math.min(100,Math.round(Number(pieces?.value)||1))),badge:badge?badge.value:'',items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
+  const itemRows=Array.from(document.querySelectorAll('[data-set-item-row="'+id+'"]'));
+  const selectedItems=itemRows.length?itemRows.map(itemRow=>{
+   const selected=itemRow.querySelector('[data-set-item-selected]');
+   const quantity=itemRow.querySelector('[data-set-item-quantity]');
+   const amount=Math.max(1,Math.min(50,Math.round(Number(quantity?.value)||1)));
+   return selected?.checked?{id:itemRow.dataset.productId,qty:amount}:null;
+  }).filter(Boolean):(siteSetItems[id]||[]).filter(item=>item.qty>0);
+  siteSetItems[id]=selectedItems.map(item=>({...item}));
+  const row={id,description:cardText,desc:pageDescription?pageDescription.value.trim():'',card_description:cardText,details:details?details.value.trim():'',weight:weight?weight.value.trim():'',pieces:Math.max(1,Math.min(100,Math.round(Number(pieces?.value)||1))),badge:badge?badge.value:'',items:selectedItems,active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
   const image=siteSetPhotos[id]||(url?url.value.trim():'');
   if(image||siteSetPhotoCleared[id])row.image=image;
   if(siteSetGalleryLoaded[id])row.photos=(siteSetGalleryPhotos[id]||[]).slice(0,5);
@@ -520,16 +528,28 @@ function renderSetContentEditor(){
   box.querySelector('[data-set-stock="'+def.id+'"]').addEventListener('input',event=>siteSetStock[def.id]=event.target.value===''?null:Math.max(0,Math.min(10000,Number(event.target.value)||0)));
   const itemsRoot=box.querySelector('[data-set-items="'+def.id+'"]');
   (Array.isArray(products)?products:[]).forEach(product=>{
-   const row=document.createElement('div');row.className='set-product-choice';
-   const label=document.createElement('label');label.textContent=product.name;
-   const qty=document.createElement('input');qty.type='number';qty.min='0';qty.max='50';qty.value=String(siteSetItems[def.id].find(item=>item.id===product.id)?.qty||0);qty.setAttribute('aria-label','Количество '+product.name);
-   qty.addEventListener('input',()=>{
-    const amount=Math.max(0,Math.min(50,Number(qty.value)||0));
-    const index=siteSetItems[def.id].findIndex(item=>item.id===product.id);
-    if(amount===0){if(index>=0)siteSetItems[def.id].splice(index,1)}
-    else if(index>=0)siteSetItems[def.id][index].qty=amount;
-    else siteSetItems[def.id].push({id:product.id,qty:amount});
-   });
+   const row=document.createElement('div');row.className='set-product-choice';row.dataset.setItemRow=def.id;row.dataset.productId=product.id;
+   const current=siteSetItems[def.id].find(item=>item.id===product.id);
+   const label=document.createElement('label');
+   const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=!!current;checkbox.disabled=product.active===false&&!current;checkbox.setAttribute('data-set-item-selected','');checkbox.setAttribute('aria-label','Включить '+product.name+' в состав сета');
+   const name=document.createElement('span');name.textContent=product.name+(product.active===false?' (скрыт на сайте)':'');
+   label.append(checkbox,name);
+   const qty=document.createElement('input');qty.type='number';qty.min='1';qty.max='50';qty.value=String(current?.qty||1);qty.disabled=!current;qty.setAttribute('data-set-item-quantity','');qty.setAttribute('aria-label','Количество порций '+product.name);
+   const syncSelectedItem=()=>{
+    const amount=Math.max(1,Math.min(50,Math.round(Number(qty.value)||1)));
+    if(checkbox.checked){
+     qty.disabled=false;qty.value=String(amount);
+     const index=siteSetItems[def.id].findIndex(item=>item.id===product.id);
+     if(index>=0)siteSetItems[def.id][index].qty=amount;
+     else siteSetItems[def.id].push({id:product.id,qty:amount});
+    }else{
+     qty.disabled=true;
+     const index=siteSetItems[def.id].findIndex(item=>item.id===product.id);
+     if(index>=0)siteSetItems[def.id].splice(index,1);
+    }
+   };
+   checkbox.addEventListener('change',syncSelectedItem);
+   qty.addEventListener('input',syncSelectedItem);
    row.append(label,qty);itemsRoot.append(row);
   });
   url.addEventListener('input',()=>{siteSetPhotos[def.id]='';siteSetPhotoCleared[def.id]=!url.value.trim();preview.src=safeImage(url.value.trim()||def.image)});
