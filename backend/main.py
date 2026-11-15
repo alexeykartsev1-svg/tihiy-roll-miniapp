@@ -1873,9 +1873,24 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: неизвестный или повторяющийся ID.")
             existing_set = existing_sets_by_id.get(str(set_id), {})
             description = item.get("description", existing_set.get("description", ""))
+            card_description = item.get("card_description", description if description else existing_set.get("card_description", existing_set.get("description", "")))
+            page_description = item.get("desc", existing_set.get("desc", description))
+            details = item.get("details", existing_set.get("details", ""))
+            weight = item.get("weight", existing_set.get("weight", ""))
+            pieces = item.get("pieces", existing_set.get("pieces"))
+            badge = item.get("badge", existing_set.get("badge", "НОВИНКА" if set_id == "newyear" else ""))
             image = item.get("image", existing_set.get("image", ""))
-            if not isinstance(description, str) or len(description) > 300:
-                raise HTTPException(status_code=400, detail=f"Сет {index+1}: описание должно быть до 300 символов.")
+            for field_name, field_value in (("описание на странице товара", page_description), ("текст в карточке каталога", card_description), ("ингредиенты", details)):
+                if not isinstance(field_value, str) or len(field_value) > 1000:
+                    raise HTTPException(status_code=400, detail=f"Сет {index+1}: поле «{field_name}» должно быть не длиннее 1000 символов.")
+            if not isinstance(description, str) or len(description) > 1000:
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: текст карточки должен быть до 1000 символов.")
+            if not isinstance(weight, str) or len(weight) > 30:
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: вес должен быть текстом до 30 символов.")
+            if pieces is not None and (not isinstance(pieces, int) or isinstance(pieces, bool) or not 1 <= pieces <= 100):
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: количество штук должно быть от 1 до 100.")
+            if badge not in {"", "ХИТ", "НОВИНКА", "СКИДКА"}:
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: выбери плашку ХИТ, НОВИНКА, СКИДКА или «Без плашки».")
             if not isinstance(image, str) or len(image) > 1_000_000:
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: фотография слишком большая.")
             if image and not (image.startswith("https://") or re.match(r"^data:image/(jpeg|png|webp);base64,", image)):
@@ -1913,7 +1928,7 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: признак активности должен быть true/false.")
             if stock is not None and (not isinstance(stock, int) or isinstance(stock, bool) or not 0 <= stock <= 10000):
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: остаток должен быть пустым (без учёта) или от 0 до 10 000.")
-            clean_sets.append({"id": set_id, "description": description.strip(), "image": image.strip(), "photos": clean_photos, "items": clean_items, "active": active, "stock": stock})
+            clean_sets.append({"id": set_id, "description": card_description.strip(), "desc": page_description.strip(), "card_description": card_description.strip(), "details": details.strip(), "weight": weight.strip(), "pieces": pieces, "badge": badge, "image": image.strip(), "photos": clean_photos, "items": clean_items, "active": active, "stock": stock})
             seen.add(set_id)
         current["sets"] = clean_sets
     if "seasonal_banners" in payload:
