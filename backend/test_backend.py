@@ -55,6 +55,26 @@ def main() -> None:
     )
     assert catalog_item.pieces == 8
     assert catalog_item.gallery == ["data:image/jpeg;base64,YQ=="]
+
+    # Large image blobs are no longer embedded in catalogue responses.
+    image_data = "data:image/jpeg;base64,YQ=="
+    image_parts = backend._data_image_parts(image_data)
+    assert image_parts is not None and image_parts[0] == "image/jpeg" and image_parts[1] == b"a"
+    image_response = backend._serve_data_image(image_data)
+    assert image_response.body == b"a"
+    assert image_response.headers.get("cache-control") == "public, max-age=31536000, immutable"
+    compact_product = backend._catalog_product_payload({
+        "id": "test_roll", "name": "Тестовый ролл", "photo": image_data, "gallery": [image_data]
+    })
+    assert "gallery" not in compact_product and "photo" not in compact_product
+    assert compact_product["photo_url"].startswith("https://tihiy-roll-order-api.onrender.com/api/products/test_roll/photo?v=")
+    compact_set = backend._catalog_set_payload({
+        "id": "test_set", "image": image_data, "photos": [image_data], "items": []
+    })
+    assert "photos" not in compact_set and "image" not in compact_set
+    assert compact_set["image_url"].startswith("https://tihiy-roll-order-api.onrender.com/api/sets/test_set/photo?v=")
+    admin_summary = backend._admin_site_content_payload({"sets": [{"id": "test_set", "image": image_data, "photos": [image_data]}]})
+    assert "photos" not in admin_summary["sets"][0] and admin_summary["sets"][0]["photos_count"] == 1
     try:
         ProductPayload(
             id="bad_roll",
