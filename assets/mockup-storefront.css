@@ -5435,3 +5435,189 @@ body {
  .checkout-form .checkout-date-control{padding-right:34px!important;padding-left:7px!important}
  .checkout-form .checkout-date-display{font-size:13px!important}
 }
+
+
+/* 2026-11-15: large set cards span the catalogue width.
+   Existing card markup and delegated handlers keep all live controls intact. */
+.rr-card.rr-card-set-wide{
+ grid-column:1 / -1!important;
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:auto auto!important;
+ width:100%!important;
+ max-width:100%!important;
+ height:auto!important;
+ min-height:0!important;
+ aspect-ratio:auto!important;
+ align-self:stretch!important;
+ overflow:hidden!important;
+}
+.rr-card.rr-card-set-wide .rr-card-photo{
+ grid-row:1!important;
+ position:relative!important;
+ display:block!important;
+ width:100%!important;
+ height:auto!important;
+ min-width:0!important;
+ min-height:0!important;
+ aspect-ratio:16 / 7.2!important;
+ overflow:hidden!important;
+}
+.rr-card.rr-card-set-wide .rr-card-photo::before{
+ content:"БОЛЬШОЙ СЕТ"!important;
+ position:absolute!important;
+ z-index:3!important;
+ top:12px!important;
+ left:12px!important;
+ display:inline-flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ min-height:30px!important;
+ padding:6px 12px!important;
+ border:1px solid rgba(255,213,105,.95)!important;
+ border-radius:999px!important;
+ background:linear-gradient(145deg,rgba(22,17,8,.94),rgba(3,5,7,.94))!important;
+ color:#ffe09a!important;
+ font-size:clamp(10px,2.7vw,13px)!important;
+ font-weight:950!important;
+ letter-spacing:.06em!important;
+ line-height:1!important;
+ text-shadow:0 1px 4px #000!important;
+ box-shadow:0 0 10px rgba(255,190,63,.42),inset 0 0 7px rgba(255,215,120,.12)!important;
+ pointer-events:none!important;
+}
+.rr-card.rr-card-set-wide .rr-card-image{
+ width:100%!important;
+ height:100%!important;
+ object-fit:cover!important;
+ object-position:center center!important;
+}
+.rr-card.rr-card-set-wide .rr-card-info{
+ grid-row:2!important;
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:auto auto auto auto!important;
+ align-content:stretch!important;
+ align-items:stretch!important;
+ gap:8px!important;
+ width:100%!important;
+ height:auto!important;
+ min-width:0!important;
+ min-height:0!important;
+ margin:0!important;
+ padding:10px 12px 12px!important;
+ overflow:visible!important;
+ background:linear-gradient(180deg,#0b1218 0%,#050a0e 100%)!important;
+}
+.rr-card.rr-card-set-wide .rr-card-title{
+ grid-row:1!important;
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ width:100%!important;
+ height:auto!important;
+ min-width:0!important;
+ min-height:36px!important;
+ max-height:none!important;
+ margin:0!important;
+ padding:6px 12px!important;
+ overflow:visible!important;
+ font-size:clamp(17px,4.7vw,24px)!important;
+ line-height:1.12!important;
+ white-space:normal!important;
+}
+.rr-card.rr-card-set-wide .rr-card-description{
+ grid-row:2!important;
+ display:-webkit-box!important;
+ -webkit-box-orient:vertical!important;
+ -webkit-line-clamp:2!important;
+ width:100%!important;
+ height:auto!important;
+ min-width:0!important;
+ min-height:0!important;
+ max-height:3.2em!important;
+ margin:0!important;
+ padding:8px 10px!important;
+ overflow:hidden!important;
+ font-size:clamp(11px,3.4vw,15px)!important;
+ line-height:1.25!important;
+}
+.rr-card.rr-card-set-wide .rr-card-meta-row{
+ grid-row:3!important;
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) minmax(108px,30%)!important;
+ align-items:stretch!important;
+ gap:8px!important;
+ width:100%!important;
+ height:auto!important;
+ min-width:0!important;
+ min-height:42px!important;
+ margin:0!important;
+ padding:0!important;
+ overflow:visible!important;
+}
+.rr-card.rr-card-set-wide .rr-card-meta,
+.rr-card.rr-card-set-wide .rr-card-composition{
+ width:100%!important;
+ min-width:0!important;
+ min-height:42px!important;
+ height:auto!important;
+ margin:0!important;
+}
+.rr-card.rr-card-set-wide .rr-card-meta{
+ display:flex!important;
+ flex-wrap:wrap!important;
+ align-items:center!important;
+ justify-content:space-evenly!important;
+ gap:5px!important;
+ padding:5px 7px!important;
+ font-size:clamp(10px,2.8vw,14px)!important;
+}
+.rr-card.rr-card-set-wide .rr-card-composition{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ padding:6px 8px!important;
+ font-size:clamp(10px,2.8vw,14px)!important;
+}
+.rr-card.rr-card-set-wide .rr-card-purchase{
+ grid-row:4!important;
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) 68px!important;
+ align-items:center!important;
+ gap:10px!important;
+ width:100%!important;
+ height:auto!important;
+ min-width:0!important;
+ min-height:58px!important;
+ margin:0!important;
+ padding:6px 8px 6px 12px!important;
+ overflow:visible!important;
+}
+.rr-card.rr-card-set-wide .rr-card-price{
+ font-size:clamp(21px,6vw,30px)!important;
+ line-height:1!important;
+}
+.rr-card.rr-card-set-wide .rr-card-add,
+.rr-card.rr-card-set-wide .rr-card-stepper{
+ justify-self:end!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:none!important;
+ height:46px!important;
+ min-height:46px!important;
+ margin:0!important;
+}
+.rr-card.rr-card-set-wide .rr-card-add{font-size:34px!important;}
+.rr-card.rr-card-set-wide .rr-card-stepper button{font-size:22px!important;}
+.rr-card.rr-card-set-wide .rr-card-heart{z-index:5!important;}
+@media(max-width:390px){
+ .rr-card.rr-card-set-wide .rr-card-photo{aspect-ratio:16 / 8.2!important;}
+ .rr-card.rr-card-set-wide .rr-card-info{gap:6px!important;padding:8px 9px 10px!important;}
+ .rr-card.rr-card-set-wide .rr-card-meta-row{grid-template-columns:minmax(0,1fr) minmax(96px,31%)!important;gap:5px!important;}
+ .rr-card.rr-card-set-wide .rr-card-meta,
+ .rr-card.rr-card-set-wide .rr-card-composition{min-height:38px!important;font-size:clamp(9px,2.7vw,12px)!important;}
+ .rr-card.rr-card-set-wide .rr-card-purchase{grid-template-columns:minmax(0,1fr) 58px!important;min-height:52px!important;}
+ .rr-card.rr-card-set-wide .rr-card-add,
+ .rr-card.rr-card-set-wide .rr-card-stepper{height:42px!important;min-height:42px!important;}
+}
