@@ -57,8 +57,8 @@ const photoFallback=p=>PRODUCT_PHOTO_PLACEHOLDER;
 const productTotal=()=>state.products.reduce((sum,p)=>sum+p.price*qty(p.id),0);
 const cartCount=()=>Object.values(state.cart).reduce((sum,n)=>sum+Number(n||0),0);
 const setPrice=s=>(s.items||[]).reduce((sum,i)=>sum+(find(i.id)?.price||0)*Number(i.qty||0),0);
-const setPieces=s=>(s.items||[]).reduce((sum,i)=>sum+(Number(find(i.id)?.pieces)||8)*Number(i.qty||0),0);
-const setWeight=s=>(s.items||[]).reduce((sum,i)=>sum+(parseInt(find(i.id)?.weight,10)||0)*Number(i.qty||0),0);
+const setPieces=s=>{const saved=Number(s?.pieces);return Number.isInteger(saved)&&saved>0?saved:(s.items||[]).reduce((sum,i)=>sum+(Number(find(i.id)?.pieces)||8)*Number(i.qty||0),0);};
+const setWeight=s=>{const saved=parseInt(s?.weight,10);return Number.isFinite(saved)&&saved>0?saved:(s.items||[]).reduce((sum,i)=>sum+(parseInt(find(i.id)?.weight,10)||0)*Number(i.qty||0),0);};
 function toast(msg){const n=$('#toast');n.textContent=msg;n.classList.add('show');clearTimeout(state.toastTimer);state.toastTimer=setTimeout(()=>n.classList.remove('show'),2600);}
 function save(){try{localStorage.setItem('tihiy-stage1-cart',JSON.stringify(state.cart));localStorage.setItem('tihiy-stage1-fav',JSON.stringify(Array.from(state.favorites)));localStorage.setItem('tihiy-stage1-sets',JSON.stringify(state.setCounts));}catch(e){}}
 function loadSaved(){try{state.cart=JSON.parse(localStorage.getItem('tihiy-stage1-cart')||'{}');state.favorites=new Set(JSON.parse(localStorage.getItem('tihiy-stage1-fav')||'[]'));state.setCounts=JSON.parse(localStorage.getItem('tihiy-stage1-sets')||'{}');let migrated=false;const legacyPankoQty=Number(state.cart.philadelphia||0);if(legacyPankoQty>0){state.cart.shrimp_panko=Number(state.cart.shrimp_panko||0)+legacyPankoQty;delete state.cart.philadelphia;migrated=true;}if(state.favorites.has('philadelphia')){state.favorites.delete('philadelphia');state.favorites.add('shrimp_panko');migrated=true;}if(migrated)save();}catch(e){}}
@@ -83,7 +83,12 @@ function mergeCatalogueSets(remoteRows){
  if(rows.length&&!rows.some(row=>row.active!==false))rows.forEach(row=>{row.active=true});
  return rows;
 }
-function setCards(){return state.sets.filter(s=>s.active!==false).map(s=>({id:'set:'+s.id,set:s,name:s.name||SET_NAMES[s.id]||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',cat:'sets',badge:s.id==='newyear'?'НОВИНКА':'',photo:setImage(s),desc:s.description||'Готовый набор роллов.'}));}
+function setCards(){return state.sets.filter(s=>s.active!==false).map(s=>{
+ const hasCardText=Object.prototype.hasOwnProperty.call(s,'card_description');
+ const hasPageText=Object.prototype.hasOwnProperty.call(s,'desc');
+ const badge=Object.prototype.hasOwnProperty.call(s,'badge')?String(s.badge||''):(s.id==='newyear'?'НОВИНКА':'');
+ return {id:'set:'+s.id,set:s,name:s.name||SET_NAMES[s.id]||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',cat:'sets',badge,photo:setImage(s),desc:hasPageText?s.desc:(s.description||'Готовый набор роллов.'),card_description:hasCardText?s.card_description:(s.description||'Готовый набор роллов.'),details:s.details||''};
+});}
 function productCategory(p){
  const raw=String(p.cat||p.category_id||p.category||'').toLowerCase().trim();
  const c=raw.replace(/[ _]+/g,'-');
@@ -211,7 +216,7 @@ function showBuilderInfo(id){
  const key=String(id||'');let item;
  if(key.startsWith('set:')){
   const s=state.sets.find(row=>row.id===key.slice(4));if(!s)return;
-  item={id:key,name:SET_NAMES[s.id]||s.name||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',desc:s.description||'Готовый набор роллов.',set:s};
+  item={id:key,name:SET_NAMES[s.id]||s.name||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',desc:Object.prototype.hasOwnProperty.call(s,'desc')?s.desc:(s.description||'Готовый набор роллов.'),card_description:Object.prototype.hasOwnProperty.call(s,'card_description')?s.card_description:(s.description||''),details:s.details||'',set:s};
  }else item=find(key);
  if(!item)return;
  $('#builderInfoName').textContent=item.name;
@@ -219,9 +224,11 @@ function showBuilderInfo(id){
  $('#builderInfoPieces').textContent=(Number(item.pieces)||8)+' шт.';
  $('#builderInfoWeight').textContent=item.weight||'280 г';
  $('#builderInfoPrice').textContent=money(item.price);
- $('#builderInfoIngredients').innerHTML=item.set
-  ?(item.set.items||[]).map(row=>{const p=find(row.id);return p?'<div class="set-info-component"><b>'+esc(p.name)+(Number(row.qty)>1?' × '+row.qty:'')+'</b><div class="set-component-ingredients">'+ingredientCompactMarkup(p)+'</div></div>':'';}).join('')||'<div class="ingredient-chip"><strong>🍽️</strong><span>Состав уточняется</span></div>'
-  :ingredientMarkup(item);
+ $('#builderInfoIngredients').innerHTML=item.set&&compositionValue(item.set.details)
+  ?ingredientMarkup(item)
+  :item.set
+   ?(item.set.items||[]).map(row=>{const p=find(row.id);return p?'<div class="set-info-component"><b>'+esc(p.name)+(Number(row.qty)>1?' × '+row.qty:'')+'</b><div class="set-component-ingredients">'+ingredientCompactMarkup(p)+'</div></div>':'';}).join('')||'<div class="ingredient-chip"><strong>🍽️</strong><span>Состав уточняется</span></div>'
+   :ingredientMarkup(item);
  openModal('builderInfoModal');
 }
 function allRows(){
@@ -256,7 +263,7 @@ function card(p){
  const image=p.id==='shrimp_panko'?'https://d2ol7oe51mr4n9.cloudfront.net/user_3Ko71bIJnzA2ooDrjzm38jCchY8/a4f0ca39-9e57-4852-a2be-008127afba9f.webp':photo(p),imageFallback=image===photo(p)?photoFallback(p):photo(p);
  const heart='<button class="rr-card-heart '+(fav?'active':'')+'" type="button" data-fav="'+id+'" aria-pressed="'+(fav?'true':'false')+'" aria-label="'+(fav?'Удалить из избранного':'Добавить в избранное')+'">'+(fav?'♥':'♡')+'</button>';
  const cleanBadge=String(p.badge||'').trim();
- const badge=hit&&!artPhoto?'<span class="rr-card-hit-badge '+(p.id==='salmon_panko'?'rr-salmon-panko-hit':'')+'">✦ ХИТ</span>':(!hit&&cleanBadge&&!/хит/i.test(cleanBadge)?'<span class="rr-card-badge">'+esc(cleanBadge)+'</span>':'');
+ const badge=hit&&!artPhoto?'<span class="rr-card-hit-badge '+(p.id==='salmon_panko'?'rr-salmon-panko-hit':'')+'">✦ ХИТ</span>':(isSet&&/^хит$/i.test(cleanBadge)?'<span class="rr-card-hit-badge">✦ ХИТ</span>':(!hit&&cleanBadge&&!/хит/i.test(cleanBadge)?'<span class="rr-card-badge">'+esc(cleanBadge)+'</span>':''));
  return '<article class="product-card rr-card '+(isSet?'rr-card-set ':'')+(wideSet?'rr-card-set-wide ':'')+(pankoCard?'rr-card-panko ':'')+(hit?'rr-card-is-hit ':'')+(state.selected?.id===p.id?'is-selected ':'')+(!available?'is-unavailable':'')+'" data-card="'+id+'">'
   +'<div class="rr-card-photo '+(artPhoto?'rr-card-photo-art':'')+'"><img class="rr-card-image" src="'+image+'" data-image-fallback="'+esc(imageFallback)+'" alt="'+esc(p.name)+'" loading="'+(['california','philadelphia','shrimp_panko','salmon_panko'].includes(p.id)?'eager':'lazy')+'" decoding="async" fetchpriority="'+(['california','philadelphia','shrimp_panko','salmon_panko'].includes(p.id)?'high':'low')+'">'+badge+heart+'</div>'
   +'<div class="rr-card-info">'
@@ -455,8 +462,12 @@ function detail(p,openOnMobile=true){
  $('#detailCompositionTitle').textContent=p.set?'Состав сета':'Состав';
  $('#photoStrip').innerHTML=state.photos.map((src,i)=>'<button class="thumb '+(i===0?'active':'')+'" type="button" data-photo-index="'+i+'"><img src="'+src+'" data-image-fallback="'+esc(p.set?PRODUCT_PHOTO_PLACEHOLDER:photoFallback(p))+'" alt="Фото '+(i+1)+'" loading="lazy" decoding="async"></button>').join('')+'<button class="thumb thumb-next" type="button" data-gallery-next>›</button>';
  const counter=$('#detailPhotoCount');if(counter){counter.textContent='1 / '+Math.max(1,state.photos.length);counter.hidden=state.photos.length<2;}
- const grid=$('#ingredientGrid');grid.classList.toggle('set-composition-grid',!!p.set);
- if(p.set){
+ const grid=$('#ingredientGrid');
+ const hasSetIngredients=!!(p.set&&compositionValue(p.set.details));
+ grid.classList.toggle('set-composition-grid',!!p.set&&!hasSetIngredients);
+ if(hasSetIngredients){
+   grid.innerHTML=ingredientMarkup(p);
+ }else if(p.set){
    const rows=(p.set.items||[]).map(item=>{const component=find(item.id);if(!component)return '';const pieces=Number(component.pieces)||8;const multiplier=Number(item.qty)||1;return '<div class="set-component" title="'+esc(component.name)+'"><img src="'+photo(component)+'" data-image-fallback="'+esc(photoFallback(component))+'" alt="'+esc(component.name)+'" loading="lazy"><b>'+esc(component.name)+'</b><small>'+pieces+' шт.'+(multiplier>1?' × '+multiplier:'')+'</small><div class="set-component-ingredients">'+ingredientCompactMarkup(component)+'</div></div>';}).filter(Boolean);
    grid.innerHTML=rows.length?rows.join(''):'<div class="set-component-empty">Состав пока не заполнен.</div>';
  }else{
@@ -468,7 +479,7 @@ function detail(p,openOnMobile=true){
  if(openOnMobile)loadDetailGallery(p);
  renderCatalog();
 }
-function setDetail(s){detail({id:'set:'+s.id,name:SET_NAMES[s.id]||s.name||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',set:s,desc:s.description||'Готовый набор роллов.'});}
+function setDetail(s){detail({id:'set:'+s.id,name:SET_NAMES[s.id]||s.name||'Готовый сет',price:setPrice(s),pieces:setPieces(s),weight:setWeight(s)+' г',set:s,desc:Object.prototype.hasOwnProperty.call(s,'desc')?s.desc:(s.description||'Готовый набор роллов.'),card_description:Object.prototype.hasOwnProperty.call(s,'card_description')?s.card_description:(s.description||''),details:s.details||''});}
 function openSetFromHome(id){
  state.filter='sets';state.search='';returnToCatalogue();syncHomeShortcutState();
  $$('.category-tile').forEach(button=>button.classList.toggle('active',button.dataset.filter==='sets'));
