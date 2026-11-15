@@ -118,6 +118,10 @@ function productCardDescription(p){
  return compositionValue(p?.desc)||compositionValue(p?.description)||productDescription(p);
 }
 function productDescription(p){
+ if(p?.set){
+  const setText=compositionValue(p.desc);
+  return setText||'Готовый набор роллов из ассортимента «Тихий ролл».';
+ }
  const details=compositionValue(p?.details)||compositionValue(p?.composition)||compositionValue(p?.ingredients);
  const desc=compositionValue(p?.short_description)||compositionValue(p?.shortDescription)||compositionValue(p?.short_desc)||compositionValue(p?.desc)||compositionValue(p?.description);
  if(desc&&/временная карточка-образец/i.test(desc)&&details)return details;
