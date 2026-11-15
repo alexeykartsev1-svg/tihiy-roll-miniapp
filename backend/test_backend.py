@@ -158,6 +158,28 @@ def main() -> None:
         backend.PRODUCTS_FILE = original_products_file_for_sets
         backend.admin_from_header = original_admin_from_header
 
+    original_legacy_site_files = backend.SITE_CONTENT_LEGACY_FILES
+    original_site_content_logged = backend._SITE_CONTENT_STATUS_LOGGED
+    try:
+        with tempfile.TemporaryDirectory() as temporary:
+            legacy_file = os.path.join(temporary, "legacy-site-content.json")
+            persistent_file = os.path.join(temporary, "persistent", "site-content.json")
+            legacy_image = "data:image/webp;base64,ZA=="
+            with open(legacy_file, "w", encoding="utf-8") as legacy_handle:
+                json.dump({"sets": [{"id": "solo", "image": legacy_image, "photos": ["data:image/webp;base64,ZQ=="]}]}, legacy_handle)
+            backend.SITE_CONTENT_FILE = persistent_file
+            backend.SITE_CONTENT_LEGACY_FILES = [legacy_file]
+            backend._SITE_CONTENT_STATUS_LOGGED = False
+            migrated_content = backend.read_site_content()
+            migrated_solo = next(row for row in migrated_content["sets"] if row["id"] == "solo")
+            assert migrated_solo["image"] == legacy_image
+            assert migrated_solo["photos"] == ["data:image/webp;base64,ZQ=="]
+            assert os.path.isfile(persistent_file)
+    finally:
+        backend.SITE_CONTENT_FILE = original_site_content_file
+        backend.SITE_CONTENT_LEGACY_FILES = original_legacy_site_files
+        backend._SITE_CONTENT_STATUS_LOGGED = original_site_content_logged
+
     try:
         ProductPayload(
             id="bad_roll",
