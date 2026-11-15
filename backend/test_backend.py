@@ -143,10 +143,6 @@ def main() -> None:
             public_set = backend._catalog_set_payload(saved_set)
             assert public_set["desc"] == "Страница" and public_set["details"] == "Лосось, сыр, рис, нори"
             assert public_set["weight"] == "640 г" and public_set["pieces"] == 16 and public_set["pieces_manual"] is True and public_set["badge"] == "ХИТ"
-    finally:
-        backend.SITE_CONTENT_FILE = original_site_content_file
-        backend.PRODUCTS_FILE = original_products_file_for_sets
-        backend.admin_from_header = original_admin_from_header
             # Blank/missing image values must preserve artwork; clear only explicitly.
             assert backend._resolve_site_set_image({"image": ""}, {"image": original_main_photo}) == original_main_photo
             assert backend._resolve_site_set_image({}, {"image": original_main_photo}) == original_main_photo
@@ -157,6 +153,11 @@ def main() -> None:
             with open(backup_path, "r", encoding="utf-8") as backup_file:
                 backup_data = json.load(backup_file)
             assert backup_data["sets"][0]["image"] == original_main_photo
+    finally:
+        backend.SITE_CONTENT_FILE = original_site_content_file
+        backend.PRODUCTS_FILE = original_products_file_for_sets
+        backend.admin_from_header = original_admin_from_header
+
     try:
         ProductPayload(
             id="bad_roll",
