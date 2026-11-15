@@ -85,13 +85,16 @@ def main() -> None:
         with tempfile.TemporaryDirectory() as temporary:
             backend.SITE_CONTENT_FILE = os.path.join(temporary, "site-content.json")
             backend.PRODUCTS_FILE = os.path.join(temporary, "products.json")
-            backend.write_products([{"id": "philadelphia", "name": "Филадельфия", "price": 500, "pieces": 8, "weight": "300 г", "active": True}])
+            backend.write_products([
+                {"id": "philadelphia", "name": "Филадельфия", "price": 500, "pieces": 8, "weight": "300 г", "active": True},
+                {"id": "lava", "name": "Лава", "price": 450, "pieces": 8, "weight": "280 г", "active": True},
+            ])
             backend.admin_from_header = lambda _header: None
             saved_content = asyncio.run(backend.admin_update_site_content({
                 "sets": [{
                     "id": "solo", "description": "Карточка", "desc": "Страница", "card_description": "Карточка",
                     "details": "Лосось, сыр, рис, нори", "weight": "640 г", "pieces": 16, "badge": "ХИТ",
-                    "image": "", "photos": [], "items": [{"id": "philadelphia", "qty": 1}], "active": True, "stock": None
+                    "image": "", "photos": [], "items": [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 2}], "active": True, "stock": None
                 }]
             }, "test-init-data"))
             saved_set = saved_content["content"]["sets"][0]
@@ -101,6 +104,7 @@ def main() -> None:
             assert saved_set["details"] == "Лосось, сыр, рис, нори"
             assert saved_set["weight"] == "640 г" and saved_set["pieces"] == 16
             assert saved_set["badge"] == "ХИТ"
+            assert saved_set["items"] == [{"id": "philadelphia", "qty": 1}, {"id": "lava", "qty": 2}]
             public_set = backend._catalog_set_payload(saved_set)
             assert public_set["desc"] == "Страница" and public_set["details"] == "Лосось, сыр, рис, нори"
             assert public_set["weight"] == "640 г" and public_set["pieces"] == 16 and public_set["badge"] == "ХИТ"
