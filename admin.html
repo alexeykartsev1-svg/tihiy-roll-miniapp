@@ -276,7 +276,7 @@ $('photoFile').addEventListener('change',async event=>{
  $('photoPreview').src=previewUrl;
  photoUploadFailed=false;photoProcessingError='';photoProcessing=true;status('Фото выбрано. Подготавливаем его…');
  try{
-  const compressed=await compressImage(file,{maxDimension:1600,maxLength:1000000});
+  const compressed=await compressImage(file,{maxDimension:1400,maxLength:650000});
   photoData=compressed;photoCleared=false;
   $('photoPreview').src=compressed;
   status('Фото подготовлено. Нажми «Сохранить».','ok');
