@@ -1878,6 +1878,7 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
             details = item.get("details", existing_set.get("details", ""))
             weight = item.get("weight", existing_set.get("weight", ""))
             pieces = item.get("pieces", existing_set.get("pieces"))
+            pieces_manual = item.get("pieces_manual", existing_set.get("pieces_manual", False))
             badge = item.get("badge", existing_set.get("badge", "НОВИНКА" if set_id == "newyear" else ""))
             image = item.get("image", existing_set.get("image", ""))
             for field_name, field_value in (("описание на странице товара", page_description), ("текст в карточке каталога", card_description), ("ингредиенты", details)):
@@ -1889,6 +1890,8 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: вес должен быть текстом до 30 символов.")
             if pieces is not None and (not isinstance(pieces, int) or isinstance(pieces, bool) or not 1 <= pieces <= 100):
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: количество штук должно быть от 1 до 100.")
+            if not isinstance(pieces_manual, bool):
+                raise HTTPException(status_code=400, detail=f"Сет {index+1}: режим ручного количества должен быть true/false.")
             if not isinstance(badge, str) or badge not in {"", "ХИТ", "НОВИНКА", "СКИДКА"}:
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: выбери плашку ХИТ, НОВИНКА, СКИДКА или «Без плашки».")
             if not isinstance(image, str) or len(image) > 1_000_000:
@@ -1928,7 +1931,7 @@ async def admin_update_site_content(payload: dict[str, Any], x_telegram_init_dat
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: признак активности должен быть true/false.")
             if stock is not None and (not isinstance(stock, int) or isinstance(stock, bool) or not 0 <= stock <= 10000):
                 raise HTTPException(status_code=400, detail=f"Сет {index+1}: остаток должен быть пустым (без учёта) или от 0 до 10 000.")
-            clean_sets.append({"id": set_id, "description": card_description.strip(), "desc": page_description.strip(), "card_description": card_description.strip(), "details": details.strip(), "weight": weight.strip(), "pieces": pieces, "badge": badge, "image": image.strip(), "photos": clean_photos, "items": clean_items, "active": active, "stock": stock})
+            clean_sets.append({"id": set_id, "description": card_description.strip(), "desc": page_description.strip(), "card_description": card_description.strip(), "details": details.strip(), "weight": weight.strip(), "pieces": pieces, "pieces_manual": pieces_manual, "badge": badge, "image": image.strip(), "photos": clean_photos, "items": clean_items, "active": active, "stock": stock})
             seen.add(set_id)
         current["sets"] = clean_sets
     if "seasonal_banners" in payload:
