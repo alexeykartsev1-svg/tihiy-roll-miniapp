@@ -341,6 +341,7 @@ $('delete').addEventListener('click',async()=>{
 });
 let siteSeasonalBanners=[];
 let siteSetPhotoProcessing={},siteSetPhotoFailed={},siteSetGalleryProcessing={},siteSetGalleryFailed={};
+let siteSetGalleryLoaded={},siteSetPhotoCleared={};
 
 function collectSetContentPayload(){
  const ids=['solo','duo','party','newyear','autumn','winter','spring','summer'];
@@ -353,7 +354,11 @@ function collectSetContentPayload(){
  return ids.map(id=>{
   const description=document.querySelector('[data-set-field="'+id+'"]');
   const url=document.querySelector('[data-set-url="'+id+'"]');
-  return {id,description:description?description.value.trim():'',image:siteSetPhotos[id]||(url?url.value.trim():''),photos:(siteSetGalleryPhotos[id]||[]).slice(0,5),items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
+  const row={id,description:description?description.value.trim():'',items:(siteSetItems[id]||[]).filter(item=>item.qty>0),active:siteSetActive[id]!==false,stock:siteSetStock[id]==null?null:Math.max(0,Number(siteSetStock[id])||0)};
+  const image=siteSetPhotos[id]||(url?url.value.trim():'');
+  if(image||siteSetPhotoCleared[id])row.image=image;
+  if(siteSetGalleryLoaded[id])row.photos=(siteSetGalleryPhotos[id]||[]).slice(0,5);
+  return row;
  });
 }
 
@@ -361,21 +366,27 @@ async function saveSetContentOnly(){
  const button=$('saveSetsFull');
  const notice=$('saveSetsStatus');
  if(button){button.disabled=true;button.textContent='Сохраняем…'}
- if(notice){notice.textContent='Отправляем сеты и фотографии на сервер…';notice.className='muted'}
+ if(notice){notice.textContent='Отправляем изменения сетов на сервер…';notice.className='muted'}
  status('Сохраняем готовые сеты и фотографии…');
  try{
   const sets=collectSetContentPayload();
-  await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify({sets})});
-  const verify=await api('/api/admin/site-content');
+  const saved=await api('/api/admin/site-content',{method:'PUT',body:JSON.stringify({sets})});
+  const verify=saved.content||await api('/api/admin/site-content');
   const savedSets=Array.isArray(verify.sets)?verify.sets:[];
   const mismatches=sets.filter(expected=>{
    const actual=savedSets.find(row=>row&&row.id===expected.id);
    if(!actual)return true;
-   return actual.description!==expected.description||actual.image!==expected.image||JSON.stringify(actual.photos||[])!==JSON.stringify(expected.photos)||JSON.stringify(actual.items||[])!==JSON.stringify(expected.items)||actual.active!==expected.active||(actual.stock??null)!==(expected.stock??null);
+   if(actual.description!==expected.description||JSON.stringify(actual.items||[])!==JSON.stringify(expected.items)||actual.active!==expected.active||(actual.stock??null)!==(expected.stock??null))return true;
+   if(Object.prototype.hasOwnProperty.call(expected,'image')){
+    if(String(expected.image||'').startsWith('data:image/')){if(!actual.image_url)return true}
+    else if((actual.image||'')!==expected.image)return true;
+   }
+   if(Object.prototype.hasOwnProperty.call(expected,'photos')&&Number(actual.photos_count||0)!==expected.photos.length)return true;
+   return false;
   });
   if(mismatches.length)throw new Error('Сервер не подтвердил сохранение сетов: '+mismatches.map(row=>row.id).join(', ')+'.');
   siteContent=verify;
-  const message='Сеты, главные фотографии и дополнительные фото сохранены и подтверждены сервером.';
+  const message='Изменения сетов сохранены и подтверждены сервером. Дополнительные галереи загружаются отдельно.';
   status(message,'ok');
   if(notice){notice.textContent=message;notice.className='status ok'}
   return true;
